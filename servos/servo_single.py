@@ -2,7 +2,7 @@ from dynamixel_sdk import *  # pip install dynamixel-sdk
 import time
 
 # ====== USER SETTINGS ======
-DEVICENAME = "COM4"  # change if different
+DEVICENAME = "/dev/ttyUSB0"  # change if different
 BAUDRATE = 1_000_000           # AX-12A default baud
 DXL_ID = 0                   # your servo ID (change if needed)
 PROTOCOL_VERSION = 1.0       # AX-12A uses Protocol 1.0
