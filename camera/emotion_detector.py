@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import time
 import tensorflow as tf
-from tensorflow.lite import Interpreter
+from tensorflow.lite.python import Interpreter
    
 
 class EmotionDetectorTFLite:
@@ -84,101 +84,72 @@ class EmotionDetectorTFLite:
         
         return dominant_emotion, emotions
 
-def detect_emotion_realtime(model_path='model.tflite'):
-    """Run real-time emotion detection"""
-    
-    # Initialize detector
+
+def detect_emotion_realtime(model_path='model/face_model.tflite'):
+    """Run real-time emotion detection using Picamera2 frames."""
     detector = EmotionDetectorTFLite(model_path)
-    
-    # Initialize webcam
-    cap = cv2.VideoCapture(0)
-    
-    if not cap.isOpened():
-        print("Error: Could not open webcam")
-        return
-    
-    print("\nStarting emotion detection with TFLite. Press 'q' to quit.")
-    
-    # FPS calculation
+
+    # --- Picamera2 init (fast on Pi 3 B+) ---
+    picam2 = Picamera2()
+    config = picam2.create_preview_configuration(main={"size": (640, 480)})
+    picam2.configure(config)
+    picam2.start()
+    print("\nStarting emotion detection (Picamera2 + TFLite). Press 'q' to quit.")
+
     fps_start_time = time.time()
     fps_frame_count = 0
     fps = 0
-    
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("Failed to grab frame")
-            break
-        
-        # Convert to grayscale for face detection
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        
-        # Detect faces
-        faces = detector.face_cascade.detectMultiScale(
-            gray, 
-            scaleFactor=1.1, 
-            minNeighbors=5, 
-            minSize=(30, 30)
-        )
 
-        # faces = [_pick_face(faces)]
-        
-        # Process each face
-        for (x, y, w, h) in faces:
-            
-            # Extract face ROI
-            face_roi = frame[y:y+h, x:x+w]
-            
-            try:
-                # Predict emotion
-                dominant_emotion, emotions = detector.predict_emotion(face_roi)
-                confidence = emotions[dominant_emotion]
+    try:
+        while True:
+            # Picamera2 returns RGB; convert to BGR for OpenCV drawing and consistency
+            frame_rgb = picam2.capture_array()
+            frame = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
 
-                print("Dominant Emotion: ", dominant_emotion)
-                print("Emotions: ", emotions)
+            # Face detection uses grayscale
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-                
-                # Draw rectangle around face
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-                
-                # Display dominant emotion
-                text = f"{dominant_emotion}: {confidence:.2f}"
-                cv2.putText(frame, text, (x, y-10),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
-                
-                # Display top 3 emotions
-                sorted_emotions = sorted(emotions.items(), key=lambda x: x[1], reverse=True)[:3]
-                y_offset = y + h + 25
-                for emotion, score in sorted_emotions:
-                    text = f"{emotion}: {score:.2f}"
-                    cv2.putText(frame, text, (x, y_offset),
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-                    y_offset += 20
-                    
-            except Exception as e:
-                print(f"Error processing face: {e}")
-        
-        # Calculate FPS
-        fps_frame_count += 1
-        if time.time() - fps_start_time > 1:
-            fps = fps_frame_count
-            fps_frame_count = 0
-            fps_start_time = time.time()
-        
-        # Display FPS and face count
-        cv2.putText(frame, f"FPS: {fps} | Faces: {len(faces)}", (10, 30),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-        
-        # Show frame
-        cv2.imshow('TFLite Emotion Detection', frame)
-        
-        # Press 'q' to quit
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    
-    # Cleanup
-    cap.release()
-    cv2.destroyAllWindows()
+            faces = detector.face_cascade.detectMultiScale(
+                gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
+            )
+
+            for (x, y, w, h) in faces:
+                face_roi = frame[y:y+h, x:x+w]
+
+                try:
+                    dominant_emotion, emotions = detector.predict_emotion(face_roi)
+                    confidence = emotions[dominant_emotion]
+
+                    # Draws on BGR frame
+                    cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                    cv2.putText(frame, f"{dominant_emotion}: {confidence:.2f}",
+                                (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+                    top3 = sorted(emotions.items(), key=lambda kv: kv[1], reverse=True)[:3]
+                    y_off = y + h + 25
+                    for lab, p in top3:
+                        cv2.putText(frame, f"{lab}: {p:.2f}", (x, y_off),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+                        y_off += 20
+                except Exception as e:
+                    print(f"Error processing face: {e}")
+
+            # FPS
+            fps_frame_count += 1
+            if time.time() - fps_start_time > 1:
+                fps = fps_frame_count
+                fps_frame_count = 0
+                fps_start_time = time.time()
+
+            cv2.putText(frame, f"FPS: {fps} | Faces: {len(faces)}", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+            cv2.imshow('Emotion Detection (Picamera2)', frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    finally:
+        picam2.stop()
+        cv2.destroyAllWindows()
 
 def _pick_face(faces):
     sortes_faces = sorted(faces, key=lambda x: x[2]*x[3])
