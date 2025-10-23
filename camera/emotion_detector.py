@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import time
 import tensorflow as tf
-from tensorflow.lite.python import Interpreter
+from tensorflow.lite.python.interpreter import Interpreter
    
 
 class EmotionDetectorTFLite:
@@ -160,5 +160,5 @@ if __name__ == "__main__":
     import sys
     
     # Run real-time detection
-    model_path = sys.argv[1] if len(sys.argv) > 1 else 'models/face_model1.tflite'
+    model_path = sys.argv[1] if len(sys.argv) > 1 else 'model/face_model.tflite'
     detect_emotion_realtime(model_path)
