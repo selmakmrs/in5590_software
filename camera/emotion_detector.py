@@ -7,7 +7,9 @@ Requires: pip install opencv-python numpy tflite-runtime (or tensorflow)
 import cv2
 import numpy as np
 import time
-from tflite_runtime.interpreter import Interpreter
+import tensorflow as tf
+from tensorflow.lite import Interpreter
+   
 
 class EmotionDetectorTFLite:
     def __init__(self, model_path='model/face_model.tflite'):
