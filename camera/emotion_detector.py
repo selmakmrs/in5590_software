@@ -44,7 +44,7 @@ class EmotionDetectorTFLite:
         
         # Initialize face detector (Haar Cascade - very lightweight)
         self.face_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+            '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
         )
     
     def preprocess_face(self, face_img):
