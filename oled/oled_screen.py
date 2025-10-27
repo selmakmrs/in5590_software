@@ -23,6 +23,7 @@ for driver, W, H in configs:
         
         with canvas(device) as draw:
             draw.text((0,0), "Hello", fill=255)
+            sleep(1)
             draw.rectangle((0,0,50,20), outline=255, fill=0)
         sleep(3)
         print("Display Responded!")
