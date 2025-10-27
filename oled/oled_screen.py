@@ -5,8 +5,8 @@ from PIL import ImageFont
 import RPi.GPIO as GPIO
 from time import sleep
 
-DC = 23
-RST = 24
+DC = 24
+RST = 25
 
 configs = [
     (ssd1306, 64, 48),
@@ -24,7 +24,7 @@ for driver, W, H in configs:
         with canvas(device) as draw:
             draw.text((0,0), "Hello", fill=255)
             draw.rectangle((0,0,50,20), outline=255, fill=0)
-        sleep(2)
+        sleep(3)
         print("Display Responded!")
         break
     except Exception as e:
