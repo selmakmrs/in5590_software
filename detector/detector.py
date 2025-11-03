@@ -12,7 +12,7 @@ class DETECTOR:
     Optimized for Raspberry Pi 3 B+
     """
     
-    def __init__(self, camera_id=0, resolution=(320, 240), model_path=r"C:\Users\selma\Documents\IN5590\pc_test\software_main\detector\model\face_model1.tflite"):
+    def __init__(self, camera_id=0, resolution=(320, 240), model_path=r"/home/pi/in5590_software/detector/model/face_model1.tflite"):
         """
         Initialize camera and detection models
         
@@ -47,7 +47,7 @@ class DETECTOR:
 
         # Initialize face detector (Haar Cascade - very lightweight)
         self.face_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+            '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
         )
 
 
