@@ -9,7 +9,8 @@ import numpy as np
 import time
 import tensorflow as tf
 from tensorflow.lite.python.interpreter import Interpreter
-   
+from picamera2 import Picamera2   
+
 
 class EmotionDetectorTFLite:
     def __init__(self, model_path='model/face_model.tflite'):
