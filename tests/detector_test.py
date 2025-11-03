@@ -18,11 +18,11 @@ while True:
         detector.draw_face_box(frame,face)
         detector.draw_emotion_text(frame,face,emotion,emotion_prob)
 
+    cv2.imshow("Frame", frame)
     key = cv2.waitKey(1)
     if key == ord('q'):
         break
 
-    cv2.imshow("Frame", frame)
 detector.stop_camera()
 
 
