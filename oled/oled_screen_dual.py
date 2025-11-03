@@ -8,13 +8,13 @@ from time import sleep
 
 W, H = 64, 48
 speed = 1_000_000
-DC = 23
-RST = 24
+
+RST = 25
 
 font = ImageFont.load_default()
 
-spi0 = spi(port=0, device=0, gpio_DC=DC, gpio_RST=RST, bus_speed_hz=speed)
-spi1 = spi(port=0, device=1, gpio_DC=DC, gpio_RST=RST, bus_speed_hz=speed)
+spi0 = spi(port=0, device=0, gpio_DC=24, gpio_RST=RST, bus_speed_hz=speed)
+spi1 = spi(port=0, device=1, gpio_DC=23, gpio_RST=RST, bus_speed_hz=speed)
     
 oled0 = ssd1306(spi0, width=W, height=H)
 oled1 = ssd1306(spi1, width=W, height=H)
