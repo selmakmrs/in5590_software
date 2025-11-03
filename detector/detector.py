@@ -12,12 +12,11 @@ class DETECTOR:
     Optimized for Raspberry Pi 3 B+
     """
     
-    def __init__(self, camera_id=0, resolution=(320, 240), model_path=r"/home/pi/in5590_software/detector/model/face_model1.tflite"):
+    def __init__(self, resolution=(320, 240), model_path=r"/home/pi/in5590_software/detector/model/face_model1.tflite"):
         """
         Initialize camera and detection models
         
         Args:
-            camera_id: Camera device ID
             resolution: (width, height) tuple
         """
         self.emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
@@ -50,6 +49,8 @@ class DETECTOR:
             '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
         )
 
+        self.resolution = resolution
+
 
 
     
@@ -60,7 +61,7 @@ class DETECTOR:
 
         # Configure for video capture
         config = self.picam2.create_preview_configuration(
-        main={"size": (640, 480), "format": "RGB888"}
+        main={"size": self.resolution, "format": "RGB888"}
         )
         self.picam2.configure(config)
         
@@ -68,8 +69,8 @@ class DETECTOR:
         self.picam2.start()
         
         # Get frame dimensions
-        self.frame_width = 640
-        self.frame_height = 480
+        self.frame_width = self.resolution[0]
+        self.frame_height = self.resolution[1]
         
         print("Picamera2 started successfully!")
 
@@ -118,9 +119,10 @@ class DETECTOR:
         """
         faces = self.face_cascade.detectMultiScale(
             frame,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(60,60),
+            scaleFactor=1.2,
+            minNeighbors=4,
+            minSize=(40,40),
+            flags=cv2.CASCADE_SCALE_IMAGE,
             )
         
         if len(faces) < 1:
@@ -208,7 +210,7 @@ class DETECTOR:
 
     def _pre_process_face(self, face_frame):
         # Resize to model input_size
-        face_frame = cv2.resize(face_frame,(self.input_width, self.input_height))
+        face_frame = cv2.resize(face_frame,(self.input_width, self.input_height), interpolation=cv2.INTER_LINEAR)
 
         # Convert to grayscale
         if len(face_frame.shape) == 3 and self.input_shape[-1] == 1:
