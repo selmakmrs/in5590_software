@@ -12,13 +12,10 @@
 #
 
 from random import randint
-
-try:
-    from micropython import const
-except ImportError:
-    const = lambda x: x  # fallback for CPython
-
 import time
+
+const = lambda x: x  # fallback for CPython
+
 # Add MicroPython-compatible functions for desktop
 if not hasattr(time, "ticks_ms"):
     time.ticks_ms = lambda: int(time.time() * 1000)
@@ -183,18 +180,18 @@ class RoboEyes():
 		# ---------------
 		#  Eyes Geometry
 		# ---------------
-		self.spaceBetweenDefault = 8
+		self.spaceBetweenDefault = 10
 
 		# --[ EYE LEFT - size and border radius ]--
-		self.eyeLwidthDefault = 36//2
-		self.eyeLheightDefault = 36//2
+		self.eyeLwidthDefault = 36
+		self.eyeLheightDefault = 36
 		self.eyeLwidthCurrent = self.eyeLwidthDefault
 		self.eyeLheightCurrent = 1 # start with closed eye, otherwise set to eyeLheightDefault
 		self.eyeLwidthNext = self.eyeLwidthDefault
 		self.eyeLheightNext = self.eyeLheightDefault
 		self.eyeLheightOffset = 0
 		# Border Radius 
-		self.eyeLborderRadiusDefault = 8//2
+		self.eyeLborderRadiusDefault = 8
 		self.eyeLborderRadiusCurrent = self.eyeLborderRadiusDefault
 		self.eyeLborderRadiusNext = self.eyeLborderRadiusDefault
 
@@ -207,7 +204,7 @@ class RoboEyes():
 		self.eyeRheightNext = self.eyeRheightDefault
 		self.eyeRheightOffset = 0
 		# Border Radius
-		self.eyeRborderRadiusDefault = 8//2
+		self.eyeRborderRadiusDefault = 8
 		self.eyeRborderRadiusCurrent = self.eyeRborderRadiusDefault
 		self.eyeRborderRadiusNext = self.eyeRborderRadiusDefault
 
@@ -240,7 +237,7 @@ class RoboEyes():
 		self.eyelidsHappyBottomOffsetNext = 0
 		# Space between eyes
 		self.spaceBetweenCurrent = self.spaceBetweenDefault
-		self.spaceBetweenNext = 10//2
+		self.spaceBetweenNext = 10
 
 
 		# -----------------
