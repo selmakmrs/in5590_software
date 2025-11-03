@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 from tensorflow.lite.python.interpreter import Interpreter
+from picamera2 import Picamera2
 
 
 
@@ -55,15 +56,29 @@ class DETECTOR:
     # === Camera Control ===
     def start_camera(self):
         """Initialize and start camera capture"""
-        self.cap = cv2.VideoCapture(0)
-        self.frame_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self.frame_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        assert self.cap.isOpened(), "Error: Cound not open camera"
+        self.picam2 = Picamera2()
+
+        # Configure for video capture
+        config = self.picam2.create_preview_configuration(
+        main={"size": (640, 480), "format": "RGB888"}
+        )
+        self.picam2.configure(config)
+        
+        # Start the camera
+        self.picam2.start()
+        
+        # Get frame dimensions
+        self.frame_width = 640
+        self.frame_height = 480
+        
+        print("Picamera2 started successfully!")
 
     
     def stop_camera(self):
         """Release camera resources"""
-        self.cap.release()
+        if hasattr(self, "picam2"):
+            self.picam2.stop()
+            self.picam2.close()
         cv2.destroyAllWindows()
     
     def get_frame(self):
@@ -73,12 +88,14 @@ class DETECTOR:
         Returns:
             frame: numpy array (BGR image)
         """
-        ret, frame = self.cap.read()
-        if not ret:
-            print("Failed to grab frame")
-            return None
-        return frame
-    
+        try:
+            frame = self.picam2.capture_array()
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            return frame
+        except Exception as e:
+            print("Failed to grab frame: ", e)
+            return None 
+
     def get_frame_size(self):
         """
         Get current frame dimensions
@@ -86,7 +103,7 @@ class DETECTOR:
         Returns:
             (width, height): tuple
         """
-        pass
+        return (self.frame_width, self.frame_height)
     
     # === Face Detection ===
     def detect_face(self, frame):
