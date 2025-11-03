@@ -7,7 +7,7 @@ class OLED:
     Typically 128x64 or 128x32 OLED via I2C
     """
     
-    def __init__(self, width=128, height=64, i2c_address=0x3C):
+    def __init__(self, width=128, height=64):
         """
         Initialize OLED display
         
