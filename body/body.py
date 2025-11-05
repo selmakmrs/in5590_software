@@ -333,6 +333,43 @@ class BODY:
             self.set_joint_mode()
             self.home_position()
 
+
+    def jump_left(self, wait=1, go_home=True):
+        self.set_wheel_mode()
+        self.wheel_speed(HEAD_ID,-1023)
+        self.wheel_speed(BODY_ID,1023)
+        time.sleep(0.8)
+        self.wheel_speed(HEAD_ID,0)
+        self.wheel_speed(BODY_ID,0)
+        time.sleep(wait)
+        if go_home:
+            self.wheel_speed(HEAD_ID,1023)
+            self.wheel_speed(BODY_ID,-1023)
+            time.sleep(0.8)
+            self.wheel_speed(HEAD_ID,0)
+            self.wheel_speed(BODY_ID,0)
+            self.set_joint_mode()
+            self.home_position()
+
+
+    def jump_right(self, wait=1, go_home=True):
+        self.set_wheel_mode()
+        self.wheel_speed(HEAD_ID,1023)
+        self.wheel_speed(BODY_ID,-1023)
+        time.sleep(0.8)
+        self.wheel_speed(HEAD_ID,0)
+        self.wheel_speed(BODY_ID,0)
+        time.sleep(wait)
+        if go_home:
+            self.wheel_speed(HEAD_ID,-1023)
+            self.wheel_speed(BODY_ID,1023)
+            time.sleep(0.8)
+            self.wheel_speed(HEAD_ID,0)
+            self.wheel_speed(BODY_ID,0)
+            self.set_joint_mode()
+            self.home_position()
+
+
         
 
 
@@ -536,6 +573,15 @@ if __name__ == "__main__":
         print("Jumping Forward")
         time.sleep(1)
         body.jump_forward()
+
+        time.sleep(1)
+        print("Jumping Left")
+        time.sleep(1)
+        body.jump_left()
+
+        print("Jumping Right")
+        time.sleep(1)
+        body.jump_right()
         # print("\n🧪 Testing basic movements...")
         # body.look_left(30)
         # time.sleep(1)
