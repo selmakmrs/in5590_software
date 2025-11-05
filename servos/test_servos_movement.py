@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
     print("Tesing some basic movements ")
     def look_up(speed = MEDUIM):
-        sec = wheel_postion[MEDUIM][90]
+        sec = wheel_postion[MEDUIM][180]
         wheel_speed(port, pkt, 0, -speed)
         wheel_speed(port, pkt, 1, speed)
         time.sleep(sec)
