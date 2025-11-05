@@ -118,42 +118,64 @@ if __name__ == "__main__":
     MEDUIM = 600
     SLOW = 200
     seconds = [0.5, 1, 1.5, 2, 2.5]
-    print("Testing for FAST SPEED:", FAST)
-    for s in seconds:
-        time.sleep(2)
-        print(f"Testing for {s} seconds")
-        time.sleep(1)
-        wheel_speed(port, pkt,0, FAST)
-        time.sleep(s)
-        wheel_speed(port, pkt,0, -FAST)
-        time.sleep(s)
-        wheel_speed(port, pkt,0, 0)
-        time.sleep(s)
+    # print("Testing for FAST SPEED:", FAST)
+    # for s in seconds:
+    #     time.sleep(2)
+    #     print(f"Testing for {s} seconds")
+    #     time.sleep(1)
+    #     wheel_speed(port, pkt,0, FAST)
+    #     time.sleep(s)
+    #     wheel_speed(port, pkt,0, -FAST)
+    #     time.sleep(s)
+    #     wheel_speed(port, pkt,0, 0)
+    #     time.sleep(s)
 
-    print("Testing for FAST SPEED:", MEDUIM)
-    for s in seconds:
-        time.sleep(2)
-        print(f"Testing for {s} seconds")
-        time.sleep(1)
-        wheel_speed(port, pkt,0, MEDUIM)
-        time.sleep(s)
-        wheel_speed(port, pkt,0, -MEDUIM)
-        time.sleep(s)
-        wheel_speed(port, pkt,0, 0)
-        time.sleep(s)
+    # print("Testing for FAST SPEED:", MEDUIM)
+    # for s in seconds:
+    #     time.sleep(2)
+    #     print(f"Testing for {s} seconds")
+    #     time.sleep(1)
+    #     wheel_speed(port, pkt,0, MEDUIM)
+    #     time.sleep(s)
+    #     wheel_speed(port, pkt,0, -MEDUIM)
+    #     time.sleep(s)
+    #     wheel_speed(port, pkt,0, 0)
+    #     time.sleep(s)
 
 
-    print("Testing for FAST SPEED:", SLOW)
-    for s in seconds:
-        time.sleep(2)
-        print(f"Testing for {s} seconds")
-        time.sleep(1)
-        wheel_speed(port, pkt,0, SLOW)
-        time.sleep(s)
-        wheel_speed(port, pkt,0, -SLOW)
-        time.sleep(s)
-        wheel_speed(port, pkt,0, 0)
-        time.sleep(s)
+    # print("Testing for FAST SPEED:", SLOW)
+    # for s in seconds:
+    #     time.sleep(2)
+    #     print(f"Testing for {s} seconds")
+    #     time.sleep(1)
+    #     wheel_speed(port, pkt,0, SLOW)
+    #     time.sleep(s)
+    #     wheel_speed(port, pkt,0, -SLOW)
+    #     time.sleep(s)
+    #     wheel_speed(port, pkt,0, 0)
+    #     time.sleep(s)
+
+
+    wheel_postion = {
+        FAST : {90 : 1, 180 : 1.5, 270 : 2, 360 : 2.5},
+        MEDUIM : {90 : 1.3, 180 : 2.0, 270 : 2.7},
+        SLOW : {90 : 3}
+    }
+
+    for speed, value in wheel_postion.items():
+        print("Testing Speed: ", speed)
+        for deg, sec in value.items():
+            print("Degree : ", deg)
+            time.sleep(1)
+            wheel_speed(port, pkt, 0, speed)
+            time.sleep(sec)
+            wheel_speed(port, pkt, 0, -speed)
+            time.sleep(sec)
+            wheel_speed(port, pkt, 0, 0)
+            time.sleep(sec)
+
+
+            
     
 
     # print("Spinning forward...")
