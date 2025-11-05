@@ -9,7 +9,7 @@ class LumaSSD1306Shim:
     Matches the MicroPython-ish API RoboEyes expects (fill, fill_rrect, etc.).
     """
     def __init__(self, width=64, height=48, rotate=0,
-                 ce=0, driver="ssd1306", dc=23, rst=24, speed=1_000_000):
+                 ce=0, driver="ssd1306", dc=24, rst=25, speed=1_000_000):
         self.width, self.height = width, height
         self._img = Image.new("1", (width, height), 0)
         self._draw = ImageDraw.Draw(self._img)
