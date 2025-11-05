@@ -162,17 +162,33 @@ if __name__ == "__main__":
         SLOW : {90 : 3}
     }
 
-    for speed, value in wheel_postion.items():
-        print("Testing Speed: ", speed)
-        for deg, sec in value.items():
-            print("Degree : ", deg)
-            time.sleep(1)
-            wheel_speed(port, pkt, 0, speed)
-            time.sleep(sec)
-            wheel_speed(port, pkt, 0, -speed)
-            time.sleep(sec)
-            wheel_speed(port, pkt, 0, 0)
-            time.sleep(sec)
+    # for speed, value in wheel_postion.items():
+    #     print("Testing Speed: ", speed)
+    #     for deg, sec in value.items():
+    #         print("Degree : ", deg)
+    #         time.sleep(1)
+    #         wheel_speed(port, pkt, 0, speed)
+    #         time.sleep(sec)
+    #         wheel_speed(port, pkt, 0, -speed)
+    #         time.sleep(sec)
+    #         wheel_speed(port, pkt, 0, 0)
+    #         time.sleep(sec)
+
+    print("Tesing some basic movements ")
+    def look_up(speed = MEDUIM):
+        sec = wheel_postion[MEDUIM][90]
+        wheel_speed(port, pkt, 0, -speed)
+        wheel_speed(port, pkt, 3, speed)
+        time.sleep(sec)
+        wheel_speed(port, pkt, 0, 0)
+        wheel_speed(port, pkt, 3, 0)
+        time.sleep(1)
+        wheel_speed(port, pkt, 0, speed)
+        wheel_speed(port, pkt, 3, -speed)
+
+
+    look_up()
+
 
 
             
