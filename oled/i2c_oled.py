@@ -62,9 +62,9 @@ robo = RoboEyes(lcd, 128, 64, frame_rate=60, on_show=lcd.on_show)
 
 robo.set_auto_blinker(ON, 3, 2)
 robo.set_idle_mode(ON, 2, 2)
-robo.eyes_width(30,30)
-robo.eyes_height(40,40)
-robo.eyes_spacing(30,30)
+robo.eyes_width(37,37)
+robo.eyes_height(43,43)
+robo.eyes_spacing(30)
 
 # print("Running… close the window or Ctrl+C to exit.")
 # while True:

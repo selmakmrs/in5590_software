@@ -6,7 +6,7 @@ import time
 
 # --- Initialize both OLEDs ---
 oled1 = ssd1306(i2c(port=1, address=0x3C))   # Bus 1 -> pins 3 & 5
-oled2 = ssd1306(i2c(port=0, address=0x3C))   # Bus 0 -> pins 27 & 28
+oled2 = ssd1306(i2c(port=11, address=0x3C))   # Bus 0 -> pins 27 & 28
 
 font = ImageFont.load_default()
 
