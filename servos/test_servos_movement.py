@@ -178,16 +178,16 @@ if __name__ == "__main__":
     def look_up(speed = MEDUIM):
         sec = wheel_postion[MEDUIM][90]
         wheel_speed(port, pkt, 0, -speed)
-        wheel_speed(port, pkt, 3, speed)
+        wheel_speed(port, pkt, 1, speed)
         time.sleep(sec)
         wheel_speed(port, pkt, 0, 0)
-        wheel_speed(port, pkt, 3, 0)
+        wheel_speed(port, pkt, 1, 0)
         time.sleep(1)
         wheel_speed(port, pkt, 0, speed)
-        wheel_speed(port, pkt, 3, -speed)
+        wheel_speed(port, pkt, 1, -speed)
         time.sleep(sec)
         wheel_speed(port, pkt, 0, 0)
-        wheel_speed(port, pkt, 3, 0)
+        wheel_speed(port, pkt, 1, 0)
 
 
 
