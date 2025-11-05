@@ -301,17 +301,17 @@ class BODY:
         """Make the robot jump back"""
         self.set_wheel_mode()
         self.wheel_speed(BASE_ID,900)
-        # self.wheel_speed(BODY_ID,-1000)
+        self.wheel_speed(BODY_ID,-500)
         time.sleep(2)
         self.wheel_speed(BASE_ID,0)
         self.wheel_speed(BODY_ID,0)
         time.sleep(wait)
         if go_home:
             self.wheel_speed(BASE_ID,-900)
-            # self.wheel_speed(BODY_ID,1000)
+            self.wheel_speed(BODY_ID,500)
             time.sleep(2)
             self.wheel_speed(BASE_ID,0)
-            # self.wheel_speed(BODY_ID,0)
+            self.wheel_speed(BODY_ID,0)
             self.set_joint_mode()
             self.home_position()
 
