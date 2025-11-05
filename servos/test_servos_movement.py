@@ -185,6 +185,10 @@ if __name__ == "__main__":
         time.sleep(1)
         wheel_speed(port, pkt, 0, speed)
         wheel_speed(port, pkt, 3, -speed)
+        time.sleep(sec)
+        wheel_speed(port, pkt, 0, 0)
+        wheel_speed(port, pkt, 3, 0)
+
 
 
     look_up()
