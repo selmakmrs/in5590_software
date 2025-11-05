@@ -276,12 +276,12 @@ if __name__ == "__main__":
     # time.sleep(1)
 
 
-    # # --- 3️⃣ Return to JOINT MODE ---
-    # print("\n🔹 Resetting to joint mode & center")
-    # for i in found:
-    #     set_joint_mode(port, pkt, i)
-    #     move_position(port, pkt, i, 512)
-    # time.sleep(2)
+    # --- 3️⃣ Return to JOINT MODE ---
+    print("\n🔹 Resetting to joint mode & center")
+    for i in found:
+        set_joint_mode(port, pkt, i)
+        move_position(port, pkt, i, 512)
+    time.sleep(2)
 
     # --- Cleanup ---
     torque_all(port, pkt, found, False)
