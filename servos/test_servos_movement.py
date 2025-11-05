@@ -123,11 +123,11 @@ if __name__ == "__main__":
         time.sleep(2)
         print(f"Testing for {s} seconds")
         time.sleep(1)
-        wheel_speed(port, pkt, FAST)
+        wheel_speed(port, pkt,0, FAST)
         time.sleep(s)
-        wheel_speed(port, pkt, -FAST)
+        wheel_speed(port, pkt,0, -FAST)
         time.sleep(s)
-        wheel_speed(port, pkt, 0)
+        wheel_speed(port, pkt,0, 0)
         time.sleep(s)
     
 
