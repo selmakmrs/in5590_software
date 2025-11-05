@@ -206,9 +206,9 @@ class BODY:
         Get position - returns tracked position if in wheel mode
         Only reads from servo if in joint mode
         """
-        if self.current_modes[dxl_id] == "wheel":
-            # In wheel mode, position reading is unreliable
-            return self.tracked_positions[dxl_id]
+        # if self.current_modes[dxl_id] == "wheel":
+        #     # In wheel mode, position reading is unreliable
+        #     return self.tracked_positions[dxl_id]
         
         # In joint mode, read actual position
         pos, comm, err = self.pkt.read2ByteTxRx(self.port, dxl_id, ADDR_PRESENT_POSITION)
@@ -360,7 +360,8 @@ class BODY:
 
         for _ in cycles:
             self.move_position(HEAD_ID, current_pos - 100)
-            time.sleep(0.3)
+            while self.is_moving():
+                time.sleep(0.01)
             self.move_position(HEAD_ID, current_pos + 100)
 
         self.home_position()
@@ -398,121 +399,8 @@ class BODY:
         """Pause for duration seconds"""
         time.sleep(duration)
 
-    # === HEAD MOVEMENTS ===
 
-    def look_left(self, angle=45):
-        """Turn head left"""
-        self.rotate_layer(HEAD_ID, -angle, use_smart=False)
-
-    def look_right(self, angle=45):
-        """Turn head right"""
-        self.rotate_layer(HEAD_ID, angle, use_smart=False)
-
-    def look_center(self):
-        """Return head to center"""
-        self.move_position(HEAD_ID, HOME_POSITIONS[HEAD_ID])
-
-    def shake_head(self, times=3, speed=0.3):
-        """Shake head left and right"""
-        center = self.get_position(HEAD_ID)
-        for _ in range(times):
-            if self.is_emergency_stopped:
-                return
-            self.move_position(HEAD_ID, center - 50)
-            time.sleep(speed)
-            self.move_position(HEAD_ID, center + 50)
-            time.sleep(speed)
-        self.move_position(HEAD_ID, center)
-
-
-
-    def tilt_curious(self):
-        """Tilt head to side (curious look)"""
-        self.rotate_layer(HEAD_ID, 25, use_smart=False)
-        time.sleep(0.5)
-
-    # === IDLE SEQUENCE (Generator) ===
-
-    def idle_sequence(self):
-        """
-        Generator that yields idle micro-movements
-        Call next() on this in your main loop
-        """
-        actions = [
-            ("look_random", 40),
-            ("wait", 2.0),
-            ("small_wiggle", None),
-            ("wait", 3.0),
-            ("look_center", None),
-            ("wait", 1.5),
-        ]
-        
-        while True:
-            for action, param in actions:
-                if action == "look_random":
-                    angle = random.randint(-param, param)
-                    self.rotate_layer(HEAD_ID, angle, use_smart=False)
-                elif action == "small_wiggle":
-                    layer = random.choice([BODY_ID, BASE_ID])
-                    self.wiggle(layer, amplitude=15, cycles=1, speed=2)
-                elif action == "look_center":
-                    self.look_center()
-                elif action == "wait":
-                    time.sleep(param)
-                
-                yield action
-
-    # === EMOTION GESTURES ===
-
-    def gesture_happy(self):
-        """Happy: bounce, wiggle, spin!"""
-        print("😊 HAPPY gesture")
-        self.bounce(BODY_ID, height=40, times=2)
-        self.wiggle(HEAD_ID, amplitude=30, cycles=3, speed=4)
-        self.spin(BASE_ID, rotations=0.5, speed=400)
-        self.home_position()
-
-    def gesture_sad(self):
-        """Sad: slow, droopy movements"""
-        print("😢 SAD gesture")
-        self.rotate_layer(HEAD_ID, -20, use_smart=False)
-        time.sleep(0.8)
-        self.rotate_layer(BODY_ID, -15, use_smart=False)
-        time.sleep(1.5)
-        self.home_position()
-
-    def gesture_angry(self):
-        """Angry: shake, tense movements"""
-        print("😠 ANGRY gesture")
-        self.shake_head(times=5, speed=0.15)
-        self.wiggle(BASE_ID, amplitude=25, cycles=2, speed=5)
-        self.home_position()
-
-    def gesture_surprised(self):
-        """Surprised: quick back movement"""
-        print("😲 SURPRISED gesture")
-        self.rotate_layer(BODY_ID, 30, use_smart=False)
-        time.sleep(0.1)
-        self.rotate_layer(HEAD_ID, 20, use_smart=False)
-        time.sleep(0.5)
-        self.rotate_layer(BODY_ID, -30, use_smart=False)
-        time.sleep(0.8)
-        self.home_position()
-
-    def gesture_fear(self):
-        """Fear: retreat, small movements"""
-        print("😨 FEAR gesture")
-        self.rotate_layer(HEAD_ID, -15, use_smart=False)
-        self.rotate_layer(BODY_ID, -20, use_smart=False)
-        time.sleep(0.5)
-        self.wiggle(HEAD_ID, amplitude=10, cycles=4, speed=6)
-        time.sleep(1.0)
-        self.home_position()
-
-    def gesture_neutral(self):
-        """Neutral: return to center"""
-        print("😐 NEUTRAL gesture")
-        self.home_position()
+   
 
     # === UTILITY ===
 
