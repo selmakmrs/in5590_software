@@ -358,7 +358,7 @@ class BODY:
         self.set_joint_mode()
         current_pos = self.get_position(HEAD_ID)
 
-        for _ in cycles:
+        for _ in range(cycles):
             self.move_position(HEAD_ID, current_pos - 100)
             while self.is_moving():
                 time.sleep(0.01)
