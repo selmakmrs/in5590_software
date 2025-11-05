@@ -5,13 +5,18 @@ import time
 
 # If your display address is not 0x3C, change it here
 serial = i2c(port=1, address=0x3C)
-device = ssd1306(serial)
+device = ssd1306(serial, rotate=1)
+
+
 
 # Create blank image
 width = device.width
 height = device.height
 image = Image.new("1", (width, height))
 draw = ImageDraw.Draw(image)
+
+print("Height: ", height)
+print("width: ", width)
 
 # Clear
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
