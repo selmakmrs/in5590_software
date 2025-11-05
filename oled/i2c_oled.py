@@ -58,7 +58,7 @@ lcd = LumaSSD1306Shim()
 def on_show(_):  # called each frame by RoboEyes
     lcd.show()
 
-robo = RoboEyes(lcd, 64, 48, frame_rate=60, on_show=lcd.on_show)
+robo = RoboEyes(lcd, 128, 64, frame_rate=60, on_show=lcd.on_show)
 
 robo.set_auto_blinker(ON, 3, 2)
 robo.set_idle_mode(ON, 2, 2)
