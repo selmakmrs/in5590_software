@@ -300,16 +300,16 @@ class BODY:
     def jump_back(self, wait=1, go_home = True):
         """Make the robot jump back"""
         self.set_wheel_mode()
-        self.wheel_speed(BASE_ID,900)
-        self.wheel_speed(BODY_ID,-900)
-        time.sleep(1.5)
+        self.wheel_speed(BASE_ID,1000)
+        self.wheel_speed(BODY_ID,-1000)
+        time.sleep(2)
         self.wheel_speed(BASE_ID,0)
         self.wheel_speed(BODY_ID,0)
         time.sleep(wait)
         if go_home:
-            self.wheel_speed(BASE_ID,-900)
-            self.wheel_speed(BODY_ID,900)
-            time.sleep(1.5)
+            self.wheel_speed(BASE_ID,-1000)
+            self.wheel_speed(BODY_ID,1000)
+            time.sleep(2)
             self.wheel_speed(BASE_ID,0)
             self.wheel_speed(BODY_ID,0)
             self.set_joint_mode()
