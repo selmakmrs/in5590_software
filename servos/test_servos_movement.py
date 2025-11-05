@@ -95,6 +95,11 @@ if __name__ == "__main__":
     torque_all(port, pkt, found, True)
     print("⚙️ Torque enabled")
 
+    print("Starting joint positions")
+    for i in found:
+        pos = read_pos(port, pkt, i)
+        print(f"Servo: {i} |  Pos: {pos}")
+
     # --- 1️⃣ JOINT MODE TEST ---
     print("\n🔹 Joint mode test: moving each servo sequentially")
     for i in found:
@@ -174,20 +179,20 @@ if __name__ == "__main__":
     #         wheel_speed(port, pkt, 0, 0)
     #         time.sleep(sec)
 
-    print("Tesing some basic movements ")
-    def look_up(speed = MEDUIM):
-        sec = wheel_postion[MEDUIM][180]
-        wheel_speed(port, pkt, 0, -speed)
-        wheel_speed(port, pkt, 1, speed)
-        time.sleep(sec)
-        wheel_speed(port, pkt, 0, 0)
-        wheel_speed(port, pkt, 1, 0)
-        time.sleep(1)
-        wheel_speed(port, pkt, 0, speed)
-        wheel_speed(port, pkt, 1, -speed)
-        time.sleep(sec)
-        wheel_speed(port, pkt, 0, 0)
-        wheel_speed(port, pkt, 1, 0)
+    # print("Tesing some basic movements ")
+    # def look_up(speed = MEDUIM):
+    #     sec = wheel_postion[MEDUIM][180]
+    #     wheel_speed(port, pkt, 0, -speed)
+    #     wheel_speed(port, pkt, 1, speed)
+    #     time.sleep(sec)
+    #     wheel_speed(port, pkt, 0, 0)
+    #     wheel_speed(port, pkt, 1, 0)
+    #     time.sleep(1)
+    #     wheel_speed(port, pkt, 0, speed)
+    #     wheel_speed(port, pkt, 1, -speed)
+    #     time.sleep(sec)
+    #     wheel_speed(port, pkt, 0, 0)
+    #     wheel_speed(port, pkt, 1, 0)
 
 
 
