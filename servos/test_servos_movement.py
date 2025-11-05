@@ -114,11 +114,11 @@ if __name__ == "__main__":
         set_wheel_mode(port, pkt, i)
         set_torque_limit(port, pkt, i, 800)
 
-    FAST = 800
-    MEDUIM = 450
+    FAST = 900
+    MEDUIM = 600
     SLOW = 200
     seconds = [0.5, 1, 1.5, 2, 2.5]
-    print("Testing for FAST SPEED:")
+    print("Testing for FAST SPEED:", FAST)
     for s in seconds:
         time.sleep(2)
         print(f"Testing for {s} seconds")
@@ -126,6 +126,31 @@ if __name__ == "__main__":
         wheel_speed(port, pkt,0, FAST)
         time.sleep(s)
         wheel_speed(port, pkt,0, -FAST)
+        time.sleep(s)
+        wheel_speed(port, pkt,0, 0)
+        time.sleep(s)
+
+    print("Testing for FAST SPEED:", MEDUIM)
+    for s in seconds:
+        time.sleep(2)
+        print(f"Testing for {s} seconds")
+        time.sleep(1)
+        wheel_speed(port, pkt,0, MEDUIM)
+        time.sleep(s)
+        wheel_speed(port, pkt,0, -MEDUIM)
+        time.sleep(s)
+        wheel_speed(port, pkt,0, 0)
+        time.sleep(s)
+
+
+    print("Testing for FAST SPEED:", SLOW)
+    for s in seconds:
+        time.sleep(2)
+        print(f"Testing for {s} seconds")
+        time.sleep(1)
+        wheel_speed(port, pkt,0, SLOW)
+        time.sleep(s)
+        wheel_speed(port, pkt,0, -SLOW)
         time.sleep(s)
         wheel_speed(port, pkt,0, 0)
         time.sleep(s)
