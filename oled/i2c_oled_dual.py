@@ -80,7 +80,7 @@ import random, time, math
 
 
 
-
+sequences = []
 
 
 seq = robo.sequences.add( "demo")
@@ -93,6 +93,8 @@ seq.step( 7000, lambda robo : robo.set_mood(CURIOUS) )
 seq.step( 10000, lambda robo : robo.close() )
 seq.step( 11000, lambda robo : print(seq.name,"done !") )  # Also signal the end of sequence at 10 sec
 
+sequences.append(seq)
+
 seq = robo.sequences.add("happy")
 seq.step( 2000, lambda robo : robo.open() ) # at 2000 ms from start --> open eyes.
 seq.step( 4000, lambda robo : robo.set_mood(HAPPY) ) # Lamba must call function! Cannot assign property! 
@@ -100,7 +102,74 @@ seq.step( 4010, lambda robo : robo.laugh() )
 seq.step( 9000, lambda robo : robo.laugh() )
 # seq.step( 10000, lambda robo : robo.close() )
 seq.step( 9000, lambda robo : robo.set_mood(DEFAULT) )
-seq.step( 11000, lambda robo : print(seq.name,"done !") ) 
+seq.step( 11000, lambda robo : print(seq.name,"done !") )
+sequences.append(seq)
+
+# --- ANGRY sequence ---
+seq = robo.sequences.add("angry")
+seq.step( 1000, lambda robo : robo.open() )
+seq.step( 2000, lambda robo : robo.set_mood(ANGRY) )
+seq.step( 3000, lambda robo : robo.look_left() )
+seq.step( 3500, lambda robo : robo.look_right() )
+seq.step( 4000, lambda robo : robo.look_left() )
+seq.step( 6000, lambda robo : robo.set_mood(DEFAULT) )
+seq.step( 7000, lambda robo : robo.close() )
+seq.step( 7500, lambda robo : print(seq.name, "done!") )
+sequences.append(seq)
+
+
+# --- SURPRISED sequence ---
+seq = robo.sequences.add("surprised")
+seq.step( 500, lambda robo : robo.open() )
+seq.step( 1000, lambda robo : robo.set_mood(SCARY) )
+seq.step( 1500, lambda robo : robo.blink() )
+seq.step( 2000, lambda robo : robo.look_up() )
+seq.step( 2500, lambda robo : robo.look_down() )
+seq.step( 4000, lambda robo : robo.set_mood(DEFAULT) )
+seq.step( 5000, lambda robo : print(seq.name, "done!") )
+
+sequences.append(seq)
+
+# --- SAD sequence ---
+seq = robo.sequences.add("sad")
+seq.step( 1000, lambda robo : robo.open() )
+seq.step( 2000, lambda robo : robo.set_mood(TIRED) )
+seq.step( 2500, lambda robo : robo.look_down() )
+seq.step( 4000, lambda robo : robo.blink() )
+seq.step( 5000, lambda robo : robo.look_down() )
+seq.step( 6000, lambda robo : robo.set_mood(DEFAULT) )
+seq.step( 7000, lambda robo : robo.close() )
+seq.step( 7500, lambda robo : print(seq.name, "done!") )
+sequences.append(seq)
+
+
+# --- SLEEPY sequence ---
+seq = robo.sequences.add("sleepy")
+seq.step( 500, lambda robo : robo.open() )
+seq.step( 1000, lambda robo : robo.set_mood(TIRED) )
+seq.step( 3000, lambda robo : robo.blink() )
+seq.step( 4000, lambda robo : robo.blink() )
+seq.step( 5000, lambda robo : robo.close() )
+seq.step( 5500, lambda robo : print(seq.name, "done!") )
+sequences.append(seq)
+
+
+# --- CONFUSED sequence ---
+seq = robo.sequences.add("confused")
+seq.step( 500, lambda robo : robo.open() )
+seq.step( 1000, lambda robo : robo.set_mood(CURIOUS) )
+seq.step( 1500, lambda robo : robo.look_left() )
+seq.step( 2000, lambda robo : robo.look_right() )
+seq.step( 2500, lambda robo : robo.look_up() )
+seq.step( 3000, lambda robo : robo.look_down() )
+seq.step( 4000, lambda robo : robo.look_left() )
+seq.step( 4500, lambda robo : robo.look_right() )
+seq.step( 6000, lambda robo : robo.set_mood(DEFAULT) )
+seq.step( 6500, lambda robo : robo.close() )
+seq.step( 7000, lambda robo : print(seq.name, "done!") )
+
+sequences.append(seq)
+
 
 # RoboEyes Initial state
 robo.position = DEFAULT
@@ -111,14 +180,17 @@ robo.close()
 # robo.sequences.get("demo").start()
 # robo.sequences.get("happy").start()
 
-seq = robo.sequences.get("happy")
+# seq = robo.sequences.get("happy")
 
+seq.start()
+i = 0
+seq = sequences[i]
 seq.start()
 
 while True:
-	# update eyes drawings
-	robo.update()  
-
-	# # if robo.sequences.done: # Check all sequences done
-	# if robo.sequences.get("demo").done: # Check sequence ZERO done
-		
+    robo.update()
+    if seq.done and i < len(sequences)-1:
+        i += 1
+        seq = sequences[i]
+        print("Starting: ", seq.name)
+        seq.start()
