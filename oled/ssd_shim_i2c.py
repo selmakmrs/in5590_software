@@ -8,7 +8,7 @@ class LumaSSD1306Shim:
     Drop-in replacement for your previous shim, but writes to a real SPI OLED.
     Matches the MicroPython-ish API RoboEyes expects (fill, fill_rrect, etc.).
     """
-    def __init__(self, width=64, height=48, rotate=0,
+    def __init__(self, width=128, height=64, rotate=0,
                  ce=0, driver="ssd1306", dc=24, rst=25, speed=1_000_000):
         self.width, self.height = width, height
         self._img = Image.new("1", (width, height), 0)
