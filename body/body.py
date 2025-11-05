@@ -523,6 +523,7 @@ if __name__ == "__main__":
         for _ in range(5):
             action = next(idle_gen)
             print(f"  Idle action: {action}")
+            time.sleep(2)
         
         print("\n✅ Tests complete!")
         
