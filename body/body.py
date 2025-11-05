@@ -221,37 +221,14 @@ class BODY:
         """Get current position of servo (legacy compatibility)"""
         return self.get_position_safe(dxl_id)
 
-    def move_position(self, dxl_id, pos):
+    def move_position(self, dxl_id, pos, speed = 600):
         """Move to position (simple, joint mode only)"""
         pos = max(0, min(1023, pos))
+        speed = max(0,min(1023, speed))
+        self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_MOVING_SPEED, speed)
         self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_GOAL_POSITION, pos)
         self.tracked_positions[dxl_id] = pos  # Update tracked position
 
-    def move_position_smart(self, dxl_id, target_pos, use_wheel_mode=True):
-        """
-        Smart movement: automatically switches to wheel mode for big movements
-        WARNING: Using wheel mode loses absolute position - use for full rotations only!
-        """
-        if self.is_emergency_stopped:
-            return
-            
-        current_pos = self.get_position_safe(dxl_id)
-        distance = abs(target_pos - current_pos)
-        
-        # Small movement: just use joint mode
-        if distance < BIG_MOVE_THRESHOLD or not use_wheel_mode:
-            self.set_joint_mode(dxl_id)
-            self.move_position(dxl_id, target_pos)
-            return
-        
-        # Big movement: AVOID wheel mode for precise positioning
-        # Instead, just move slower in joint mode
-        print(f"🔄 Big move on ID {dxl_id}: {current_pos} → {target_pos} (joint mode)")
-        self.set_joint_mode(dxl_id)
-        self.move_position(dxl_id, target_pos)
-        
-        # Wait for movement to complete
-        time.sleep(0.5)
 
     def wheel_speed(self, dxl_id, speed):
         """
@@ -375,6 +352,19 @@ class BODY:
             self.wheel_speed(BODY_ID,0)
             self.set_joint_mode()
             self.home_position()
+
+
+    def shake_head(self, speed=600, cycles=3):
+        self.set_joint_mode()
+        current_pos = self.get_position(HEAD_ID)
+
+        for _ in cycles:
+            self.move_position(HEAD_ID, current_pos - 100)
+            time.sleep(0.3)
+            self.move_position(HEAD_ID, current_pos + 100)
+
+        self.home_position()
+
 
 
         
@@ -588,7 +578,8 @@ if __name__ == "__main__":
 
         print("Jumping Right")
         time.sleep(1)
-        body.jump_right()
+        body.jump_right(go_home=False)
+        body.shake_head()
         # print("\n🧪 Testing basic movements...")
         # body.look_left(30)
         # time.sleep(1)
