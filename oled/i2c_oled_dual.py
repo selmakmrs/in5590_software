@@ -107,6 +107,196 @@ sequences.append(seq)
 
 
 
+# 1. GREETING SEQUENCE - Friendly welcome
+seq = robo.sequences.add("greeting")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_mood(HAPPY))
+seq.step(1500, lambda robo: robo.blink())
+seq.step(2500, lambda robo: robo.set_position(N))
+seq.step(3500, lambda robo: robo.set_position(DEFAULT))
+seq.step(4000, lambda robo: robo.set_mood(DEFAULT))
+seq.step(5000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 2. CURIOUS SCAN - Looking around curiously
+seq = robo.sequences.add("curious_scan")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_mood(CURIOUS))
+seq.step(1500, lambda robo: robo.set_position(W))
+seq.step(3000, lambda robo: robo.set_position(E))
+seq.step(4500, lambda robo: robo.set_position(N))
+seq.step(6000, lambda robo: robo.set_position(DEFAULT))
+seq.step(6500, lambda robo: robo.blink())
+seq.step(7500, lambda robo: robo.set_mood(DEFAULT))
+seq.step(8000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 3. CONFUSED - Expressing confusion
+seq = robo.sequences.add("confused")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.confuse())
+seq.step(2000, lambda robo: robo.set_position(NW))
+seq.step(3000, lambda robo: robo.confuse())
+seq.step(4000, lambda robo: robo.set_position(NE))
+seq.step(5000, lambda robo: robo.confuse())
+seq.step(6000, lambda robo: robo.set_position(DEFAULT))
+seq.step(7000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 4. ANGRY OUTBURST - Getting angry
+seq = robo.sequences.add("angry_outburst")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_mood(ANGRY))
+seq.step(1500, lambda robo: robo.set_position(E))
+seq.step(2000, lambda robo: robo.set_position(W))
+seq.step(2500, lambda robo: robo.set_position(E))
+seq.step(3000, lambda robo: robo.set_position(DEFAULT))
+seq.step(4000, lambda robo: robo.close())
+seq.step(5000, lambda robo: robo.open())
+seq.step(6000, lambda robo: robo.set_mood(TIRED))
+seq.step(8000, lambda robo: robo.set_mood(DEFAULT))
+seq.step(9000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 5. SLEEPY - Getting tired and falling asleep
+seq = robo.sequences.add("sleepy")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_mood(TIRED))
+seq.step(2000, lambda robo: robo.blink())
+seq.step(3500, lambda robo: robo.blink())
+seq.step(4500, lambda robo: robo.blink())
+seq.step(5500, lambda robo: robo.close())
+seq.step(7000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 6. SURPRISE - Surprised reaction
+seq = robo.sequences.add("surprise")
+seq.step(500, lambda robo: robo.close())
+seq.step(1000, lambda robo: robo.open())
+seq.step(1100, lambda robo: robo.eyes_width(leftEye=40, rightEye=40))
+seq.step(1200, lambda robo: robo.eyes_height(leftEye=40, rightEye=40))
+seq.step(2000, lambda robo: robo.blink())
+seq.step(3000, lambda robo: robo.eyes_width(leftEye=18, rightEye=18))
+seq.step(3100, lambda robo: robo.eyes_height(leftEye=18, rightEye=18))
+seq.step(4000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 7. SCARY MODE - Frightening look
+seq = robo.sequences.add("scary")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_mood(SCARY))
+seq.step(1500, lambda robo: robo.eyes_width(leftEye=30, rightEye=30))
+seq.step(5000, lambda robo: robo.set_mood(DEFAULT))
+seq.step(5500, lambda robo: robo.eyes_width(leftEye=18, rightEye=18))
+seq.step(6000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 8. FROZEN SCARED - Frozen in fear
+seq = robo.sequences.add("frozen")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_mood(FROZEN))
+seq.step(1500, lambda robo: robo.eyes_width(leftEye=25, rightEye=25))
+seq.step(4000, lambda robo: robo.set_mood(DEFAULT))
+seq.step(4500, lambda robo: robo.eyes_width(leftEye=18, rightEye=18))
+seq.step(5000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+# 9. HAPPY LAUGH - Joyful laughing
+seq = robo.sequences.add("happy_laugh")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_mood(HAPPY))
+seq.step(1500, lambda robo: robo.laugh())
+seq.step(3000, lambda robo: robo.laugh())
+seq.step(4500, lambda robo: robo.laugh())
+seq.step(6000, lambda robo: robo.set_mood(DEFAULT))
+seq.step(7000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 10. WINK LEFT - Playful left wink
+seq = robo.sequences.add("wink_left")
+seq.step(500, lambda robo: robo.open())
+seq.step(1500, lambda robo: robo.wink(left=True))
+seq.step(3000, lambda robo: robo.set_mood(HAPPY))
+seq.step(4000, lambda robo: robo.set_mood(DEFAULT))
+seq.step(5000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 11. WINK RIGHT - Playful right wink
+seq = robo.sequences.add("wink_right")
+seq.step(500, lambda robo: robo.open())
+seq.step(1500, lambda robo: robo.wink(right=True))
+seq.step(3000, lambda robo: robo.set_mood(HAPPY))
+seq.step(4000, lambda robo: robo.set_mood(DEFAULT))
+seq.step(5000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+# 12. LOOK AROUND - Systematic scanning
+seq = robo.sequences.add("look_around")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_position(NW))
+seq.step(2000, lambda robo: robo.set_position(N))
+seq.step(3000, lambda robo: robo.set_position(NE))
+seq.step(4000, lambda robo: robo.set_position(E))
+seq.step(5000, lambda robo: robo.set_position(SE))
+seq.step(6000, lambda robo: robo.set_position(S))
+seq.step(7000, lambda robo: robo.set_position(SW))
+seq.step(8000, lambda robo: robo.set_position(W))
+seq.step(9000, lambda robo: robo.set_position(DEFAULT))
+seq.step(9500, lambda robo: robo.blink())
+seq.step(10000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 13. THINKING - Contemplative expression
+seq = robo.sequences.add("thinking")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_position(NW))
+seq.step(2000, lambda robo: robo.set_mood(CURIOUS))
+seq.step(4000, lambda robo: robo.blink())
+seq.step(6000, lambda robo: robo.set_position(DEFAULT))
+seq.step(7000, lambda robo: robo.set_mood(DEFAULT))
+seq.step(8000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 14. CYCLOPS SCAN - One-eyed scanning
+seq = robo.sequences.add("cyclops_scan")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_cyclops(True))
+seq.step(1500, lambda robo: robo.set_position(W))
+seq.step(3000, lambda robo: robo.set_position(E))
+seq.step(4500, lambda robo: robo.set_position(DEFAULT))
+seq.step(5000, lambda robo: robo.blink())
+seq.step(6000, lambda robo: robo.set_cyclops(False))
+seq.step(7000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+# 15. EMOTIONAL ROLLERCOASTER - Rapid mood changes
+seq = robo.sequences.add("emotional_rollercoaster")
+seq.step(500, lambda robo: robo.open())
+seq.step(1000, lambda robo: robo.set_mood(HAPPY))
+seq.step(1500, lambda robo: robo.laugh())
+seq.step(3000, lambda robo: robo.set_mood(CURIOUS))
+seq.step(4000, lambda robo: robo.confuse())
+seq.step(5500, lambda robo: robo.set_mood(ANGRY))
+seq.step(7000, lambda robo: robo.set_mood(TIRED))
+seq.step(8500, lambda robo: robo.set_mood(DEFAULT))
+seq.step(9000, lambda robo: robo.blink())
+seq.step(10000, lambda robo: print(seq.name, "done!"))
+sequences.append(seq)
+
+
+
 
 # RoboEyes Initial state
 robo.position = DEFAULT
