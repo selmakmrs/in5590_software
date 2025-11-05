@@ -297,16 +297,44 @@ class BODY:
         # Return to center
         self.move_position(layer_id, center)
 
-    def bounce(self, layer_id, height=30, times=3):
-        """Bounce up and down"""
-        center = self.get_position(layer_id)
-        for _ in range(times):
-            if self.is_emergency_stopped:
-                return
-            self.move_position(layer_id, center + height)
-            time.sleep(0.2)
-            self.move_position(layer_id, center)
-            time.sleep(0.2)
+    def jump_back(self, wait=1, go_home = True):
+        """Make the robot jump back"""
+        self.set_wheel_mode()
+        self.wheel_speed(BASE_ID,900)
+        self.wheel_speed(BODY_ID,-900)
+        time.sleep(1.5)
+        self.wheel_speed(BASE_ID,0)
+        self.wheel_speed(BODY_ID,0)
+        time.sleep(wait)
+        if go_home:
+            self.wheel_speed(BASE_ID,-900)
+            self.wheel_speed(BODY_ID,900)
+            time.sleep(1.5)
+            self.wheel_speed(BASE_ID,0)
+            self.wheel_speed(BODY_ID,0)
+            self.set_joint_mode()
+            self.home_position()
+
+    def jump_forward(self, wait=1, go_home = True):
+        """Make the robot jump back"""
+        self.set_wheel_mode()
+        self.wheel_speed(HEAD_ID,900)
+        self.wheel_speed(BODY_ID,-900)
+        time.sleep(1.5)
+        self.wheel_speed(HEAD_ID,0)
+        self.wheel_speed(BODY_ID,0)
+        time.sleep(wait)
+        if go_home:
+            self.wheel_speed(HEAD_ID,-900)
+            self.wheel_speed(BODY_ID,900)
+            time.sleep(1.5)
+            self.wheel_speed(HEAD_ID,0)
+            self.wheel_speed(BODY_ID,0)
+            self.set_joint_mode()
+            self.home_position()
+
+        
+
 
     def spin(self, layer_id, rotations=1, speed=300):
         """
@@ -362,15 +390,7 @@ class BODY:
             time.sleep(speed)
         self.move_position(HEAD_ID, center)
 
-    def nod_head(self, times=2, speed=0.3):
-        """Nod head (if you have tilt - simulated with body for now)"""
-        for _ in range(times):
-            if self.is_emergency_stopped:
-                return
-            self.rotate_layer(BODY_ID, 10, use_smart=False)
-            time.sleep(speed)
-            self.rotate_layer(BODY_ID, -10, use_smart=False)
-            time.sleep(speed)
+
 
     def tilt_curious(self):
         """Tilt head to side (curious look)"""
@@ -507,23 +527,32 @@ if __name__ == "__main__":
         body.start()
         
         # Test movements
-        print("\n🧪 Testing basic movements...")
-        body.look_left(30)
+        print("Starting testing Movemnts")
         time.sleep(1)
-        body.look_right(30)
+        print("Jumping Back")
         time.sleep(1)
-        body.look_center()
+        body.jump_back()
+
+        print("Jumping Forward")
+        time.sleep(1)
+        body.jump_forward()
+        # print("\n🧪 Testing basic movements...")
+        # body.look_left(30)
+        # time.sleep(1)
+        # body.look_right(30)
+        # time.sleep(1)
+        # body.look_center()
         
-        print("\n😊 Testing HAPPY gesture...")
-        body.gesture_happy()
-        time.sleep(2)
+        # print("\n😊 Testing HAPPY gesture...")
+        # body.gesture_happy()
+        # time.sleep(2)
         
-        print("\n🔁 Testing idle sequence (5 iterations)...")
-        idle_gen = body.idle_sequence()
-        for _ in range(5):
-            action = next(idle_gen)
-            print(f"  Idle action: {action}")
-            time.sleep(2)
+        # print("\n🔁 Testing idle sequence (5 iterations)...")
+        # idle_gen = body.idle_sequence()
+        # for _ in range(5):
+        #     action = next(idle_gen)
+        #     print(f"  Idle action: {action}")
+        #     time.sleep(1)
         
         print("\n✅ Tests complete!")
         
