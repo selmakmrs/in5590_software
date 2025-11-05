@@ -130,14 +130,19 @@ if __name__ == "__main__":
     time.sleep(1)
 
     print("Lift up head...")
-    wheel_speed(port, pkt, 0, -300)
-    wheel_speed(port, pkt, 3, 300)
+    wheel_speed(port, pkt, 0, -400)
+    wheel_speed(port, pkt, 3, 400)
     time.sleep(2)
 
     print("Go back")
-    wheel_speed(port, pkt, 0, 300)
-    wheel_speed(port, pkt, 3, -300)
+    wheel_speed(port, pkt, 0, 400)
+    wheel_speed(port, pkt, 3, -400)
     time.sleep(2)
+
+    print("Stopping...")
+    for i in found:
+        wheel_speed(port, pkt, i, 0)
+    time.sleep(1)
 
 
     # --- 3️⃣ Return to JOINT MODE ---
