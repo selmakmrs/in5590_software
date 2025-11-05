@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from dynamixel_sdk import *
 import time
+import math
 
 # ========= CONFIGURATION =========
 DEVICENAME = "/dev/ttyUSB0"   # Adjust if needed
@@ -196,7 +197,48 @@ if __name__ == "__main__":
 
 
 
-    look_up()
+    # look_up()
+    print("🎵 Starting happy wiggle dance!")
+
+    # --- dance parameters ---
+    duration = 10.0  # seconds total dance time
+    start_time = time.time()
+
+    # frequencies (in Hz)
+    base_freq = 0.6      # slow big motion
+    body_freq = 0.9      # medium wiggle
+    head_freq = 1.2      # quick small head shake
+
+    # amplitude in speed units
+    base_amp = 450    # base has big swings
+    body_amp = FAST * 0.7
+    head_amp = SLOW * 1.5
+
+    try:
+        while time.time() - start_time < duration:
+            t = time.time() - start_time
+
+            # smooth sine-based motion, each layer slightly phase-shifted
+            base_speed = int(base_amp * math.sin(2 * math.pi * base_freq * t))
+            body_speed = int(body_amp * math.sin(2 * math.pi * body_freq * t + 0.7))
+            head_speed = int(head_amp * math.sin(2 * math.pi * head_freq * t + 1.4))
+
+            # lower body drives everything – upper layers "follow"
+            wheel_speed(port, pkt, BASE_ID, base_speed)
+            wheel_speed(port, pkt, BODY_ID, body_speed)
+            wheel_speed(port, pkt, HEAD_ID, head_speed)
+
+            time.sleep(0.03)
+
+        # stop gracefully
+        for i in SERVOS:
+            wheel_speed(port, pkt, i, 0)
+        print("✅ Dance complete!")
+
+    except KeyboardInterrupt:
+        for i in SERVOS:
+            wheel_speed(port, pkt, i, 0)
+        print("⏹️  Stopped by user")
 
 
 
