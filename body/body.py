@@ -360,9 +360,9 @@ class BODY:
 
         for _ in range(cycles):
             self.move_position(HEAD_ID, current_pos - 100)
-            while self.is_moving():
-                time.sleep(0.01)
+            time.sleep(0.5)
             self.move_position(HEAD_ID, current_pos + 100)
+            time.sleep(0.5)
 
         self.home_position()
 
