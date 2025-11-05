@@ -5,8 +5,8 @@ from PIL import Image, ImageDraw, ImageFont
 import time
 
 # --- Initialize both OLEDs ---
-oled1 = ssd1306(i2c(port=1, address=0x3C))   # Bus 1 -> pins 3 & 5
-oled2 = ssd1306(i2c(port=11, address=0x3C))   # Bus 0 -> pins 27 & 28
+oled1 = ssd1306(i2c(port=1, address=0x3C),rotate=1)   # Bus 1 -> pins 3 & 5
+oled2 = ssd1306(i2c(port=11, address=0x3C),rotate=3)   # Bus 0 -> pins 27 & 28
 
 font = ImageFont.load_default()
 
@@ -26,6 +26,8 @@ try:
         draw_text(oled2, f"OLED #2\nCount: {count}")
         count += 1
         time.sleep(1)
+        if count > 5:
+          break
 except KeyboardInterrupt:
     print("\nExiting test...")
 
@@ -61,7 +63,7 @@ lcd = LumaSSD1306Shim()
 def on_show(_):  # called each frame by RoboEyes
     lcd.show()
 
-robo = RoboEyes(lcd, 128, 64, frame_rate=60, on_show=lcd.on_show)
+robo = RoboEyes(lcd, 128, 64, frame_rate=50, on_show=lcd.on_show)
 
 robo.set_auto_blinker(ON, 3, 2)
 robo.set_idle_mode(ON, 2, 2)

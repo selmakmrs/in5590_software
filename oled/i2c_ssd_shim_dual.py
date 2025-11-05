@@ -18,8 +18,8 @@ class LumaSSD1306Shim:
         i2c0 = i2c(port=1, address=0x3C)  
         i2c1 = i2c(port=11, address=0x3C)
 
-        self.oled0 = ssd1306(i2c0, width=width//2, height=height, rotate=1)
-        self.oled1 = ssd1306(i2c1, width=width//2, height=height, rotate=3)
+        self.oled0 = ssd1306(i2c0, rotate=3)
+        self.oled1 = ssd1306(i2c1, rotate=1)
 
 
 
