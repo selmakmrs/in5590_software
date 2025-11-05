@@ -289,8 +289,8 @@ class BODY:
             time.sleep(2)
             self.wheel_speed(BASE_ID,0)
             self.wheel_speed(BODY_ID,0)
-            self.set_joint_mode()
-            self.home_position()
+            self.sleep(0.3)
+            self.recalibrate_after_spin()
 
     def jump_forward(self, wait=1, go_home = True):
         """Make the robot jump back"""
@@ -307,8 +307,8 @@ class BODY:
             time.sleep(1.3)
             self.wheel_speed(HEAD_ID,0)
             self.wheel_speed(BODY_ID,0)
-            self.set_joint_mode()
-            self.home_position()
+            self.sleep(0.3)
+            self.recalibrate_after_spin()
 
 
     def jump_left(self, wait=1, go_home=True):
@@ -328,9 +328,8 @@ class BODY:
             time.sleep(0.8)
             self.wheel_speed(HEAD_ID,0)
             self.wheel_speed(BODY_ID,0)
-            self.set_joint_mode()
-            self.home_position()
-
+            self.sleep(0.3)
+            self.recalibrate_after_spin()
 
 
     def jump_right(self, wait=1, go_home=True):
@@ -350,8 +349,8 @@ class BODY:
             time.sleep(0.8)
             self.wheel_speed(HEAD_ID,0)
             self.wheel_speed(BODY_ID,0)
-            self.set_joint_mode()
-            self.home_position()
+            time.sleep(0.3)
+            self.recalibrate_after_spin()
 
 
     def shake_head(self, speed=600, cycles=3):
@@ -359,11 +358,12 @@ class BODY:
         current_pos = self.get_position(HEAD_ID)
 
         for _ in range(cycles):
-            self.move_position(HEAD_ID, current_pos - 100)
+            self.move_position(HEAD_ID, current_pos - 70, speed=speed)
             time.sleep(0.5)
-            self.move_position(HEAD_ID, current_pos + 100)
+            self.move_position(HEAD_ID, current_pos + 80, speed=speed)
             time.sleep(0.5)
 
+        time.sleep(0.3)
         self.home_position()
 
 
