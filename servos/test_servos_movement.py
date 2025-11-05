@@ -114,45 +114,64 @@ if __name__ == "__main__":
         set_wheel_mode(port, pkt, i)
         set_torque_limit(port, pkt, i, 800)
 
-    print("Spinning forward...")
-    for i in found:
-        wheel_speed(port, pkt, i, 300)
-    time.sleep(2)
+    FAST = 800
+    MEDUIM = 450
+    SLOW = 200
+    seconds = [0.5, 1, 1.5, 2, 2.5]
+    print("Testing for FAST SPEED:")
+    for s in seconds:
+        time.sleep(2)
+        print(f"Testing for {s} seconds")
+        time.sleep(1)
+        wheel_speed(port, pkt, FAST)
+        time.sleep(s)
+        wheel_speed(port, pkt, -FAST)
+        time.sleep(s)
+        wheel_speed(port, pkt, 0)
+        time.sleep(s)
+    
 
-    print("Reversing...")
-    for i in found:
-        wheel_speed(port, pkt, i, -300)
-    time.sleep(2)
+    # print("Spinning forward...")
+    # for i in found:
+    #     wheel_speed(port, pkt, i, 300)
+    # time.sleep(2)
 
-    print("Stopping...")
-    for i in found:
-        wheel_speed(port, pkt, i, 0)
-    time.sleep(1)
+    # print("Reversing...")
+    # for i in found:
+    #     wheel_speed(port, pkt, i, -300)
+    # time.sleep(2)
 
-    print("Lift up head...")
-    wheel_speed(port, pkt, 0, -600)
-    wheel_speed(port, pkt, 1, 600)
-    time.sleep(2)
+    # print("Stopping...")
+    # for i in found:
+    #     wheel_speed(port, pkt, i, 0)
+    # time.sleep(1)
 
-    print("Go back")
-    wheel_speed(port, pkt, 0, 600)
-    wheel_speed(port, pkt, 1, -600)
-    time.sleep(2)
+    # print("Lift up head...")
+    # wheel_speed(port, pkt, 0, -600)
+    # wheel_speed(port, pkt, 1, 600)
+    # time.sleep(2)
 
-    print("Stopping...")
-    for i in found:
-        wheel_speed(port, pkt, i, 0)
-    time.sleep(1)
+    # print("Go back")
+    # wheel_speed(port, pkt, 0, 600)
+    # wheel_speed(port, pkt, 1, -600)
+    # time.sleep(2)
+
+    # print("Stopping...")
+    # for i in found:
+    #     wheel_speed(port, pkt, i, 0)
+    # time.sleep(1)
 
 
-    # --- 3️⃣ Return to JOINT MODE ---
-    print("\n🔹 Resetting to joint mode & center")
-    for i in found:
-        set_joint_mode(port, pkt, i)
-        move_position(port, pkt, i, 512)
-    time.sleep(2)
+    # # --- 3️⃣ Return to JOINT MODE ---
+    # print("\n🔹 Resetting to joint mode & center")
+    # for i in found:
+    #     set_joint_mode(port, pkt, i)
+    #     move_position(port, pkt, i, 512)
+    # time.sleep(2)
 
     # --- Cleanup ---
     torque_all(port, pkt, found, False)
     port.closePort()
     print("✅ Test complete and port closed.")
+
+
