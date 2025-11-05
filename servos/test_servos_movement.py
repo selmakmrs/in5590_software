@@ -131,12 +131,12 @@ if __name__ == "__main__":
 
     print("Lift up head...")
     wheel_speed(port, pkt, 0, -400)
-    wheel_speed(port, pkt, 3, 400)
+    wheel_speed(port, pkt, 1, 400)
     time.sleep(2)
 
     print("Go back")
     wheel_speed(port, pkt, 0, 400)
-    wheel_speed(port, pkt, 3, -400)
+    wheel_speed(port, pkt, 1, -400)
     time.sleep(2)
 
     print("Stopping...")
