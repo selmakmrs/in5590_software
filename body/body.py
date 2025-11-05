@@ -109,7 +109,7 @@ class BODY:
         """Start the body system"""
         self.enable_motors()
         self.set_joint_mode()
-        self.set_torque_limit(512)  # 50% torque to start
+        self.set_torque_limit(900)  # 50% torque to start
         self.calibrate()
         print("▶️  BODY started")
 
