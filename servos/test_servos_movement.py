@@ -129,6 +129,17 @@ if __name__ == "__main__":
         wheel_speed(port, pkt, i, 0)
     time.sleep(1)
 
+    print("Lift up head...")
+    wheel_speed(port, pkt, 0, -300)
+    wheel_speed(port, pkt, 3, 300)
+    time.sleep(2)
+
+    print("Go back")
+    wheel_speed(port, pkt, 0, 300)
+    wheel_speed(port, pkt, 3, -300)
+    time.sleep(2)
+
+
     # --- 3️⃣ Return to JOINT MODE ---
     print("\n🔹 Resetting to joint mode & center")
     for i in found:
