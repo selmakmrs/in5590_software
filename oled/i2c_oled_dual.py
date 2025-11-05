@@ -105,70 +105,7 @@ seq.step( 9000, lambda robo : robo.set_mood(DEFAULT) )
 seq.step( 11000, lambda robo : print(seq.name,"done !") )
 sequences.append(seq)
 
-# --- ANGRY sequence ---
-seq = robo.sequences.add("angry")
-seq.step( 1000, lambda robo : robo.open() )
-seq.step( 2000, lambda robo : robo.set_mood(ANGRY) )
-seq.step( 3000, lambda robo : robo.look_left() )
-seq.step( 3500, lambda robo : robo.look_right() )
-seq.step( 4000, lambda robo : robo.look_left() )
-seq.step( 6000, lambda robo : robo.set_mood(DEFAULT) )
-seq.step( 7000, lambda robo : robo.close() )
-seq.step( 7500, lambda robo : print(seq.name, "done!") )
-sequences.append(seq)
 
-
-# --- SURPRISED sequence ---
-seq = robo.sequences.add("surprised")
-seq.step( 500, lambda robo : robo.open() )
-seq.step( 1000, lambda robo : robo.set_mood(SCARY) )
-seq.step( 1500, lambda robo : robo.blink() )
-seq.step( 2000, lambda robo : robo.look_up() )
-seq.step( 2500, lambda robo : robo.look_down() )
-seq.step( 4000, lambda robo : robo.set_mood(DEFAULT) )
-seq.step( 5000, lambda robo : print(seq.name, "done!") )
-
-sequences.append(seq)
-
-# --- SAD sequence ---
-seq = robo.sequences.add("sad")
-seq.step( 1000, lambda robo : robo.open() )
-seq.step( 2000, lambda robo : robo.set_mood(TIRED) )
-seq.step( 2500, lambda robo : robo.look_down() )
-seq.step( 4000, lambda robo : robo.blink() )
-seq.step( 5000, lambda robo : robo.look_down() )
-seq.step( 6000, lambda robo : robo.set_mood(DEFAULT) )
-seq.step( 7000, lambda robo : robo.close() )
-seq.step( 7500, lambda robo : print(seq.name, "done!") )
-sequences.append(seq)
-
-
-# --- SLEEPY sequence ---
-seq = robo.sequences.add("sleepy")
-seq.step( 500, lambda robo : robo.open() )
-seq.step( 1000, lambda robo : robo.set_mood(TIRED) )
-seq.step( 3000, lambda robo : robo.blink() )
-seq.step( 4000, lambda robo : robo.blink() )
-seq.step( 5000, lambda robo : robo.close() )
-seq.step( 5500, lambda robo : print(seq.name, "done!") )
-sequences.append(seq)
-
-
-# --- CONFUSED sequence ---
-seq = robo.sequences.add("confused")
-seq.step( 500, lambda robo : robo.open() )
-seq.step( 1000, lambda robo : robo.set_mood(CURIOUS) )
-seq.step( 1500, lambda robo : robo.look_left() )
-seq.step( 2000, lambda robo : robo.look_right() )
-seq.step( 2500, lambda robo : robo.look_up() )
-seq.step( 3000, lambda robo : robo.look_down() )
-seq.step( 4000, lambda robo : robo.look_left() )
-seq.step( 4500, lambda robo : robo.look_right() )
-seq.step( 6000, lambda robo : robo.set_mood(DEFAULT) )
-seq.step( 6500, lambda robo : robo.close() )
-seq.step( 7000, lambda robo : print(seq.name, "done!") )
-
-sequences.append(seq)
 
 
 # RoboEyes Initial state
