@@ -16,7 +16,7 @@ class LumaSSD1306Shim:
         self._font = ImageFont.load_default()
 
         serial = i2c(port=1, address=0x3C)
-        device = ssd1306(serial)
+        self.device = ssd1306(serial)
 
     # --- MicroPython-ish API used by RoboEyes ---
     def fill(self, c):  # clear/fill
