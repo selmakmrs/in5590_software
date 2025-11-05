@@ -136,7 +136,7 @@ if __name__ == "__main__":
 
     print("Go back")
     wheel_speed(port, pkt, 0, 300)
-    wheel_speed(port, pkt, 1, -300)
+    wheel_speed(port, pkt, 3, -300)
     time.sleep(2)
 
 
