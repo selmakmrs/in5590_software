@@ -109,7 +109,7 @@ class BODY:
         """Start the body system"""
         self.enable_motors()
         self.set_joint_mode()
-        self.set_torque_limit(900)  # 50% torque to start
+        self.set_torque_limit(1023)  # 50% torque to start
         self.calibrate()
         print("▶️  BODY started")
 
@@ -300,15 +300,15 @@ class BODY:
     def jump_back(self, wait=1, go_home = True):
         """Make the robot jump back"""
         self.set_wheel_mode()
-        self.wheel_speed(BASE_ID,900)
-        self.wheel_speed(BODY_ID,-500)
+        self.wheel_speed(BASE_ID,1023)
+        self.wheel_speed(BODY_ID,-600)
         time.sleep(2)
         self.wheel_speed(BASE_ID,0)
         self.wheel_speed(BODY_ID,0)
         time.sleep(wait)
         if go_home:
-            self.wheel_speed(BASE_ID,-900)
-            self.wheel_speed(BODY_ID,500)
+            self.wheel_speed(BASE_ID,-1023)
+            self.wheel_speed(BODY_ID,600)
             time.sleep(2)
             self.wheel_speed(BASE_ID,0)
             self.wheel_speed(BODY_ID,0)
@@ -318,15 +318,15 @@ class BODY:
     def jump_forward(self, wait=1, go_home = True):
         """Make the robot jump back"""
         self.set_wheel_mode()
-        self.wheel_speed(HEAD_ID,1000)
-        self.wheel_speed(BODY_ID,-1000)
+        self.wheel_speed(HEAD_ID,1023)
+        self.wheel_speed(BODY_ID,-1023)
         time.sleep(1.3)
         self.wheel_speed(HEAD_ID,0)
         self.wheel_speed(BODY_ID,0)
         time.sleep(wait)
         if go_home:
-            self.wheel_speed(HEAD_ID,-1000)
-            self.wheel_speed(BODY_ID,1000)
+            self.wheel_speed(HEAD_ID,-1023)
+            self.wheel_speed(BODY_ID,1023)
             time.sleep(1.3)
             self.wheel_speed(HEAD_ID,0)
             self.wheel_speed(BODY_ID,0)
