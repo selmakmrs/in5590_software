@@ -97,9 +97,11 @@ if __name__ == "__main__":
     print("⚙️ Torque enabled")
 
     print("Starting joint positions")
+    starting_pos = {}
     for i in found:
         pos = read_pos(port, pkt, i)
         print(f"Servo: {i} |  Pos: {pos}")
+        starting_pos[i] = pos
 
     # --- 1️⃣ JOINT MODE TEST ---
     print("\n🔹 Joint mode test: moving each servo sequentially")
@@ -280,7 +282,7 @@ if __name__ == "__main__":
     print("\n🔹 Resetting to joint mode & center")
     for i in found:
         set_joint_mode(port, pkt, i)
-        move_position(port, pkt, i, 512)
+        move_position(port, pkt, i, starting_pos[i])
     time.sleep(2)
 
     # --- Cleanup ---
