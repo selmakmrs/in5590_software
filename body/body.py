@@ -313,7 +313,7 @@ class BODY:
             time.sleep(2)
             self.wheel_speed(BASE_ID,0)
             self.wheel_speed(BODY_ID,0)
-            self.sleep(0.3)
+            time.sleep(0.3)
             self.recalibrate_after_spin()
 
     def jump_forward(self, wait=1, go_home = True):
@@ -352,6 +352,7 @@ class BODY:
             time.sleep(0.8)
             self.wheel_speed(HEAD_ID,0)
             self.wheel_speed(BODY_ID,0)
+            self.wheel_speed(BASE_ID,0)
             self.sleep(0.3)
             self.recalibrate_after_spin()
 
