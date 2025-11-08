@@ -486,9 +486,9 @@ if __name__ == "__main__":
         MEDUIM = 600
         SLOW = 250
 
-        seconds = [0.8, 1.5, 2.3]
+        seconds = [0.7, 1.5, 2.3]
         body.set_wheel_mode()
-        for sec in seconds[:-1]:
+        for sec in seconds[:]:
             body.set_wheel_mode()
             print(f"Second = {sec}")
             time.sleep(1)
