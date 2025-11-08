@@ -489,11 +489,11 @@ if __name__ == "__main__":
         body.start()
         
         # Test movements
-        print("Starting testing Movemnts")
-        time.sleep(1)
-        print("Jumping Back")
-        time.sleep(1)
-        body.jump_back()
+        # print("Starting testing Movemnts")
+        # time.sleep(1)
+        # print("Jumping Back")
+        # time.sleep(1)
+        # body.jump_back()
 
         # print("Jumping Forward")
         # time.sleep(1)
@@ -532,30 +532,30 @@ if __name__ == "__main__":
 
 
                 
-        # FAST = 1024
-        # MEDUIM = 600
-        # SLOW = 250
+        FAST = 1024
+        MEDUIM = 600
+        SLOW = 250
 
 
-        # ID = HEAD_ID
+        ID = BASE_ID
 
-        # seconds = [0.6, 1, 1.7]
-        # body.set_wheel_mode()
-        # for sec in seconds[:]:
-        #     body.set_wheel_mode()
-        #     print(f"Second = {sec}")
-        #     time.sleep(1)
-        #     body.wheel_speed(ID, FAST)
-        #     time.sleep(sec)
-        #     body.wheel_speed(ID,0)
-        #     time.sleep(1)
-        #     body.wheel_speed(ID,-FAST)
-        #     time.sleep(sec)
-        #     body.wheel_speed(ID,0)
-        #     time.sleep(1)
-        #     body.set_joint_mode()
-        #     body.home_position()
-        #     time.sleep(5)
+        seconds = [1, 2, 2.5]
+        body.set_wheel_mode()
+        for sec in seconds[:]:
+            body.set_wheel_mode()
+            print(f"Second = {sec}")
+            time.sleep(1)
+            body.wheel_speed(ID, MEDUIM)
+            time.sleep(sec)
+            body.wheel_speed(ID,0)
+            time.sleep(1)
+            body.wheel_speed(ID,-MEDUIM)
+            time.sleep(sec)
+            body.wheel_speed(ID,0)
+            time.sleep(1)
+            body.set_joint_mode()
+            body.home_position()
+            time.sleep(5)
 
 
         # movemnt = { FAST : {
