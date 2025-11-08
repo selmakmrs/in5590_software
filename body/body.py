@@ -462,11 +462,22 @@ if __name__ == "__main__":
 
 
         print("Tesing how far each motor can move")
-        positions = [0, 200, 400, 512, 800, 900]
-        for pos in positions:
-            print("Set in position : ", pos)
-            time.sleep(1.2)
-            body.move_position(BASE_ID, pos)
+        positions = [0, 200,512, 800,1000]
+        speeds = [600,800,1000]
+        for speed in speeds:
+            time.sleep(2)
+            print(f"----- Speed = {speed} -----")
+            body.home_position()
+            time.sleep(1)
+            for pos in positions:
+                print("Set in position : ", pos)
+                time.sleep(2)
+                body.move_position(BASE_ID, pos, speed)
+
+        time.sleep(1)
+
+            
+
 
 
         # body.shake_head()
