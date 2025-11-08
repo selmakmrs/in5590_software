@@ -1,3 +1,4 @@
+from typing import List
 from dynamixel_sdk import *
 import time
 import math
@@ -274,6 +275,29 @@ class BODY:
         # Return to center
         self.move_position(layer_id, center)
 
+
+   # ======== Big Wheel Movemnts
+
+    def run_wheel_movement(self, layer_ids : List, speeds : List, duration : int|float, wait_before_returning: int|float = 1):
+        assert len(layer_ids) == len(speeds), "All layers needs to have a speed"
+        self.set_wheel_mode()
+        for id, speed in zip(layer_ids, speeds):
+            self.wheel_speed(id,speed)
+        self.hold(duration)
+        for id in layer_ids:
+            self.wheel_speed(id,0)
+        self.hold(wait_before_returning)
+        for id, speed in zip(layer_ids, speeds):
+            self.wheel_speed(id,-speed)
+        self.hold(duration)
+        for id, speed in zip(layer_ids, speeds):
+            self.wheel_speed(id,-speed)
+        self.hold(duration)
+        for id, speed in zip(layer_ids, speeds):
+            self.wheel_speed(id,0)
+        self.hold(0.3)
+        self.recalibrate_after_spin()
+
     def jump_back(self, wait=1, go_home = True):
         """Make the robot jump back"""
         self.set_wheel_mode()
@@ -349,61 +373,18 @@ class BODY:
             time.sleep(0.8)
             self.wheel_speed(HEAD_ID,0)
             self.wheel_speed(BODY_ID,0)
+            self.wheel_speed(BASE_ID,0)
             time.sleep(0.3)
             self.recalibrate_after_spin()
-
-
-    def shake_head(self, speed=600, cycles=3):
-        self.set_joint_mode()
-        current_pos = self.get_position(HEAD_ID)
-
-        for _ in range(cycles):
-            self.move_position(HEAD_ID, current_pos - 70, speed=speed)
-            time.sleep(0.5)
-            self.move_position(HEAD_ID, current_pos + 80, speed=speed)
-            time.sleep(0.5)
-
-        time.sleep(0.3)
-        self.home_position()
-
-
-
-        
-
-
-    def spin(self, layer_id, rotations=1, speed=300):
-        """
-        Continuous spin (requires wheel mode)
-        WARNING: This LOSES absolute position! Must recalibrate after.
-        """
-        print(f"⚠️  Spinning ID {layer_id} - position tracking will be lost!")
-        self.set_wheel_mode(layer_id)
-        duration = rotations * 2.0  # ~2 seconds per rotation at medium speed
-        self.wheel_speed(layer_id, speed)
-        time.sleep(duration)
-        self.wheel_speed(layer_id, 0)
-        time.sleep(0.2)
-        
-        # CRITICAL: After spinning, we don't know where we are!
-        # Options:
-        # 1. Return to home position (safest)
-        # 2. Assume we're near where we started
-        # 3. Use external encoder
-        
-        self.set_joint_mode(layer_id)
-        print(f"⚠️  ID {layer_id} lost position - returning home")
-        self.move_position(layer_id, HOME_POSITIONS[layer_id])
-        time.sleep(0.5)
-
-    def hold(self, duration):
-        """Pause for duration seconds"""
-        time.sleep(duration)
-
 
    
 
     # === UTILITY ===
 
+    def hold(self, duration):
+        """Pause for duration seconds"""
+        time.sleep(duration)
+        
     def is_moving(self, dxl_id=None):
         """Check if servo(s) are currently moving"""
         ids = [dxl_id] if dxl_id else self.ids
@@ -466,8 +447,8 @@ if __name__ == "__main__":
 
         print("Jumping Right")
         time.sleep(1)
-        body.jump_right(go_home=False)
-        body.shake_head()
+        body.jump_right()
+        # body.shake_head()
         # print("\n🧪 Testing basic movements...")
         # body.look_left(30)
         # time.sleep(1)
