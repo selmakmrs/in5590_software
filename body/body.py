@@ -500,6 +500,7 @@ if __name__ == "__main__":
         body.wheel_speed(BASE_ID,0)
         time.sleep(1)
         body.home_position()
+        time.sleep(5)
 
     body.set_joint_mode()
 
