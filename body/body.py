@@ -539,7 +539,7 @@ if __name__ == "__main__":
 
         ID = HEAD_ID
 
-        seconds = [1.4, 2.5, 3.8]
+        seconds = [1.2, 2, 3]
         body.set_wheel_mode()
         for sec in seconds[:]:
             body.set_wheel_mode()
