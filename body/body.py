@@ -533,13 +533,13 @@ if __name__ == "__main__":
 
                 
         FAST = 1024
-        MEDUIM = 600
+        MEDUIM = 650
         SLOW = 250
 
 
         ID = BASE_ID
 
-        seconds = [1, 2, 2.5]
+        seconds = [1, 2, 3]
         body.set_wheel_mode()
         for sec in seconds[:]:
             body.set_wheel_mode()
