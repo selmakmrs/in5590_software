@@ -489,6 +489,7 @@ if __name__ == "__main__":
         seconds = [0.5, 1.0, 1.5, 2, 2.5, 3]
         body.set_wheel_mode()
         for sec in seconds:
+            body.set_joint_mode()
             print(f"Second = {sec}")
             time.sleep(1)
             body.wheel_speed(BASE_ID, FAST)
@@ -499,10 +500,10 @@ if __name__ == "__main__":
             time.sleep(sec)
             body.wheel_speed(BASE_ID,0)
             time.sleep(1)
+            body.set_joint_mode()
             body.home_position()
             time.sleep(5)
 
-        body.set_joint_mode()
 
 
         # body.shake_head()
