@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from dynamixel_sdk import *
 import time
 import math
@@ -34,6 +34,8 @@ HOME_POSITIONS = {
     BODY_ID: 512,
     BASE_ID: 512
 }
+
+FAST = 1023
 
 # MOVEMENT THRESHOLDS
 BIG_MOVE_THRESHOLD = 200  # Use wheel mode only for movements larger than this
@@ -278,15 +280,59 @@ class BODY:
 
    # ======== Big Wheel Movemnts ================
 
-    def run_wheel_movement(self, layer_ids : List, speeds : List, duration : int|float, wait_before_returning: int|float = 1):
-        assert len(layer_ids) == len(speeds), "All layers needs to have a speed"
+    def _run_wheel_movement(self, config : List[Tuple], speed):
+        movemnt = { FAST : {
+            BASE_ID : {90 : 0.7, 180 : 1.5, 270 : 2.3},
+            BODY_ID : {90 : 0.5, 180 : 1.0, 270 : 1.5},
+            HEAD_ID : {90 : 0.6, 180 : 1.1, 270 : 1.7},
+        
+        }}
+        durations = {}
+        for dxl_id, deg in config:
+            durations[dxl_id] = self._get_rotation_duration(dxl_id,deg,speed)
+
+        max_duration = max(durations)
+
+
+        # Enter wheel mode
         self.set_wheel_mode()
-        self._run_wheels(layer_ids, speeds, duration)
-        self._stop_wheel(layer_ids, wait_before_returning)
-        self._run_wheels(layer_ids, [speed*-1 for speed in speeds], duration)
-        self._stop_wheel(layer_ids, wait_before_returning)
-        self.set_joint_mode()
-        self.home_position()
+        for dxl_id, deg in config:
+            dir_speed = speed if deg > 0 else -speed
+            self.wheel_speed(dxl_id, dir_speed)
+
+        start = time.time()
+        # Loop untill all are stopped
+        while True:
+            elapsed = time.time() - start()
+            all_stopped = True
+
+            for dxl_id, deg in config:
+                if elapsed >= durations[dxl_id]:
+                    self.wheel_speed(dxl_id,0)
+                else:
+                    all_stopped = False
+            
+            if all_stopped or elapsed > (max_duration + 0.2):
+                break
+            
+            time.sleep(0.01)
+        
+        for dxl_id, deg in config:
+            self.wheel_speed(dxl_id, 0)
+
+        
+        
+
+
+    def _get_rotation_duration(self, dxl_id, degree, speed):
+        movemnt = { FAST : {
+            BASE_ID : {90 : 0.7, 180 : 1.5, 270 : 2.3},
+            BODY_ID : {90 : 0.5, 180 : 1.0, 270 : 1.5},
+            HEAD_ID : {90 : 0.6, 180 : 1.1, 270 : 1.7},
+        
+        }}
+        duartion = movemnt[speed][dxl_id][abs(degree)]
+        return duartion
 
 
     def _stop_wheel(self, layer_ids, wait=0.3):
@@ -294,20 +340,33 @@ class BODY:
             self.wheel_speed(layer_id, 0)
         self.hold(wait)
 
-    def _run_wheels(self, layer_ids, speeds, duration):
-        for id, speed in zip(layer_ids, speeds):
+    def _run_wheels(self, layer_ids, speed, durations):
+        for id in layer_ids:
             self.wheel_speed(id,speed)
-        self.hold(duration)
+        
+        max_duration = max(durations)
 
 
-    def jump_back(self, wait=1, go_home = True):
+
+    def jump_back(self, speed=FAST):
         """Make the robot jump back"""
+        # Rotate BASE 180 degree
+        # Rotate BODY -180 degree
+
+
+        # duration_dictonary = movemnt[speed]
+
         self.set_wheel_mode()
-        layer_ids = [BASE_ID, BODY_ID]
-        speeds = [1023, -600]
-        duration = 1.5
-        wait_before_returning = 1
-        self.run_wheel_movement(layer_ids, speeds, duration, wait_before_returning)
+
+        config = [(BASE_ID, 180), (BODY_ID, -180)]
+        self._run_wheel_movement(config, speed)
+        self.hold(2)
+        config = [(BASE_ID, -180), (BODY_ID, 180)]
+        self._run_wheel_movement(config, speed)
+        self.set_joint_mode()
+        self.home_position()
+        
+        
 
     def jump_forward(self, wait=1, go_home = True):
         """Make the robot jump back"""
@@ -430,11 +489,11 @@ if __name__ == "__main__":
         body.start()
         
         # Test movements
-        # print("Starting testing Movemnts")
-        # time.sleep(1)
-        # print("Jumping Back")
-        # time.sleep(1)
-        # body.jump_back()
+        print("Starting testing Movemnts")
+        time.sleep(1)
+        print("Jumping Back")
+        time.sleep(1)
+        body.jump_back()
 
         # print("Jumping Forward")
         # time.sleep(1)
@@ -473,30 +532,39 @@ if __name__ == "__main__":
 
 
                 
-        FAST = 1024
-        MEDUIM = 600
-        SLOW = 250
+        # FAST = 1024
+        # MEDUIM = 600
+        # SLOW = 250
 
 
-        ID = HEAD_ID
+        # ID = HEAD_ID
 
-        seconds = [0.6, 1, 1.7]
-        body.set_wheel_mode()
-        for sec in seconds[:]:
-            body.set_wheel_mode()
-            print(f"Second = {sec}")
-            time.sleep(1)
-            body.wheel_speed(ID, FAST)
-            time.sleep(sec)
-            body.wheel_speed(ID,0)
-            time.sleep(1)
-            body.wheel_speed(ID,-FAST)
-            time.sleep(sec)
-            body.wheel_speed(ID,0)
-            time.sleep(1)
-            body.set_joint_mode()
-            body.home_position()
-            time.sleep(5)
+        # seconds = [0.6, 1, 1.7]
+        # body.set_wheel_mode()
+        # for sec in seconds[:]:
+        #     body.set_wheel_mode()
+        #     print(f"Second = {sec}")
+        #     time.sleep(1)
+        #     body.wheel_speed(ID, FAST)
+        #     time.sleep(sec)
+        #     body.wheel_speed(ID,0)
+        #     time.sleep(1)
+        #     body.wheel_speed(ID,-FAST)
+        #     time.sleep(sec)
+        #     body.wheel_speed(ID,0)
+        #     time.sleep(1)
+        #     body.set_joint_mode()
+        #     body.home_position()
+        #     time.sleep(5)
+
+
+        # movemnt = { FAST : {
+        #     BASE_ID : {90 : 0.7, 180 : 1.5, 270 : 2.3},
+        #     BODY_ID : {90 : 0.5, 180 : 1.0, 270 : 1.5},
+        #     HEAD_ID : {90 : 0.6, 180 : 1.1, 270 : 1.7},
+        # }
+
+        # }
 
 
 
