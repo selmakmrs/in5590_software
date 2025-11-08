@@ -463,7 +463,7 @@ if __name__ == "__main__":
 
         print("Tesing how far each motor can move")
         positions = [0, 1000]
-        speeds = [600,800,1000]
+        speeds = [200,1000]
         for speed in speeds:
             time.sleep(2)
             print(f"----- Speed = {speed} -----")
