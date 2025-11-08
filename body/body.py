@@ -303,7 +303,7 @@ class BODY:
         start = time.time()
         # Loop untill all are stopped
         while True:
-            elapsed = time.time() - start()
+            elapsed = time.time() - start
             all_stopped = True
 
             for dxl_id, deg in config:
@@ -591,5 +591,7 @@ if __name__ == "__main__":
         
     except KeyboardInterrupt:
         print("\n⚠️  Interrupted by user")
+        body.set_wheel_mode()
+        body._stop_wheel([0,3,1])
     finally:
         body.cleanup()
