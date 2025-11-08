@@ -537,9 +537,9 @@ if __name__ == "__main__":
         SLOW = 250
 
 
-        ID = BODY_ID
+        ID = HEAD_ID
 
-        seconds = [0.8, 1.5, 2.5]
+        seconds = [1.4, 2.5, 3.8]
         body.set_wheel_mode()
         for sec in seconds[:]:
             body.set_wheel_mode()
