@@ -480,7 +480,7 @@ if __name__ == "__main__":
 
         ID = BODY_ID
 
-        seconds = [0.5, 0.8, 1]
+        seconds = [0.5, 1, 1.5]
         body.set_wheel_mode()
         for sec in seconds[:]:
             body.set_wheel_mode()
