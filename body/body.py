@@ -358,10 +358,10 @@ class BODY:
 
         self.set_wheel_mode()
 
-        config = [(BASE_ID, 180), (BODY_ID, -180)]
+        config = [(BASE_ID, 180), (BODY_ID, 180)]
         self._run_wheel_movement(config, speed)
         self.hold(2)
-        config = [(BASE_ID, -180), (BODY_ID, 180)]
+        config = [(BASE_ID, -180), (BODY_ID, -180)]
         self._run_wheel_movement(config, speed)
         self.set_joint_mode()
         self.home_position()
