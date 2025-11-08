@@ -333,7 +333,7 @@ class BODY:
             time.sleep(1.3)
             self.wheel_speed(HEAD_ID,0)
             self.wheel_speed(BODY_ID,0)
-            self.sleep(0.3)
+            self.hold(0.3)
             self.set_joint_mode()
             self.home_position()
             # self.recalibrate_after_spin()
@@ -445,9 +445,9 @@ if __name__ == "__main__":
         time.sleep(1)
         body.jump_back()
 
-        # print("Jumping Forward")
-        # time.sleep(1)
-        # body.jump_forward()
+        print("Jumping Forward")
+        time.sleep(1)
+        body.jump_forward()
 
         # time.sleep(1)
         # print("Jumping Left")
