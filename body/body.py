@@ -439,24 +439,36 @@ if __name__ == "__main__":
         body.start()
         
         # Test movements
-        print("Starting testing Movemnts")
-        time.sleep(1)
-        print("Jumping Back")
-        time.sleep(1)
-        body.jump_back()
+        # print("Starting testing Movemnts")
+        # time.sleep(1)
+        # print("Jumping Back")
+        # time.sleep(1)
+        # body.jump_back()
 
-        print("Jumping Forward")
-        time.sleep(1)
-        body.jump_forward()
+        # print("Jumping Forward")
+        # time.sleep(1)
+        # body.jump_forward()
 
-        time.sleep(1)
-        print("Jumping Left")
-        time.sleep(1)
-        body.jump_left()
+        # time.sleep(1)
+        # print("Jumping Left")
+        # time.sleep(1)
+        # body.jump_left()
 
-        print("Jumping Right")
-        time.sleep(1)
-        body.jump_right()
+        # print("Jumping Right")
+        # time.sleep(1)
+        # body.jump_right()
+
+
+
+
+        print("Tesing how far each motor can move")
+        positions = [0, 200, 400, 512, 800, 900]
+        for pos in positions:
+            print("Set in position : ", pos)
+            time.sleep(0.5)
+            body.move_position(BASE_ID, pos)
+
+
         # body.shake_head()
         # print("\n🧪 Testing basic movements...")
         # body.look_left(30)
