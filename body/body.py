@@ -461,24 +461,47 @@ if __name__ == "__main__":
 
 
 
-        print("Tesing how far each motor can move")
-        positions = [0, 1000]
-        speeds = [200,1000]
-        for speed in speeds:
-            time.sleep(2)
-            print(f"----- Speed = {speed} -----")
-            body.home_position()
-            time.sleep(1)
-            for pos in positions:
-                print("Set in position : ", pos)
-                time.sleep(1)
-                body.move_position(BASE_ID, pos, speed)
-                time.sleep(5)
+        # print("Tesing how far each motor can move")
+        # positions = [0, 1000]
+        # speeds = [200,1000]
+        # for speed in speeds:
+        #     time.sleep(2)
+        #     print(f"----- Speed = {speed} -----")
+        #     body.home_position()
+        #     time.sleep(1)
+        #     for pos in positions:
+        #         print("Set in position : ", pos)
+        #         time.sleep(1)
+        #         body.move_position(BASE_ID, pos, speed)
+        #         time.sleep(5)
 
-        time.sleep(1)
+        # time.sleep(1)
+
+
+        print("Testing Wheel mode:")
+
 
             
+    FAST = 1024
+    MEDUIM = 600
+    SLOW = 250
 
+    seconds = [0.5, 1.0, 1.5, 2, 2.5, 3]
+    body.set_wheel_mode()
+    for sec in seconds:
+        print(f"Second = {sec}")
+        time.sleep(1)
+        body.wheel_speed(BASE_ID, FAST)
+        time.sleep(sec)
+        body.wheel_speed(BASE_ID,0)
+        time.sleep(1)
+        body.wheel_speed(BASE_ID,-FAST)
+        time.sleep(sec)
+        body.wheel_speed(BASE_ID,0)
+        time.sleep(1)
+        body.home_position()
+
+    body.set_joint_mode()
 
 
         # body.shake_head()
