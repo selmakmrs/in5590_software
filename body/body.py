@@ -465,7 +465,7 @@ if __name__ == "__main__":
         positions = [0, 200, 400, 512, 800, 900]
         for pos in positions:
             print("Set in position : ", pos)
-            time.sleep(0.5)
+            time.sleep(1.2)
             body.move_position(BASE_ID, pos)
 
 
