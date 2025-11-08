@@ -296,7 +296,7 @@ class BODY:
         for id, speed in zip(layer_ids, speeds):
             self.wheel_speed(id,0)
         self.hold(0.3)
-        self.recalibrate_after_spin()
+        # self.recalibrate_after_spin()
 
     def jump_back(self, wait=1, go_home = True):
         """Make the robot jump back"""
@@ -314,7 +314,9 @@ class BODY:
             self.wheel_speed(BASE_ID,0)
             self.wheel_speed(BODY_ID,0)
             time.sleep(0.3)
-            self.recalibrate_after_spin()
+            self.set_joint_mode()
+            self.home_position()
+            # self.recalibrate_after_spin()
 
     def jump_forward(self, wait=1, go_home = True):
         """Make the robot jump back"""
@@ -332,7 +334,9 @@ class BODY:
             self.wheel_speed(HEAD_ID,0)
             self.wheel_speed(BODY_ID,0)
             self.sleep(0.3)
-            self.recalibrate_after_spin()
+            self.set_joint_mode()
+            self.home_position()
+            # self.recalibrate_after_spin()
 
 
     def jump_left(self, wait=1, go_home=True):
@@ -354,7 +358,9 @@ class BODY:
             self.wheel_speed(BODY_ID,0)
             self.wheel_speed(BASE_ID,0)
             self.sleep(0.3)
-            self.recalibrate_after_spin()
+            self.set_joint_mode()
+            self.home_position()
+            # self.recalibrate_after_spin()
 
 
     def jump_right(self, wait=1, go_home=True):
@@ -376,7 +382,9 @@ class BODY:
             self.wheel_speed(BODY_ID,0)
             self.wheel_speed(BASE_ID,0)
             time.sleep(0.3)
-            self.recalibrate_after_spin()
+            self.set_joint_mode()
+            self.home_position()
+            # self.recalibrate_after_spin()
 
    
 
