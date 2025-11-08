@@ -276,47 +276,38 @@ class BODY:
         self.move_position(layer_id, center)
 
 
-   # ======== Big Wheel Movemnts
+   # ======== Big Wheel Movemnts ================
 
     def run_wheel_movement(self, layer_ids : List, speeds : List, duration : int|float, wait_before_returning: int|float = 1):
         assert len(layer_ids) == len(speeds), "All layers needs to have a speed"
         self.set_wheel_mode()
+        self._run_wheels(layer_ids, speeds, duration)
+        self._stop_wheel(layer_ids, wait_before_returning)
+        self._run_wheels(layer_ids, [speed*-1 for speed in speeds], duration)
+        self._stop_wheel(layer_ids, wait_before_returning)
+        self.set_joint_mode()
+        self.home_position()
+
+
+    def _stop_wheel(self, layer_ids, wait=0.3):
+        for layer_id in layer_ids:
+            self.wheel_speed(layer_id, 0)
+        self.hold(wait)
+
+    def _run_wheels(self, layer_ids, speeds, duration):
         for id, speed in zip(layer_ids, speeds):
             self.wheel_speed(id,speed)
         self.hold(duration)
-        for id in layer_ids:
-            self.wheel_speed(id,0)
-        self.hold(wait_before_returning)
-        for id, speed in zip(layer_ids, speeds):
-            self.wheel_speed(id,-speed)
-        self.hold(duration)
-        for id, speed in zip(layer_ids, speeds):
-            self.wheel_speed(id,-speed)
-        self.hold(duration)
-        for id, speed in zip(layer_ids, speeds):
-            self.wheel_speed(id,0)
-        self.hold(0.3)
-        # self.recalibrate_after_spin()
+
 
     def jump_back(self, wait=1, go_home = True):
         """Make the robot jump back"""
         self.set_wheel_mode()
-        self.wheel_speed(BASE_ID,1023)
-        self.wheel_speed(BODY_ID,-600)
-        time.sleep(1.5)
-        self.wheel_speed(BASE_ID,0)
-        self.wheel_speed(BODY_ID,0)
-        time.sleep(wait)
-        if go_home:
-            self.wheel_speed(BASE_ID,-1023)
-            self.wheel_speed(BODY_ID,600)
-            time.sleep(1.5)
-            self.wheel_speed(BASE_ID,0)
-            self.wheel_speed(BODY_ID,0)
-            time.sleep(0.3)
-            self.set_joint_mode()
-            self.home_position()
-            # self.recalibrate_after_spin()
+        layer_ids = [BASE_ID, BODY_ID]
+        speeds = [1023, -600]
+        duration = 1.5
+        wait_before_returning = 1
+        self.run_wheel_movement(layer_ids, speeds, duration, wait_before_returning)
 
     def jump_forward(self, wait=1, go_home = True):
         """Make the robot jump back"""
@@ -489,7 +480,7 @@ if __name__ == "__main__":
 
         ID = BODY_ID
 
-        seconds = [0.7, 1.5, 2.3]
+        seconds = [0.5, 0.8, 1]
         body.set_wheel_mode()
         for sec in seconds[:]:
             body.set_wheel_mode()
