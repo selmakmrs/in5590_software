@@ -272,7 +272,25 @@ class BODY:
 
 
     def _look_right_slow(self):
-        pass
+        """Turn head left and light body twist"""
+        self.set_joint_mode()
+
+        steps = 10
+        duration = 0.01
+
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 600, 50)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 700, 50)
+        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+
+        # Hold position
+        time.sleep(1)
+
+        # Return home
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 50)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 50)
+        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+
+        time.sleep(3)
 
     def _look_arounf_sweep(self):
         pass
@@ -351,6 +369,7 @@ if __name__ == "__main__":
         time.sleep(1)
         print("Testing Body movemnt in joint mode")
         body._look_left_slow()
+        body._look_right_slow()
 
         
         print("\n✅ Tests complete!")
