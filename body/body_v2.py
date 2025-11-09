@@ -249,11 +249,11 @@ class BODY:
 
     # ============ Base movemnts ==================
 
-    def _look_left_slow(self):
+    def _look_left_slow(self, hold = 1):
         """Turn head left and light body twist"""
         self.set_joint_mode()
 
-        steps = 10
+        steps = 5
         duration = 0.01
 
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 200, 50)
@@ -261,21 +261,21 @@ class BODY:
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         # Hold position
-        time.sleep(1)
+        time.sleep(hold)
 
         # Return home
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 50)
         body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 50)
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
-        time.sleep(3)
+        time.sleep(0.5)
 
 
-    def _look_right_slow(self):
+    def _look_right_slow(self, hold = 1):
         """Turn head left and light body twist"""
         self.set_joint_mode()
 
-        steps = 10
+        steps = 5
         duration = 0.01
 
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 800, 50)
@@ -283,23 +283,23 @@ class BODY:
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         # Hold position
-        time.sleep(1)
+        time.sleep(hold)
 
         # Return home
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 50)
         body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 50)
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
-        time.sleep(3)
+        time.sleep(0.5)
 
     def _look_arounf_sweep(self):
         pass
 
-    def _curious_tilit_left(self):
+    def _curious_tilit_left(self, hold=1):
         """Turn head left and light body twist"""
         self.set_joint_mode()
 
-        steps = 10
+        steps = 5
         duration = 0.01
 
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 0, 100)
@@ -308,7 +308,7 @@ class BODY:
         self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
 
         # Hold position
-        time.sleep(3)
+        time.sleep(hold)
 
         # Return home
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 100)
@@ -316,9 +316,9 @@ class BODY:
         base_config = (BASE_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BASE_ID], 100)
         self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
 
-        time.sleep(1)
+        time.sleep(0.5)
 
-    def _curious_tilit_right(self):
+    def _curious_tilit_right(self, hold=1):
         """Turn head left and light body twist"""
         self.set_joint_mode()
 
@@ -331,7 +331,7 @@ class BODY:
         self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
 
         # Hold position
-        time.sleep(3)
+        time.sleep(hold)
 
         # Return home
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 100)
@@ -339,7 +339,7 @@ class BODY:
         base_config = (BASE_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BASE_ID], 100)
         self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
 
-        time.sleep(1)
+        time.sleep(0.5)
 
 
     def _twitch(self):
@@ -472,7 +472,8 @@ class BODY:
         while True:
 
             sequence = random.choice(look_sequences)
-            sequence()
+            hold = random.uniform(0.1,2.5)
+            sequence(hold)
 
             if 30 < time.time() - start:
                 break
