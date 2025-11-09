@@ -21,6 +21,9 @@ ADDR_PRESENT_POSITION = 36
 TORQUE_ENABLE = 1
 TORQUE_DISABLE = 0
 
+ADDR_CW_ANGLE_LIMIT = 6
+ADDR_CCW_ANGLE_LIMIT = 8
+
 # Positions (0–1023 → 0–300 degrees)
 POS_LEFT = 300
 POS_RIGHT = 700
@@ -43,6 +46,10 @@ else:
 
 # Enable torque
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
+
+# Set joint mode
+packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CW_ANGLE_LIMIT, 0)
+packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CCW_ANGLE_LIMIT, 1023)
 
 # ------------------ QUIET SETTINGS ------------------
 # Lower speed
