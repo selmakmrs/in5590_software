@@ -496,7 +496,6 @@ class BODY:
         head_config = (HEAD_ID, 900, 0.7)
 
         self._run_wheel_movements([base_config, body_config, head_config])
-        
 
     def dance(self):
         hold = 0.1
@@ -504,7 +503,6 @@ class BODY:
         for _ in range(2):
             self.jump_left(hold)
             self.jump_right(hold)
-
 
     def sway(self, cycles=4):
 
@@ -532,6 +530,28 @@ class BODY:
         body_config_end = (BODY_ID, -700, 1.5)
         base_config_end = (BASE_ID, 1023, 1.5)
         self._run_wheel_movements([body_config_end, base_config_end], go_back=False)
+
+
+    def look_up(self):
+        base_config = (BASE_ID, -1023, 1.5)
+        body_config = (BODY_ID, 700, 1.5)
+        head_config = (HEAD_ID, -1024, 1.1)
+
+        self._run_wheel_movements([base_config, body_config, head_config], go_back=False)
+        
+
+        
+
+
+
+    def look_down(self):
+        base_config = (BASE_ID, 1023, 1.5)
+        body_config = (BODY_ID, -700, 1.5)
+        head_config = (HEAD_ID, 1024, 1.1)
+
+        self._run_wheel_movements([base_config, body_config, head_config], go_back=False)
+        
+
 
         
 
@@ -629,7 +649,7 @@ if __name__ == "__main__":
         # body.jump_back()
         # body.jump_left()
         # body.jump_right()
-        body.sway()
+        body.look_up()
 
         
         print("\n✅ Tests complete!")
