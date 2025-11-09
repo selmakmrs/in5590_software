@@ -410,7 +410,7 @@ if __name__ == "__main__":
         print("Testing Body movemnt in joint mode")
         # body._look_left_slow()
         # body._look_right_slow()
-        body._curious_tilit_left()
+        # body._curious_tilit_left()
         body._curious_tilit_right()
 
         
