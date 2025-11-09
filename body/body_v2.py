@@ -533,12 +533,18 @@ class BODY:
 
 
     def look_up(self):
+        self.set_wheel_mode()
         base_config = (BASE_ID, -1023, 1.5)
-        body_config = (BODY_ID, 700, 2)
+        body_config = (BODY_ID, 700, 1.7)
         head_config = (HEAD_ID, -1023, 1.1)
 
-        self._run_wheel_movements([base_config, body_config, head_config], go_back=False)
-        
+        for dxl_id, speed, time in [base_config, body_config, head_config]:
+            self.wheel_speed(dxl_id, speed)
+
+        time.sleep(1.5)
+
+        self._stop_wheels()
+        self.set_joint_mode()
 
         
 
@@ -547,7 +553,7 @@ class BODY:
     def look_down(self):
         base_config = (BASE_ID, 1023, 1.5)
         body_config = (BODY_ID, -700, 1.5)
-        head_config = (HEAD_ID, 1024, 1.1)
+        head_config = (HEAD_ID, 1024, 1.5)
 
         self._run_wheel_movements([base_config, body_config, head_config], go_back=False)
         
