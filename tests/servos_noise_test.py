@@ -6,7 +6,7 @@ import time
 import math
 
 # ------------------ USER CONFIG ------------------
-DXL_ID = 0
+DXL_ID = 3
 BAUDRATE = 1000000
 DEVICENAME = '/dev/ttyUSB0'   # e.g. 'COM3' on Windows
 
