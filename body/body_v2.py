@@ -376,7 +376,7 @@ class BODY:
         BASE 180 deg
         BODY -180 deg """
         base_config = (BASE_ID, 1024)
-        body_config = (BODY_ID, 600)
+        body_config = (BODY_ID, -600)
         duration = 1.5
         self._run_wheel_movements([base_config, body_config], duration)
 
