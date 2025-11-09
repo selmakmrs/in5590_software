@@ -655,6 +655,7 @@ if __name__ == "__main__":
             body._look_right_slow()
             body._look_left_slow()
         body.look_down()
+        body.idle()
         time.sleep(2)
         
 
