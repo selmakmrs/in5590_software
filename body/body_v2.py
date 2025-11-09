@@ -540,25 +540,17 @@ class BODY:
 
         self._run_wheel_movements([base_config, head_config], go_back=False)
 
-        # for dxl_id, speed, duration in [base_config, head_config]:
-        #     print(dxl_id, speed)
-        #     self.wheel_speed(dxl_id, speed)
-
-        # time.sleep(2)
-
-        # self._stop_wheels()
-        # self.set_joint_mode()
-
         
 
 
 
     def look_down(self):
-        base_config = (BASE_ID, 1023, 1.5)
-        body_config = (BODY_ID, -700, 1.5)
-        head_config = (HEAD_ID, 1024, 1.5)
+        self.set_wheel_mode()
+        base_config = (BASE_ID, 600, 2)
+        head_config = (HEAD_ID, -500, 2)
 
-        self._run_wheel_movements([base_config, body_config, head_config], go_back=False)
+        self._run_wheel_movements([base_config, head_config], go_back=False)
+
         
 
 
@@ -659,6 +651,11 @@ if __name__ == "__main__":
         # body.jump_left()
         # body.jump_right()
         body.look_up()
+        body._look_right_slow()
+        body._look_left_slow()
+        body.look_down()
+        time.sleep(2)
+        
 
         
         print("\n✅ Tests complete!")
