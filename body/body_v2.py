@@ -408,8 +408,8 @@ class BODY:
         """Makes Root jumb back
         BASE 180 deg
         BODY -180 deg """
-        base_config = (BASE_ID, 1024, 0.7)
-        body_config = (BODY_ID, -600, 0.7)
+        base_config = (BASE_ID, 1024, 1.5)
+        body_config = (BODY_ID, -600, 1.5)
    
         self._run_wheel_movements([base_config, body_config])
 
@@ -498,8 +498,8 @@ if __name__ == "__main__":
         # body._look_right_slow()
         # body._curious_tilit_left()
         # body._curious_tilit_right()
-        # body.jump_back()
-        body.jump_left()
+        body.jump_back()
+        # body.jump_left()
 
         
         print("\n✅ Tests complete!")
