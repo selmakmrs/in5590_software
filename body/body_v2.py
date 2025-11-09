@@ -471,9 +471,9 @@ class BODY:
 
         duration = 0.7
 
-        base_config = (BASE_ID, -900, 1)
+        base_config = (BASE_ID, -900, 0.7)
         body_config = (BODY_ID, 1024, 0.9)
-        head_config = (HEAD_ID, -900, 1)
+        head_config = (HEAD_ID, -900, 0.7)
 
         self._run_wheel_movements([base_config, body_config, head_config], hold=hold)
         
@@ -487,9 +487,9 @@ class BODY:
           - HEAD : 90 deg
           
         """
-        base_config = (BASE_ID, 900, 1)
+        base_config = (BASE_ID, 900, 0.7)
         body_config = (BODY_ID, -1024, 0.9)
-        head_config = (HEAD_ID, 900, 1)
+        head_config = (HEAD_ID, 900, 0.7)
 
         self._run_wheel_movements([base_config, body_config, head_config])
         
