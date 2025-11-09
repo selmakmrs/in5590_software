@@ -468,7 +468,7 @@ class BODY:
 
         start = time.time()
 
-        run_seq_prob = 0.4
+        run_seq_prob = 0.2
 
 
         while True:
@@ -476,7 +476,7 @@ class BODY:
             if random.random() < run_seq_prob:
 
                 sequence = random.choice(look_sequences)
-                hold = random.uniform(1,2.5)
+                hold = random.uniform(1,4)
                 sequence(hold)
 
             if 30 < time.time() - start:
