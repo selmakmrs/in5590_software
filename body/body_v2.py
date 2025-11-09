@@ -399,7 +399,7 @@ class BODY:
 
         base_config = (BASE_ID, -1024)
         body_config = (BODY_ID, 1024)
-        head_config = (HEAD_ID, -800)
+        head_config = (HEAD_ID, -500)
 
         self._run_wheel_movements([base_config, body_config, head_config], duration)
 
