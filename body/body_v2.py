@@ -395,13 +395,10 @@ class BODY:
 
         self._stop_wheels()
         time.sleep(3)
+        self.set_joint_mode()
 
 
             
-
-            
-
-
 
     def _stop_wheels(self):
         for dxl_id in self.ids:
@@ -415,6 +412,8 @@ class BODY:
         body_config = (BODY_ID, -600, 0.7)
    
         self._run_wheel_movements([base_config, body_config])
+
+        self.home_position()
 
 
 
@@ -438,6 +437,7 @@ class BODY:
         head_config = (HEAD_ID, -1024, 0.6)
 
         self._run_wheel_movements([base_config, body_config, head_config])
+        self.home_position()
 
 
 
