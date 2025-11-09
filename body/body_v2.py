@@ -534,8 +534,8 @@ class BODY:
 
     def look_up(self):
         base_config = (BASE_ID, -1023, 1.5)
-        body_config = (BODY_ID, 700, 1.5)
-        head_config = (HEAD_ID, -1024, 1.1)
+        body_config = (BODY_ID, 700, 2)
+        head_config = (HEAD_ID, -1023, 1.1)
 
         self._run_wheel_movements([base_config, body_config, head_config], go_back=False)
         
