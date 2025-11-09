@@ -395,7 +395,7 @@ class BODY:
           
         """
 
-        duration = 0.5
+        duration = 0.6
 
         base_config = (BASE_ID, -1024)
         body_config = (BODY_ID, 1024)
