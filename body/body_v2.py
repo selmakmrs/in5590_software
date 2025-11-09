@@ -304,7 +304,8 @@ class BODY:
 
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 0, 100)
         body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 1000, 100)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+        base_config = (BASE_ID, self.tracked_positions[HEAD_ID], 0, 100)
+        self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
 
         # Hold position
         time.sleep(3)
@@ -312,7 +313,8 @@ class BODY:
         # Return home
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 100)
         body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 100)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+        base_config = (BASE_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BASE_ID], 100)
+        self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
 
 
     def _twitch(self):
