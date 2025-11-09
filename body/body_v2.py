@@ -437,7 +437,7 @@ class BODY:
                 break
 
         self._stop_wheels()
-        time.sleep(3)
+        time.sleep(hold)
         self.set_joint_mode()
 
     def _stop_wheels(self):
