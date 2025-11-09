@@ -316,6 +316,8 @@ class BODY:
         base_config = (BASE_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BASE_ID], 100)
         self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
 
+        time.sleep(1)
+
     def _curious_tilit_right(self):
         """Turn head left and light body twist"""
         self.set_joint_mode()
@@ -336,6 +338,8 @@ class BODY:
         body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 100)
         base_config = (BASE_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BASE_ID], 100)
         self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
+
+        time.sleep(1)
 
 
     def _twitch(self):
@@ -410,7 +414,7 @@ if __name__ == "__main__":
         print("Testing Body movemnt in joint mode")
         # body._look_left_slow()
         # body._look_right_slow()
-        # body._curious_tilit_left()
+        body._curious_tilit_left()
         body._curious_tilit_right()
 
         
