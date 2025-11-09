@@ -253,10 +253,10 @@ class BODY:
         """Turn head left and light body twist"""
         self.set_joint_mode()
 
-        steps = 40
-        duration = 0.023
+        steps = 50
+        duration = 0.01
 
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 100, 200)
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 50, 200)
         body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 200, 200)
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
