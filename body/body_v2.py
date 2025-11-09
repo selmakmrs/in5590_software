@@ -210,7 +210,7 @@ class BODY:
     def _scurve_interpolate(self, start, end, s):
         """S-curve interpolation between start and end position"""
         s_smooth = 3 * s * s - 2 * s * s * s
-        return start + (end - start) *s_smooth
+        return int(start + (end - start) * s_smooth)
     
 
     def move_positions_smooth(self, layer_configs, steps=50, duration = 0.025):
