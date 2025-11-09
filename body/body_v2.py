@@ -433,7 +433,7 @@ class BODY:
         duration = 0.7
 
         base_config = (BASE_ID, -1024, 0.7)
-        body_config = (BODY_ID, 1024, 0.7)
+        body_config = (BODY_ID, 1024, 1)
         head_config = (HEAD_ID, -1024, 0.6)
 
         self._run_wheel_movements([base_config, body_config, head_config])
@@ -498,8 +498,8 @@ if __name__ == "__main__":
         # body._look_right_slow()
         # body._curious_tilit_left()
         # body._curious_tilit_right()
-        body.jump_back()
-        # body.jump_left()
+        # body.jump_back()
+        body.jump_left()
 
         
         print("\n✅ Tests complete!")
