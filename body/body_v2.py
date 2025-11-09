@@ -479,10 +479,21 @@ class BODY:
         self._run_wheel_movements([base_config, body_config, head_config])
         self.home_position()
 
+    def jump_right(self):
+        """
+        Makes robot jump left
+        Config:
+          - BASE : 90 deg
+          - BODY : -180 deg
+          - HEAD : 90 deg
+          
+        """
+        base_config = (BASE_ID, 900, 0.9)
+        body_config = (BODY_ID, -1024, 0.9)
+        head_config = (HEAD_ID, 900, 0.9)
 
-
-    def jump_right(slef):
-        pass 
+        self._run_wheel_movements([base_config, body_config, head_config])
+        self.home_position() 
 
 
 
@@ -582,6 +593,7 @@ if __name__ == "__main__":
         # body._curious_tilit_right()
         # body.jump_back()
         body.jump_left()
+        body.jump_right()
 
         
         print("\n✅ Tests complete!")
