@@ -278,7 +278,7 @@ class BODY:
         steps = 10
         duration = 0.01
 
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 700, 50)
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 800, 50)
         body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 700, 50)
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
