@@ -271,7 +271,7 @@ class BODY:
         time.sleep(0.5)
 
 
-    def _look_right_slow(self, hold = 1):
+    def _look_right_slow(self, hold=1):
         """Turn head left and light body twist"""
         self.set_joint_mode()
 
@@ -472,11 +472,13 @@ class BODY:
         while True:
 
             sequence = random.choice(look_sequences)
-            hold = random.uniform(0.1,2.5)
+            hold = random.uniform(0.8,2.5)
             sequence(hold)
 
             if 30 < time.time() - start:
                 break
+
+            self.sleep(0.5)
 
 
 
