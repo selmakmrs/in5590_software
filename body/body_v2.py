@@ -521,7 +521,7 @@ class BODY:
         for _ in range(cycles):
             body_config = (BODY_ID, self.tracked_positions[BODY_ID], 0, 100)
             self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
-            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 900, 100)
+            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 1024, 100)
             self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
 
         body_config = (BODY_ID, self.tracked_positions[BODY_ID], HOME_POSITIONS[BODY_ID], 400)
