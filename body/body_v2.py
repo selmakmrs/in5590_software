@@ -261,12 +261,14 @@ class BODY:
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         # Hold position
-        time.sleep(0.5)
+        time.sleep(1)
 
         # Return home
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 150)
         body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 150)
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+
+        time.sleep(1)
 
 
     def _look_right_slow(self):
