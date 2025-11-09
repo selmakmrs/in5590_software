@@ -369,7 +369,7 @@ class BODY:
                 else:
                     all_servos_stopped = False
 
-            if all_servos_stopped or elapsed >= 1.5:
+            if all_servos_stopped or elapsed >= 2:
                 break
             time.sleep(0.01)
 
@@ -411,9 +411,9 @@ class BODY:
         """Makes Root jumb back
         BASE 180 deg
         BODY -180 deg """
-        base_config = (BASE_ID, 1024, 1.5)
-        body_config = (BODY_ID, -600, 1.5)
-        duration = 1.5
+        base_config = (BASE_ID, 1024, 1)
+        body_config = (BODY_ID, -600, 1)
+   
         self._run_wheel_movements([base_config, body_config])
 
 
@@ -434,7 +434,7 @@ class BODY:
         duration = 0.7
 
         base_config = (BASE_ID, -1024, 0.7)
-        body_config = (BODY_ID, -1024, 0.9)
+        body_config = (BODY_ID, 1024, 0.9)
         head_config = (HEAD_ID, -1024, 0.6)
 
         self._run_wheel_movements([base_config, body_config, head_config])
