@@ -497,12 +497,6 @@ class BODY:
 
         self._run_wheel_movements([base_config, body_config, head_config])
 
-    def dance(self):
-        hold = 0.1
-        
-        for _ in range(2):
-            self.jump_left(hold)
-            self.jump_right(hold)
 
     def sway(self, cycles=4):
 
@@ -595,7 +589,7 @@ class BODY:
                 self.home_position()
 
             if random.random() <= fast_seq_prob:
-                sequence = random.choice(fast_seq_prob)
+                sequence = random.choice(fast_look_sequence)
                 hold = random.uniform(1,4)
                 sequence(hold)
 
