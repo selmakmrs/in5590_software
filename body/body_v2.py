@@ -536,7 +536,7 @@ class BODY:
         self.set_wheel_mode()
         base_config = (BASE_ID, -600, 2)
         # body_config = (BODY_ID, 300, 1.7)
-        head_config = (HEAD_ID, 500, 1.5)
+        head_config = (HEAD_ID, 500, 2)
 
         self._run_wheel_movements([base_config, head_config], go_back=False)
 
