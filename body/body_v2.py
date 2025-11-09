@@ -352,20 +352,56 @@ class BODY:
 
     # ============== Wheel Movements =================
 
-    def _run_wheel_movements(self, layer_config, duration):
+    def _run_wheel_movements(self, layer_config):
         self.set_wheel_mode()
-        for dxl_id, speed in layer_config:
+
+        for dxl_id, speed, duration in layer_config:
             self.wheel_speed(dxl_id, speed)
-        time.sleep(duration)
-        self._stop_wheels()
-        time.sleep(2)
-        for dxl_id, speed in layer_config:
-            self.wheel_speed(dxl_id, -speed)
-        time.sleep(duration)
-        self._stop_wheels()
-        time.sleep(1)
-        self.set_joint_mode()
+
+        start = time.time()
         
+        while True:
+            elapsed = time.time() - start
+            all_servos_stopped = True
+            for dxl_id, speed, duration in layer_config:
+                if duration <= elapsed:
+                    self.wheel_speed(dxl_id,0)
+                else:
+                    all_servos_stopped = False
+
+            if all_servos_stopped or elapsed >= 1.5:
+                break
+            time.sleep(0.01)
+
+        self._stop_wheels()
+        time.sleep(3)
+
+        for dxl_id, speed, duration in layer_config:
+            self.wheel_speed(dxl_id, -speed)
+
+        start = time.time()
+        
+        while True:
+            elapsed = time.time() - start
+            all_servos_stopped = True
+            for dxl_id, speed, duration in layer_config:
+                if duration <= elapsed:
+                    self.wheel_speed(dxl_id,0)
+                else:
+                    all_servos_stopped = False
+
+            if all_servos_stopped or elapsed >= 2:
+                break
+
+        self._stop_wheels()
+        time.sleep(3)
+
+
+            
+
+            
+
+
 
     def _stop_wheels(self):
         for dxl_id in self.ids:
@@ -375,10 +411,10 @@ class BODY:
         """Makes Root jumb back
         BASE 180 deg
         BODY -180 deg """
-        base_config = (BASE_ID, 1024)
-        body_config = (BODY_ID, -600)
+        base_config = (BASE_ID, 1024, 1.5)
+        body_config = (BODY_ID, -600, 1.5)
         duration = 1.5
-        self._run_wheel_movements([base_config, body_config], duration)
+        self._run_wheel_movements([base_config, body_config])
 
 
 
@@ -395,13 +431,13 @@ class BODY:
           
         """
 
-        duration = 0.8
+        duration = 0.7
 
-        base_config = (BASE_ID, -1024)
-        body_config = (BODY_ID, 800)
-        head_config = (HEAD_ID, -900)
+        base_config = (BASE_ID, -1024, 0.7)
+        body_config = (BODY_ID, -1024, 0.9)
+        head_config = (HEAD_ID, -1024, 0.6)
 
-        self._run_wheel_movements([base_config, body_config, head_config], duration)
+        self._run_wheel_movements([base_config, body_config, head_config])
 
 
 
