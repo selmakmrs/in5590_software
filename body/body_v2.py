@@ -257,7 +257,7 @@ class BODY:
         duration = 0.01
 
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 20, 100)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 200, 100)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 100, 100)
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         # Hold position
