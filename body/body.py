@@ -556,6 +556,7 @@ if __name__ == "__main__":
             body.set_joint_mode()
             body.home_position()
             time.sleep(5)
+            break
 
 
         # movemnt = { FAST : {
@@ -593,5 +594,6 @@ if __name__ == "__main__":
         print("\n⚠️  Interrupted by user")
         body.set_wheel_mode()
         body._stop_wheel([0,3,1])
+        body.set_joint_mode()
     finally:
         body.cleanup()
