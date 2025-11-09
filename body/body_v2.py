@@ -85,6 +85,7 @@ class BODY:
         }
 
         self.current_mode = None
+        self.is_looking_up = False
 
         print("Body initialized")
 
@@ -527,23 +528,29 @@ class BODY:
 
 
     def look_up(self):
+        if self.is_looking_up:
+            return
         self.set_wheel_mode()
         base_config = (BASE_ID, -600, 2)
         # body_config = (BODY_ID, 300, 1.7)
         head_config = (HEAD_ID, 500, 2)
 
         self._run_wheel_movements([base_config, head_config], go_back=False)
+        self.is_looking_up = True
 
         
 
 
 
     def look_down(self):
+        if not self.is_looking_up:
+            return 
         self.set_wheel_mode()
         base_config = (BASE_ID, 600, 2)
         head_config = (HEAD_ID, -500, 2)
 
         self._run_wheel_movements([base_config, head_config], go_back=False)
+        self.is_looking_up = False
 
         
 
