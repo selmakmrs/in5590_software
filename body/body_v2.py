@@ -411,8 +411,8 @@ class BODY:
         """Makes Root jumb back
         BASE 180 deg
         BODY -180 deg """
-        base_config = (BASE_ID, 1024, 1)
-        body_config = (BODY_ID, -600, 1)
+        base_config = (BASE_ID, 1024, 0.7)
+        body_config = (BODY_ID, -600, 0.7)
    
         self._run_wheel_movements([base_config, body_config])
 
@@ -434,7 +434,7 @@ class BODY:
         duration = 0.7
 
         base_config = (BASE_ID, -1024, 0.7)
-        body_config = (BODY_ID, 1024, 0.9)
+        body_config = (BODY_ID, 1024, 0.7)
         head_config = (HEAD_ID, -1024, 0.6)
 
         self._run_wheel_movements([base_config, body_config, head_config])
