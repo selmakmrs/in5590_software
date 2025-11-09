@@ -533,7 +533,7 @@ if __name__ == "__main__":
 
                 
         FAST = 1024
-        MEDUIM = 600
+        MEDIUM = 600
         SLOW = 250
 
 
@@ -545,11 +545,11 @@ if __name__ == "__main__":
             body.set_wheel_mode()
             print(f"Second = {sec}")
             time.sleep(1)
-            body.wheel_speed(ID, MEDUIM)
+            body.wheel_speed(ID, MEDIUM)
             time.sleep(sec)
             body.wheel_speed(ID,0)
             time.sleep(1)
-            body.wheel_speed(ID,-MEDUIM)
+            body.wheel_speed(ID,-MEDIUM)
             time.sleep(sec)
             body.wheel_speed(ID,0)
             time.sleep(1)
@@ -559,13 +559,27 @@ if __name__ == "__main__":
             break
 
 
-        # movemnt = { FAST : {
-        #     BASE_ID : {90 : 0.7, 180 : 1.5, 270 : 2.3},
-        #     BODY_ID : {90 : 0.5, 180 : 1.0, 270 : 1.5},
-        #     HEAD_ID : {90 : 0.6, 180 : 1.1, 270 : 1.7},
-        # }
+        movemnt = { 
+            FAST : {
+                BASE_ID : {90 : 0.7, 180 : 1.5, 270 : 2.3},
+                BODY_ID : {90 : 0.5, 180 : 1.0, 270 : 1.5},
+                HEAD_ID : {90 : 0.6, 180 : 1.1, 270 : 1.7},
+        },
+            MEDIUM : {
+                BASE_ID : {90: 1.5, 180: 2.7, 270: 4.1},
+                BODY_ID : {90: 0.8, 180: 1.7, 270: 2.5},
+                HEAD_ID : {90: 0.0, 180: 0.0, 180: 0.0},
+            },
 
-        # }
+            SLOW : {
+                BASE_ID : {},
+                BODY_ID : {},
+                HEAD_ID : {},
+
+            }
+
+
+        }
 
 
 
@@ -592,8 +606,6 @@ if __name__ == "__main__":
         
     except KeyboardInterrupt:
         print("\n⚠️  Interrupted by user")
-        body.set_wheel_mode()
-        body._stop_wheel([0,3,1])
-        body.set_joint_mode()
+        body.emergency_stop()
     finally:
         body.cleanup()
