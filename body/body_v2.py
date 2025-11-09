@@ -515,7 +515,7 @@ class BODY:
 
         time.sleep(1.0)
 
-        duration = 2
+        duration = 0.01
         steps = 20
 
         for _ in range(cycles):
