@@ -354,5 +354,6 @@ if __name__ == "__main__":
         
     except KeyboardInterrupt:
         print("\n⚠️  Interrupted by user")
+        body.emergency_stop()
     finally:
         body.close()
