@@ -253,19 +253,20 @@ class BODY:
         """Turn head left and light body twist"""
         self.set_joint_mode()
 
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 0, 200)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 200, 200)
-
         steps = 40
         duration = 0.023
 
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 100, 200)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 200, 200)
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         # Hold position
         time.sleep(0.5)
 
         # Return home
-        self.home_position()
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 200)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 200)
+        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
 
     def _look_right_slow(self):
