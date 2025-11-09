@@ -440,6 +440,8 @@ class BODY:
 
             self._stop_wheels()
             time.sleep(hold)
+
+
         self.set_joint_mode()
 
     def _stop_wheels(self):
@@ -513,9 +515,23 @@ class BODY:
 
         time.sleep(1.0)
 
+        duration = 2
+        steps = 20
+
+        for _ in cycles:
+            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 0, 500)
+            self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
+            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 900, 500)
+            self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
+
+        body_config = (BODY_ID, self.tracked_positions[BODY_ID], HOME_POSITIONS[BODY_ID], 500)
+        self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
+
+        time.sleep(1)
+
         body_config_end = (BODY_ID, -700, 1.5)
         base_config_end = (BASE_ID, 1023, 1.5)
-        self._run_wheel_movements([body_config_start, base_config_start], go_back=False)
+        self._run_wheel_movements([body_config_end, base_config_end], go_back=False)
 
         
 
