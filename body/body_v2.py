@@ -511,7 +511,7 @@ class BODY:
 
         self._run_wheel_movements([body_config_start, base_config_start], go_back=False)
 
-        self.sleep(1.0)
+        time.sleep(1.0)
 
         body_config_end = (BODY_ID, -700, 1.5)
         base_config_end = (BASE_ID, 1023, 1.5)
