@@ -535,10 +535,10 @@ class BODY:
     def look_up(self):
         self.set_wheel_mode()
         base_config = (BASE_ID, -600, 1.5)
-        body_config = (BODY_ID, 300, 1.7)
-        head_config = (HEAD_ID, -500, 1.1)
+        # body_config = (BODY_ID, 300, 1.7)
+        head_config = (HEAD_ID, 500, 1.1)
 
-        for dxl_id, speed, duration in [base_config, body_config, head_config]:
+        for dxl_id, speed, duration in [base_config, head_config]:
             print(dxl_id, speed)
             self.wheel_speed(dxl_id, speed)
 
