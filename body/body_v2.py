@@ -256,16 +256,16 @@ class BODY:
         steps = 20
         duration = 0.01
 
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 20, 150)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 200, 150)
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 20, 100)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 200, 100)
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         # Hold position
         time.sleep(1)
 
         # Return home
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 150)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 150)
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 100)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 100)
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         time.sleep(1)
