@@ -307,7 +307,7 @@ class BODY:
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         # Hold position
-        time.sleep(1)
+        time.sleep(3)
 
         # Return home
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 100)
