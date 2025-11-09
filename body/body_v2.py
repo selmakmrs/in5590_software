@@ -432,7 +432,7 @@ class BODY:
 
         duration = 0.7
 
-        base_config = (BASE_ID, -1024, 0.3)
+        base_config = (BASE_ID, -1024, 0.4)
         body_config = (BODY_ID, 1024, 0.3)
         head_config = (HEAD_ID, -1024, 0.3)
 
