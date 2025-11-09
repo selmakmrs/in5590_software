@@ -531,7 +531,7 @@ class BODY:
             if random.random() <= home_prob:
                 self.home_position()
 
-            if random.random <= fast_seq_prob:
+            if random.random() <= fast_seq_prob:
                 sequence = random.choice(fast_seq_prob)
                 hold = random.uniform(1,4)
                 sequence(hold)
