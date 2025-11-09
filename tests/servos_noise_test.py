@@ -31,7 +31,7 @@ POS_LEFT  = 350
 POS_RIGHT = 700
 
 # Trajectory parameters
-MOVE_DURATION = 0.5   # seconds per move (left → right or right → left)
+MOVE_DURATION = 1.0   # seconds per move (left → right or right → left)
 MOVE_STEPS    = 120   # more steps = smoother motion
 
 # ------------------ HELPERS ------------------
@@ -85,7 +85,7 @@ packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CW_ANGLE_LIMIT, 0)
 packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CCW_ANGLE_LIMIT, 1023)
 
 # Quieter base settings
-packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_MOVING_SPEED, 200)  # max speed limit
+packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_MOVING_SPEED, 600)  # max speed limit
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CW_COMPLIANCE_MARGIN, 4)
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CCW_COMPLIANCE_MARGIN, 4)
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CW_COMPLIANCE_SLOPE, 32)
