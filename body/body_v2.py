@@ -516,12 +516,12 @@ class BODY:
         time.sleep(1.0)
 
         duration = 0.01
-        steps = 5
+        steps = 40
 
         for _ in range(cycles):
-            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 0, 200)
+            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 0, 100)
             self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
-            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 900, 200)
+            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 900, 100)
             self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
 
         body_config = (BODY_ID, self.tracked_positions[BODY_ID], HOME_POSITIONS[BODY_ID], 400)
