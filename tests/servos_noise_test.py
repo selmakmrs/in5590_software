@@ -23,6 +23,9 @@ ADDR_PRESENT_POSITION       = 36
 TORQUE_ENABLE  = 1
 TORQUE_DISABLE = 0
 
+ADDR_CW_ANGLE_LIMIT = 6
+ADDR_CCW_ANGLE_LIMIT = 8
+
 # Positions (0–1023 ≈ 0–300°)
 POS_LEFT  = 350
 POS_RIGHT = 700
@@ -77,6 +80,9 @@ print("✅ Port opened and baudrate set")
 
 # Enable torque
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
+
+packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CW_ANGLE_LIMIT, 0)
+packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CCW_ANGLE_LIMIT, 1023)
 
 # Quieter base settings
 packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_MOVING_SPEED, 200)  # max speed limit
