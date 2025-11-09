@@ -478,7 +478,7 @@ class BODY:
             if 30 < time.time() - start:
                 break
 
-            self.sleep(0.5)
+            time.sleep(0.5)
 
 
 
