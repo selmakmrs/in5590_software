@@ -399,7 +399,7 @@ class BODY:
 
         base_config = (BASE_ID, -1024)
         body_config = (BODY_ID, 1024)
-        head_config = (HEAD_ID, -1024)
+        head_config = (HEAD_ID, -800)
 
         self._run_wheel_movements([base_config, body_config, head_config], duration)
 
@@ -460,9 +460,9 @@ if __name__ == "__main__":
         print("Testing Body movemnt in joint mode")
         # body._look_left_slow()
         # body._look_right_slow()
-        body._curious_tilit_left()
-        body._curious_tilit_right()
-        body.jump_back()
+        # body._curious_tilit_left()
+        # body._curious_tilit_right()
+        # body.jump_back()
         body.jump_left()
 
         
