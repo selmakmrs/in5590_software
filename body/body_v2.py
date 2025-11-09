@@ -296,7 +296,24 @@ class BODY:
         pass
 
     def _curious_tilit(self):
-        pass
+        """Turn head left and light body twist"""
+        self.set_joint_mode()
+
+        steps = 10
+        duration = 0.01
+
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 0, 100)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 1000, 100)
+        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+
+        # Hold position
+        time.sleep(1)
+
+        # Return home
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 100)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 100)
+        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+
 
     def _twitch(self):
         pass
@@ -370,6 +387,7 @@ if __name__ == "__main__":
         print("Testing Body movemnt in joint mode")
         body._look_left_slow()
         body._look_right_slow()
+        body._curious_tilit()
 
         
         print("\n✅ Tests complete!")
