@@ -295,7 +295,7 @@ class BODY:
     def _look_arounf_sweep(self):
         pass
 
-    def _curious_tilit(self):
+    def _curious_tilit_left(self):
         """Turn head left and light body twist"""
         self.set_joint_mode()
 
@@ -305,6 +305,27 @@ class BODY:
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 0, 100)
         body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 1000, 100)
         base_config = (BASE_ID, self.tracked_positions[HEAD_ID], 0, 100)
+        self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
+
+        # Hold position
+        time.sleep(3)
+
+        # Return home
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 100)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 100)
+        base_config = (BASE_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BASE_ID], 100)
+        self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
+
+    def _curious_tilit_right(self):
+        """Turn head left and light body twist"""
+        self.set_joint_mode()
+
+        steps = 10
+        duration = 0.01
+
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 1000, 100)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 0, 100)
+        base_config = (BASE_ID, self.tracked_positions[HEAD_ID], 1000, 100)
         self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
 
         # Hold position
@@ -387,9 +408,10 @@ if __name__ == "__main__":
 
         time.sleep(1)
         print("Testing Body movemnt in joint mode")
-        body._look_left_slow()
-        body._look_right_slow()
-        body._curious_tilit()
+        # body._look_left_slow()
+        # body._look_right_slow()
+        body._curious_tilit_left()
+        body._curious_tilit_right()
 
         
         print("\n✅ Tests complete!")
