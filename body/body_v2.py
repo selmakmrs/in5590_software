@@ -342,53 +342,6 @@ class BODY:
         time.sleep(1)
 
 
-    def _curious_tilt(self):
-        """All three segments move in a wave pattern - very organic"""
-        print("  🌊 Curious tilt...")
-        
-        steps = 60
-        duration = 0.02
-        
-        # Store starting positions
-        head_start = self.tracked_positions[HEAD_ID]
-        body_start = self.tracked_positions[BODY_ID]
-        base_start = self.tracked_positions[BASE_ID]
-        
-        # Phase 1: Wave tilt right
-        for i in range(steps):
-            t = i / steps
-            
-            # Each segment moves with a phase offset (wave effect)
-            head_offset = math.sin(t * math.pi) * 40
-            body_offset = math.sin((t - 0.2) * math.pi) * 30
-            base_offset = math.sin((t - 0.4) * math.pi) * 20
-            
-            self.move_position(HEAD_ID, int(head_start + head_offset), speed=100)
-            self.move_position(BODY_ID, int(body_start + body_offset), speed=90)
-            self.move_position(BASE_ID, int(base_start + base_offset), speed=80)
-            time.sleep(duration)
-        
-        # Pause
-        time.sleep(0.2)
-        
-        # Phase 2: Return with opposite wave
-        for i in range(steps):
-            t = i / steps
-            
-            head_offset = math.sin((1-t) * math.pi) * -40
-            body_offset = math.sin(((1-t) - 0.2) * math.pi) * -30
-            base_offset = math.sin(((1-t) - 0.4) * math.pi) * -20
-            
-            self.move_position(HEAD_ID, int(head_start - head_offset), speed=100)
-            self.move_position(BODY_ID, int(body_start - body_offset), speed=90)
-            self.move_position(BASE_ID, int(base_start - base_offset), speed=80)
-            time.sleep(duration)
-        
-        # Return to home
-        time.sleep(0.2)
-        self.home_position()
-
-
     def _twitch(self):
         pass
 
@@ -399,8 +352,35 @@ class BODY:
 
     # ============== Wheel Movements =================
 
+    def _run_wheel_movements(self, layer_config, duration):
+        self.set_wheel_mode()
+        for dxl_id, speed in layer_config:
+            self.wheel_speed(dxl_id, speed)
+        time.sleep(duration)
+        self._stop_wheels()
+        time.sleep(2)
+        for dxl_id, speed in layer_config:
+            self.wheel_speed(dxl_id, -speed)
+        time.sleep(duration)
+        self._stop_wheels()
+        time.sleep(1)
+        self.set_joint_mode()
+        
+
+    def _stop_wheels(self):
+        for dxl_id in self.ids:
+            self.wheel_speed(dxl_id, 0)
+
     def jump_back(self):
-        pass
+        """Makes Root jumb back
+        BASE 180 deg
+        BODY -180 deg """
+        base_config = (BASE_ID, 1024)
+        body_config = (BODY_ID, 600)
+        duration = 1.5
+        self._run_wheel_movements([base_config, body_config], duration)
+
+
 
     def jump_forward(self):
         pass
@@ -465,7 +445,7 @@ if __name__ == "__main__":
         # body._look_right_slow()
         body._curious_tilit_left()
         body._curious_tilit_right()
-        body._curious_tilt()
+        body.jump_back()
 
         
         print("\n✅ Tests complete!")
