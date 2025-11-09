@@ -253,7 +253,7 @@ class BODY:
         """Turn head left and light body twist"""
         self.set_joint_mode()
 
-        steps = 20
+        steps = 50
         duration = 0.01
 
         head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 200, 100)
