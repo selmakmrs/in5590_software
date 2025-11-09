@@ -494,12 +494,12 @@ if __name__ == "__main__":
 
         time.sleep(1)
         print("Testing Body movemnt in joint mode")
-        # body._look_left_slow()
-        # body._look_right_slow()
-        # body._curious_tilit_left()
-        # body._curious_tilit_right()
+        body._look_left_slow()
+        body._look_right_slow()
+        body._curious_tilit_left()
+        body._curious_tilit_right()
         # body.jump_back()
-        body.jump_left()
+        # body.jump_left()
 
         
         print("\n✅ Tests complete!")
