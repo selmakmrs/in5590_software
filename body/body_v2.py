@@ -395,7 +395,7 @@ class BODY:
 
     # ============== Wheel Movements =================
 
-    def _run_wheel_movements(self, layer_config, hold=2):
+    def _run_wheel_movements(self, layer_config, hold=2, go_back=True):
         self.set_wheel_mode()
 
         for dxl_id, speed, duration in layer_config:
@@ -412,32 +412,34 @@ class BODY:
                 else:
                     all_servos_stopped = False
 
-            if all_servos_stopped or elapsed >= 2:
+            if all_servos_stopped or elapsed >= 3:
                 break
             time.sleep(0.01)
 
         self._stop_wheels()
         time.sleep(hold)
 
-        for dxl_id, speed, duration in layer_config:
-            self.wheel_speed(dxl_id, -speed)
+        if go_back:
 
-        start = time.time()
-        
-        while True:
-            elapsed = time.time() - start
-            all_servos_stopped = True
             for dxl_id, speed, duration in layer_config:
-                if duration <= elapsed:
-                    self.wheel_speed(dxl_id,0)
-                else:
-                    all_servos_stopped = False
+                self.wheel_speed(dxl_id, -speed)
 
-            if all_servos_stopped or elapsed >= 2:
-                break
+            start = time.time()
+            
+            while True:
+                elapsed = time.time() - start
+                all_servos_stopped = True
+                for dxl_id, speed, duration in layer_config:
+                    if duration <= elapsed:
+                        self.wheel_speed(dxl_id,0)
+                    else:
+                        all_servos_stopped = False
 
-        self._stop_wheels()
-        time.sleep(hold)
+                if all_servos_stopped or elapsed >= 3:
+                    break
+
+            self._stop_wheels()
+            time.sleep(hold)
         self.set_joint_mode()
 
     def _stop_wheels(self):
@@ -502,14 +504,20 @@ class BODY:
             self.jump_right(hold)
 
 
+    def sway(self, cycles=4):
 
+        body_config_start = (BODY_ID, 700, 1.5)
+        base_config_start = (BASE_ID, -1023, 1.5)
 
-    
+        self._run_wheel_movements([body_config_start, base_config_start], go_back=False)
 
+        self.sleep(1.0)
 
+        body_config_end = (BODY_ID, -700, 1.5)
+        base_config_end = (BASE_ID, 1023, 1.5)
+        self._run_wheel_movements([body_config_start, base_config_start], go_back=False)
 
-
-
+        
 
 
     # ================================================= #
@@ -605,7 +613,7 @@ if __name__ == "__main__":
         # body.jump_back()
         # body.jump_left()
         # body.jump_right()
-        body.dance()
+        body.sway()
 
         
         print("\n✅ Tests complete!")
