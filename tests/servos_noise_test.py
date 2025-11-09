@@ -85,7 +85,7 @@ packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CW_ANGLE_LIMIT, 0)
 packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CCW_ANGLE_LIMIT, 1023)
 
 # Quieter base settings
-packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_MOVING_SPEED, 600)  # max speed limit
+packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_MOVING_SPEED, 1000)  # max speed limit
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CW_COMPLIANCE_MARGIN, 4)
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CCW_COMPLIANCE_MARGIN, 4)
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CW_COMPLIANCE_SLOPE, 32)
