@@ -534,14 +534,14 @@ class BODY:
 
     def look_up(self):
         self.set_wheel_mode()
-        base_config = (BASE_ID, -1023, 1.5)
-        body_config = (BODY_ID, 700, 1.7)
-        head_config = (HEAD_ID, -1023, 1.1)
+        base_config = (BASE_ID, -600, 1.5)
+        body_config = (BODY_ID, 300, 1.7)
+        head_config = (HEAD_ID, -500, 1.1)
 
         for dxl_id, speed, duration in [base_config, body_config, head_config]:
             self.wheel_speed(dxl_id, speed)
 
-        time.sleep(1.5)
+        time.sleep(3)
 
         self._stop_wheels()
         self.set_joint_mode()
