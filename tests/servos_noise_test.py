@@ -31,7 +31,7 @@ POS_LEFT  = 350
 POS_RIGHT = 700
 
 # Trajectory parameters
-MOVE_DURATION = 1.0   # seconds per move (left → right or right → left)
+MOVE_DURATION = 0.5   # seconds per move (left → right or right → left)
 MOVE_STEPS    = 120   # more steps = smoother motion
 
 # ------------------ HELPERS ------------------
