@@ -453,14 +453,13 @@ class BODY:
    
         self._run_wheel_movements([base_config, body_config])
 
-        self.home_position()
 
 
 
     def jump_forward(self):
         pass
 
-    def jump_left(self):
+    def jump_left(self, hold=3):
         """
         Makes robot jump left
         Config:
@@ -476,10 +475,10 @@ class BODY:
         body_config = (BODY_ID, 1024, 0.9)
         head_config = (HEAD_ID, -900, 1)
 
-        self._run_wheel_movements([base_config, body_config, head_config])
-        self.home_position()
+        self._run_wheel_movements([base_config, body_config, head_config], hold=hold)
+        
 
-    def jump_right(self):
+    def jump_right(self, hold=3):
         """
         Makes robot jump left
         Config:
@@ -493,7 +492,19 @@ class BODY:
         head_config = (HEAD_ID, 900, 1)
 
         self._run_wheel_movements([base_config, body_config, head_config])
-        self.home_position() 
+        
+
+    def dance(self):
+        hold = 0.1
+        
+        for _ in range(2):
+            self.jump_left(hold)
+            self.jump_right(hold)
+
+
+
+
+    
 
 
 
@@ -592,8 +603,9 @@ if __name__ == "__main__":
         # body._curious_tilit_left()
         # body._curious_tilit_right()
         # body.jump_back()
-        body.jump_left()
-        body.jump_right()
+        # body.jump_left()
+        # body.jump_right()
+        body.dance()
 
         
         print("\n✅ Tests complete!")
