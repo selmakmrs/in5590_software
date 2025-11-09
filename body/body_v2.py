@@ -395,7 +395,7 @@ class BODY:
 
     # ============== Wheel Movements =================
 
-    def _run_wheel_movements(self, layer_config):
+    def _run_wheel_movements(self, layer_config, hold=2):
         self.set_wheel_mode()
 
         for dxl_id, speed, duration in layer_config:
@@ -417,7 +417,7 @@ class BODY:
             time.sleep(0.01)
 
         self._stop_wheels()
-        time.sleep(3)
+        time.sleep(hold)
 
         for dxl_id, speed, duration in layer_config:
             self.wheel_speed(dxl_id, -speed)
@@ -439,9 +439,6 @@ class BODY:
         self._stop_wheels()
         time.sleep(3)
         self.set_joint_mode()
-
-
-            
 
     def _stop_wheels(self):
         for dxl_id in self.ids:
@@ -578,13 +575,13 @@ if __name__ == "__main__":
 
         time.sleep(1)
         print("Testing Body movemnt in joint mode")
-        body.idle()
+        # body.idle()
         # body._look_left_slow()
         # body._look_right_slow()
         # body._curious_tilit_left()
         # body._curious_tilit_right()
         # body.jump_back()
-        # body.jump_left()
+        body.jump_left()
 
         
         print("\n✅ Tests complete!")
