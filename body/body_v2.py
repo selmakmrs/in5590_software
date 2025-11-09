@@ -474,7 +474,7 @@ class BODY:
             sequence = random.choice(look_sequences)
             sequence()
 
-            if 10 < time.time() - start:
+            if 30 < time.time() - start:
                 break
 
 
