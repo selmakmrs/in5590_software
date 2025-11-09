@@ -651,8 +651,9 @@ if __name__ == "__main__":
         # body.jump_left()
         # body.jump_right()
         body.look_up()
-        body._look_right_slow()
-        body._look_left_slow()
+        for _ in range(3):
+            body._look_right_slow()
+            body._look_left_slow()
         body.look_down()
         time.sleep(2)
         
