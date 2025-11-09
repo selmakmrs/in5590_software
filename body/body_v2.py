@@ -459,6 +459,26 @@ class BODY:
         self.set_joint_mode()
 
 
+        look_sequences = [
+            self._look_left_slow,
+            self._look_right_slow,
+            self._curious_tilit_left,
+            self._curious_tilit_right
+        ]
+
+        start = time.time()
+
+
+        while True:
+
+            sequence = random.choice(look_sequences)
+            sequence()
+
+            if 10 < time.time - start:
+                break
+
+
+
     def happy(self):
         pass
 
@@ -494,10 +514,11 @@ if __name__ == "__main__":
 
         time.sleep(1)
         print("Testing Body movemnt in joint mode")
-        body._look_left_slow()
-        body._look_right_slow()
-        body._curious_tilit_left()
-        body._curious_tilit_right()
+        body.idle()
+        # body._look_left_slow()
+        # body._look_right_slow()
+        # body._curious_tilit_left()
+        # body._curious_tilit_right()
         # body.jump_back()
         # body.jump_left()
 
