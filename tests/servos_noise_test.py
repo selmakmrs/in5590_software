@@ -1,12 +1,12 @@
-# ax12_scurve_traj.py
-# AX-12A test with smooth s-curve acceleration / deceleration
+# ax12_scurve_traj_fast.py
+# AX-12A test with faster s-curve motion (still smooth)
 
 from dynamixel_sdk import *
 import time
 import math
 
 # ------------------ USER CONFIG ------------------
-DXL_ID = 3
+DXL_ID = 1
 BAUDRATE = 1000000
 DEVICENAME = '/dev/ttyUSB0'   # e.g. 'COM3' on Windows
 
@@ -23,25 +23,21 @@ ADDR_PRESENT_POSITION       = 36
 TORQUE_ENABLE  = 1
 TORQUE_DISABLE = 0
 
-ADDR_CW_ANGLE_LIMIT = 6
-ADDR_CCW_ANGLE_LIMIT = 8
-
 # Positions (0–1023 ≈ 0–300°)
 POS_LEFT  = 350
 POS_RIGHT = 700
 
-# Trajectory parameters
-MOVE_DURATION = 0.5   # seconds per move (left → right or right → left)
-MOVE_STEPS    = 180   # more steps = smoother motion
+# ✅ FASTER TRAJECTORY PARAMETERS
+MOVE_DURATION = 1.5   # seconds per move (faster than 3.0)
+MOVE_STEPS    = 180   # more steps to keep motion smooth
 
 # ------------------ HELPERS ------------------
 def scurve_interpolate(p0, p1, s):
     """
     S-curve interpolation between p0 and p1.
-    s in [0,1]. Position, velocity start/end at 0.
+    s in [0,1]. Position & velocity start/end at 0.
     """
-    # Smoothstep-like (3s^2 - 2s^3)
-    s_smooth = 3 * s * s - 2 * s * s * s
+    s_smooth = 3 * s * s - 2 * s * s * s   # smoothstep (3s² - 2s³)
     return p0 + (p1 - p0) * s_smooth
 
 def read_position():
@@ -66,7 +62,7 @@ def scurve_move(start_pos, end_pos, duration, steps):
 
 # ------------------ SETUP ------------------
 portHandler = PortHandler(DEVICENAME)
-packetHandler = PacketHandler(1.0)  # AX series = Protocol 1.0
+packetHandler = PacketHandler(1.0)  # Protocol 1.0 for AX-series
 
 if not portHandler.openPort():
     print("❌ Failed to open port")
@@ -81,31 +77,30 @@ print("✅ Port opened and baudrate set")
 # Enable torque
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
 
-packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CW_ANGLE_LIMIT, 0)
-packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_CCW_ANGLE_LIMIT, 1023)
+# ------------------ "FASTER BUT QUIET" SETTINGS ------------------
+# Higher max speed, but not full 1023
+packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_MOVING_SPEED, 600)
 
-# Quieter base settings
-packetHandler.write2ByteTxRx(portHandler, DXL_ID, ADDR_MOVING_SPEED, 1000)  # max speed limit
+# Compliance: still a bit soft, but slightly stiffer slopes
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CW_COMPLIANCE_MARGIN, 4)
 packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CCW_COMPLIANCE_MARGIN, 4)
-packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CW_COMPLIANCE_SLOPE, 32)
-packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CCW_COMPLIANCE_SLOPE, 32)
+packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CW_COMPLIANCE_SLOPE, 16)
+packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_CCW_COMPLIANCE_SLOPE, 16)
 
-print("\nQuiet mode + s-curve trajectory enabled.")
+print("\nFast s-curve trajectory enabled.")
 print("Moving smoothly between positions. Press Ctrl+C to stop.\n")
 
 # ------------------ MAIN LOOP ------------------
 try:
     current_pos = read_position()
-    # First move: gently go to POS_LEFT from wherever we are now
     print("→ Homing to left position with s-curve...")
     scurve_move(current_pos, POS_LEFT, MOVE_DURATION, MOVE_STEPS)
 
     while True:
-        print("→ Left → Right")
+        print("→ Left → Right (fast)")
         scurve_move(POS_LEFT, POS_RIGHT, MOVE_DURATION, MOVE_STEPS)
 
-        print("← Right → Left")
+        print("← Right → Left (fast)")
         scurve_move(POS_RIGHT, POS_LEFT, MOVE_DURATION, MOVE_STEPS)
 
 except KeyboardInterrupt:
