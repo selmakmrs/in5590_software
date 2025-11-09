@@ -538,7 +538,7 @@ class BODY:
         body_config = (BODY_ID, 700, 1.7)
         head_config = (HEAD_ID, -1023, 1.1)
 
-        for dxl_id, speed, time in [base_config, body_config, head_config]:
+        for dxl_id, speed, duration in [base_config, body_config, head_config]:
             self.wheel_speed(dxl_id, speed)
 
         time.sleep(1.5)
