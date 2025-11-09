@@ -542,7 +542,7 @@ class BODY:
             print(dxl_id, speed)
             self.wheel_speed(dxl_id, speed)
 
-        time.sleep(3)
+        time.sleep(2)
 
         self._stop_wheels()
         self.set_joint_mode()
