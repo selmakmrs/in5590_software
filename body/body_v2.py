@@ -516,13 +516,12 @@ class BODY:
 
         start = time.time()
 
-        slow_seq_prob = 0.2
+        slow_seq_prob = 0.1
         fast_seq_prob = 0.03
         home_prob = 0.02
 
 
         while True:
-
             if random.random() < slow_seq_prob:
                 sequence = random.choice(slow_look_sequences)
                 hold = random.uniform(1,4)
