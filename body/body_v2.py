@@ -292,6 +292,49 @@ class BODY:
 
         time.sleep(0.5)
 
+    def _look_left_fast(self, hold = 1):
+        """Turn head left and light body twist"""
+        self.set_joint_mode()
+
+        steps = 5
+        duration = 0.01
+
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 200, 600)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 300, 600)
+        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+
+        # Hold position
+        time.sleep(hold)
+
+        # Return home
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 50)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 50)
+        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+
+        time.sleep(0.5)
+
+
+    def _look_right_fast(self, hold=1):
+        """Turn head left and light body twist"""
+        self.set_joint_mode()
+
+        steps = 5
+        duration = 0.01
+
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 800, 600)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 700, 600)
+        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+
+        # Hold position
+        time.sleep(hold)
+
+        # Return home
+        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 50)
+        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 50)
+        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
+
+        time.sleep(0.5)
+
     def _look_arounf_sweep(self):
         pass
 
@@ -459,25 +502,40 @@ class BODY:
         self.set_joint_mode()
 
 
-        look_sequences = [
+        slow_look_sequences = [
             self._look_left_slow,
             self._look_right_slow,
             self._curious_tilit_left,
             self._curious_tilit_right
         ]
 
+        fast_look_sequence = [
+            self._look_left_fast,
+            self._look_right_fast,
+        ]
+
         start = time.time()
 
-        run_seq_prob = 0.2
+        slow_seq_prob = 0.2
+        fast_seq_prob = 0.03
+        home_prob = 0.02
 
 
         while True:
 
-            if random.random() < run_seq_prob:
-
-                sequence = random.choice(look_sequences)
+            if random.random() < slow_seq_prob:
+                sequence = random.choice(slow_look_sequences)
                 hold = random.uniform(1,4)
                 sequence(hold)
+
+            if random.random() <= home_prob:
+                self.home_position()
+
+            if random.random <= fast_seq_prob:
+                sequence = random.choice(fast_seq_prob)
+                hold = random.uniform(1,4)
+                sequence(hold)
+
 
             if 30 < time.time() - start:
                 break
