@@ -227,8 +227,24 @@ class BODY:
         
 
         
+    # ==== Tracking ========
 
-    
+    def track_position(self, displacement):
+        if displacement <= 0:
+            deg_change = +30
+        else:
+            deg_change = -30
+
+        for dxl_id in [HEAD_ID, BODY_ID, BASE_ID]:
+            current_pos = self.tracked_positions[dxl_id]
+            pos = current_pos + deg_change
+            if pos <= 0 or pos >= 1024:
+                continue
+
+            self.move_position(dxl_id, pos, 100)
+            return True
+        
+        return False 
     
 
 

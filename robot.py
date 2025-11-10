@@ -23,7 +23,7 @@ class RobotState(Enum):
 class Robot:
     def __init__(self):
         self.detector = DETECTOR()
-        # self.body = BODY()
+        self.body = BODY()
         self.oled = OLED()
         
         # State management
@@ -59,12 +59,14 @@ class Robot:
         """Start all threads"""
 
         self.detector.start_camera()
+        self.body.start()
         # self.oled.start()
 
         threads = [
             threading.Thread(target=self._vision_loop, name="Vision"),
-            threading.Thread(target=self._oled_loop, name="Oled"),
-            threading.Thread(target=self._state_loop, name="State loop")
+            # threading.Thread(target=self._oled_loop, name="Oled"),
+            threading.Thread(target=self._state_loop, name="State loop"),
+            threading.Thread(target=self._body_loop, name = "Body")
             
         ]
 
@@ -238,23 +240,37 @@ class Robot:
             # self.current_state = RobotState.TRANSITION
             # After transition completes, move to new_state
 
-    # def _body_loop(self):
-    #     """Control body movements based on state"""
-    #     while self.running:
+    def _body_loop(self):
+        """Control body movements based on state"""
+        while self.running:
             
-    #         if self.current_state == RobotState.IDLE:
-    #             # Run idle sequence (look around, small movements)
-    #             self.body.idle_sequence()
+            if self.current_state == RobotState.IDLE:
+                # Run idle sequence (look around, small movements)
+                self.body.idle_sequence()
                 
-    #         elif self.current_state == RobotState.TRACKING:
-    #             # Follow face position
-    #             if not self.face_queue.empty():
-    #                 face_data = self.face_queue.get()
-    #                 target_position = face_data['position']
-    #                 self.body.track_position(target_position)
+            elif self.current_state == RobotState.TRACKING:
+                # Follow face position
+                if not self.face_queue.empty():
+                    face_data = self.face_queue.get()
+                    # target_position = face_data['position']
+                    displacement = self._find_face_displacement(face_data)
+                    self.body.track_position(displacement)
                 
-    #         elif self.current_state == RobotState.EMOTION:
+            elif self.current_state == RobotState.EMOTION:
+                print("Emotion State :", self.current_emotion())
     #             # Perform emotion gesture
     #             self.body.emotion_sequence(self.current_emotion)
                 
-    #         time.sleep(0.02)  # Smooth motion control
+            time.sleep(0.02)  # Smooth motion control
+
+
+    def _find_face_displacement(self, face):
+        x, y, fw, fh = face
+
+        frame_center_x = 320 // 2
+        face_center_x = x + fw // 2
+
+        displacement = (face_center_x - frame_center_x) / frame_center_x
+
+        return displacement
+    
