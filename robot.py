@@ -238,7 +238,7 @@ class Robot:
         # Clear older entries
         current_time = time.time()
         self.emotion_history = deque(
-            [e for e in self.emotion_history if current_time - [2] < 2.0],
+            [e for e in self.emotion_history if current_time - e[2] < 2.0],
             maxlen = self.min_consitent_frames * 2
         )
 
@@ -339,10 +339,10 @@ class Robot:
                     # Check for face data
                     if not self.face_queue.empty():
                         face = self.face_queue.get()
-                        displacement = self._find_face_displacement(face)
-
-                        # Track face
-                        self.body.track_position(displacement)
+                        if not self._is_face_centered(face):
+                            displacement = self._find_face_displacement(face)
+                            # Track face
+                            self.body.track_position(displacement)
 
                     time.sleep(0.02)
 
@@ -377,4 +377,7 @@ class Robot:
         displacement = (face_center_x - frame_center_x) / frame_center_x
 
         return displacement
+    
+    def _is_face_centered(self, face):
+        return self.detector.is_face_centered(face)
     
