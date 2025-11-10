@@ -87,8 +87,7 @@ class DETECTOR:
         # Open face detector
         self.face_detector.setInputSize(self.resolution)
         
-        print("Picamera2 started successfully!")
-
+        print("Picamera2 started successfully!")    
     
     def stop_camera(self):
         """Release camera resources"""
@@ -156,8 +155,7 @@ class DETECTOR:
         # If we resized, coords are already in resized space (same as self.resolution),
         # which is also what you use for drawing etc., so no remapping needed.
         return (x, y, w, h)
-
-    
+  
     def is_face_centered(self, face, threshold=0.2):
         """
         Check if face is roughly centered in frame
@@ -185,9 +183,6 @@ class DETECTOR:
 
         return x_distance <= threshold # and y_distance <= threshold
 
-        
-
-    
     def is_face_close(self, face_data, min_size=100):
         """
         Check if face is close enough for emotion detection
@@ -202,43 +197,22 @@ class DETECTOR:
         pass
     
     # === Emotion Detection ===
-    # def detect_emotion(self, frame, face):
-    #     """
-    #     Detect emotion from frame or face region
-        
-    #     Args:
-    #         frame: Input image
-    #         face_data: Optional face detection data (for cropping)
-            
-    #     Returns:
-    #         (emotion, confidence): tuple
-    #             emotion: str ('happy', 'sad', 'angry', 'surprise', 'neutral', etc.)
-    #             confidence: float (0.0-1.0)
-    #     """
-    #     x, y, w, h = face
-    #     face_frame = frame[y:y+h, x:x+w]
-
-    #     input_data = self._pre_process_face(face_frame)
-        
-    #     # Run inference
-    #     self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
-    #     self.interpreter.invoke()
-        
-    #     # Get output
-    #     output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
-    #     predictions = output_data[0]
-        
-    #     # Get emotion probabilities
-    #     emotions = {label: float(pred) for label, pred in zip(self.emotion_labels, predictions)}
-    #     dominant_emotion = max(emotions, key=emotions.get)
-    #     emotion_prob = emotions[dominant_emotion]
-
-    #     return dominant_emotion, emotion_prob
-
     def detect_emotion(self, frame, face):
-        x, y, fw, fh = face
+        """
+        Detect emotion from frame or face region
+        
+        Args:
+            frame: Input image
+            face_data: Optional face detection data (for cropping)
+            
+        Returns:
+            (emotion, confidence): tuple
+                emotion: str ('happy', 'sad', 'angry', 'surprise', 'neutral', etc.)
+                confidence: float (0.0-1.0)
+        """
+        x, y, w, h = face
 
-        # Get frame height and width
+         # Get frame height and width
         h, w = frame.shape[:2]
 
         # Clamp the box so it stays inside the frame
@@ -252,7 +226,7 @@ class DETECTOR:
             print("Invalid face box, skipping emotion detection")
             return None, 0.0
 
-        face_frame = frame[y:y+fh, x:x+fw]
+        face_frame = frame[y:y+h, x:x+w]
 
         # Double-check slice result
         if face_frame is None or face_frame.size == 0:
@@ -264,13 +238,23 @@ class DETECTOR:
         except cv2.error as e:
             print("Resize failed:", e)
             return None, 0.0
+        
+        input_data = self._pre_process_face(face_frame)
+        
+        # Run inference
+        self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
+        self.interpreter.invoke()
+        
+        # Get output
+        output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
+        predictions = output_data[0]
+        
+        # Get emotion probabilities
+        emotions = {label: float(pred) for label, pred in zip(self.emotion_labels, predictions)}
+        dominant_emotion = max(emotions, key=emotions.get)
+        emotion_prob = emotions[dominant_emotion]
 
-        # 👉 your actual emotion model here
-        # emotion, prob = self.model.predict(face_frame)
-        # return emotion, prob
-
-        # Temporary dummy output so the code runs
-        return "neutral", 1.0
+        return dominant_emotion, emotion_prob
 
 
     def _pre_process_face(self, face_frame):
