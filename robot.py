@@ -246,7 +246,7 @@ class Robot:
             
             if self.current_state == RobotState.IDLE:
                 # Run idle sequence (look around, small movements)
-                self.body.idle_sequence()
+                self.body.idle()
                 
             elif self.current_state == RobotState.TRACKING:
                 # Follow face position
