@@ -39,6 +39,7 @@ class Robot:
         self.running = True
         self.face_detected = False
         self.face_position = None  # (x, y) coordinates
+        self.sequence_running = False
 
         # Emotion confidence system
         self.emotion_history = deque(maxlen=5)
@@ -234,6 +235,8 @@ class Robot:
 
     def _change_state(self, new_state):
         """Handle state transitions"""
+        if self.sequence_running:
+            return
         
         if new_state != self.current_state:
             print(f"State: {self.current_state.value} -> {new_state.value}")
@@ -250,6 +253,7 @@ class Robot:
             
             if self.current_state == RobotState.IDLE:
                 # Run idle sequence (look around, small movements)
+                self.sequence_running = True
                 self.body.idle()
                 
             elif self.current_state == RobotState.TRACKING:
@@ -265,6 +269,7 @@ class Robot:
     #             # Perform emotion gesture
     #             self.body.emotion_sequence(self.current_emotion)
                 
+            self.sequence_running = False
             time.sleep(0.02)  # Smooth motion control
 
 
