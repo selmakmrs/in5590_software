@@ -91,7 +91,7 @@ class DETECTOR:
         """
         try:
             frame = self.picam2.capture_array()
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            # frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             return frame
         except Exception as e:
             print("Failed to grab frame: ", e)
@@ -116,9 +116,15 @@ class DETECTOR:
             
         Returns:
             face: list of [x,y,h,w] or None
-        """
+            """
+            # 1) Grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # 2) Improve contrast if the image is dark
+        gray = cv2.equalizeHist(gray)
+
         faces = self.face_cascade.detectMultiScale(
-            frame,
+            gray,
             scaleFactor=1.2,
             minNeighbors=4,
             minSize=(40,40),
@@ -128,7 +134,7 @@ class DETECTOR:
         if len(faces) < 1:
             return None
 
-        face = sorted(faces, key = lambda x: x[2]*[3])[-1]
+        face = sorted(faces, key = lambda x: x[2]*x[3])[-1]
         return face
     
     def is_face_centered(self, face, threshold=0.2):
