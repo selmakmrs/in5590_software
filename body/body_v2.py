@@ -590,14 +590,14 @@ class BODY:
             self._curious_tilit_right
         ]
 
-        fast_look_sequence = [
-            self._look_left_fast,
-            self._look_right_fast,
-        ]
+        # fast_look_sequence = [
+        #     self._look_left_fast,
+        #     self._look_right_fast,
+        # ]
 
         # start = time.time()
 
-        slow_seq_prob = 0.1
+        slow_seq_prob = 0.03
         fast_seq_prob = 0.03
         home_prob = 0.02
 
@@ -608,13 +608,13 @@ class BODY:
             hold = random.uniform(1,4)
             sequence(hold)
 
-        if random.random() <= home_prob:
-            self.home_position()
+        # if random.random() <= home_prob:
+        #     self.home_position()
 
-        if random.random() <= fast_seq_prob:
-            sequence = random.choice(fast_look_sequence)
-            hold = random.uniform(1,4)
-            sequence(hold)
+        # if random.random() <= fast_seq_prob:
+        #     sequence = random.choice(fast_look_sequence)
+        #     hold = random.uniform(1,4)
+        #     sequence(hold)
 
 
        
