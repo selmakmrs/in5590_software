@@ -328,12 +328,12 @@ class Robot:
 
                     if time.time() - last_idle_action >= idle_action_interval:
                         # Mark sequence as running
-                        self._set_sequence_running(True)
+                        # self._set_sequence_running(True)
                         # Run idle sequence
                         self.body.idle_gesture()
                         last_idle_action = time.time()
                         # Mark sequence as complete
-                        self._set_sequence_running(False)
+                        # self._set_sequence_running(False)
                     
                 elif current_state == RobotState.TRACKING:
                     # Check for face data
