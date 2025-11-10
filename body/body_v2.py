@@ -702,6 +702,8 @@ class BODY:
         
         time.sleep(total_time)
 
+        self._stop_wheels()
+
         self.set_joint_mode()
 
     def test(self):
