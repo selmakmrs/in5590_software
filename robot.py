@@ -116,7 +116,7 @@ class Robot:
         with self.sequence_lock:
             sequence_done = not self.sequence_running
 
-        time_ok = (time.time() - self.last_state_change) <= self.state_cooldown
+        time_ok = (time.time() - self.last_state_change) >= self.state_cooldown
         return sequence_done and time_ok
     
     def _execute_state_change(self, new_state):
@@ -328,12 +328,12 @@ class Robot:
 
                     if time.time() - last_idle_action >= idle_action_interval:
                         # Mark sequence as running
-                        # self._set_sequence_running(True)
+                        self._set_sequence_running(True)
                         # Run idle sequence
                         self.body.idle_gesture()
                         last_idle_action = time.time()
                         # Mark sequence as complete
-                        # self._set_sequence_running(False)
+                        self._set_sequence_running(False)
                     
                 elif current_state == RobotState.TRACKING:
                     # Check for face data
