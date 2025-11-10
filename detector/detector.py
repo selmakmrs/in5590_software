@@ -47,9 +47,9 @@ class DETECTOR:
             raise
 
         # Initialize face detector (Haar Cascade - very lightweight)
-        self.face_cascade = cv2.CascadeClassifier(
-            '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
-        )
+        # self.face_cascade = cv2.CascadeClassifier(
+        #     '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
+        # )
 
         self.resolution = resolution
 
@@ -202,38 +202,76 @@ class DETECTOR:
         pass
     
     # === Emotion Detection ===
-    def detect_emotion(self, frame, face):
-        """
-        Detect emotion from frame or face region
+    # def detect_emotion(self, frame, face):
+    #     """
+    #     Detect emotion from frame or face region
         
-        Args:
-            frame: Input image
-            face_data: Optional face detection data (for cropping)
+    #     Args:
+    #         frame: Input image
+    #         face_data: Optional face detection data (for cropping)
             
-        Returns:
-            (emotion, confidence): tuple
-                emotion: str ('happy', 'sad', 'angry', 'surprise', 'neutral', etc.)
-                confidence: float (0.0-1.0)
-        """
-        x, y, w, h = face
-        face_frame = frame[y:y+h, x:x+w]
+    #     Returns:
+    #         (emotion, confidence): tuple
+    #             emotion: str ('happy', 'sad', 'angry', 'surprise', 'neutral', etc.)
+    #             confidence: float (0.0-1.0)
+    #     """
+    #     x, y, w, h = face
+    #     face_frame = frame[y:y+h, x:x+w]
 
-        input_data = self._pre_process_face(face_frame)
+    #     input_data = self._pre_process_face(face_frame)
         
-        # Run inference
-        self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
-        self.interpreter.invoke()
+    #     # Run inference
+    #     self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
+    #     self.interpreter.invoke()
         
-        # Get output
-        output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
-        predictions = output_data[0]
+    #     # Get output
+    #     output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
+    #     predictions = output_data[0]
         
-        # Get emotion probabilities
-        emotions = {label: float(pred) for label, pred in zip(self.emotion_labels, predictions)}
-        dominant_emotion = max(emotions, key=emotions.get)
-        emotion_prob = emotions[dominant_emotion]
+    #     # Get emotion probabilities
+    #     emotions = {label: float(pred) for label, pred in zip(self.emotion_labels, predictions)}
+    #     dominant_emotion = max(emotions, key=emotions.get)
+    #     emotion_prob = emotions[dominant_emotion]
 
-        return dominant_emotion, emotion_prob
+    #     return dominant_emotion, emotion_prob
+
+    def detect_emotion(self, frame, face):
+        x, y, fw, fh = face
+
+        # Get frame height and width
+        h, w = frame.shape[:2]
+
+        # Clamp the box so it stays inside the frame
+        x = max(0, x)
+        y = max(0, y)
+        fw = min(fw, w - x)
+        fh = min(fh, h - y)
+
+        # If box is invalid after clamping, bail out
+        if fw <= 0 or fh <= 0:
+            print("Invalid face box, skipping emotion detection")
+            return None, 0.0
+
+        face_frame = frame[y:y+fh, x:x+fw]
+
+        # Double-check slice result
+        if face_frame is None or face_frame.size == 0:
+            print("Empty face_frame after crop, skipping resize")
+            return None, 0.0
+
+        try:
+            face_frame = cv2.resize(face_frame, (self.input_width, self.input_height))
+        except cv2.error as e:
+            print("Resize failed:", e)
+            return None, 0.0
+
+        # 👉 your actual emotion model here
+        # emotion, prob = self.model.predict(face_frame)
+        # return emotion, prob
+
+        # Temporary dummy output so the code runs
+        return "neutral", 1.0
+
 
     def _pre_process_face(self, face_frame):
         # Resize to model input_size

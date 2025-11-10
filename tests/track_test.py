@@ -22,9 +22,9 @@ def find_direction(face):
 
 def move_servo(error):
     if error > 0: # Move right
-        angle = +10
+        angle = -20
     else:
-        angle = -10 # Move left
+        angle = +20 # Move left
 
     for dxl_id in [HEAD_ID, BODY_ID, BASE_ID]:
         current_deg = body.tracked_positions[dxl_id]
@@ -49,7 +49,7 @@ try:
         frame = detector.get_frame()
 
         if frame is None:
-            break
+            continue
         face = detector.detect_face(frame)
 
         if face is not None:
