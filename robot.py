@@ -301,9 +301,9 @@ class Robot:
                             self._request_state_change(RobotState.IDLE)
                         
                 # Execute pending state change if sequence is done
-                with self.state_lock:
-                    if self.requested_state and self._can_change_state():
-                        self._execute_state_change(self.requested_state)
+                
+                if self.requested_state and self._can_change_state():
+                    self._execute_state_change(self.requested_state)
                 
                 time.sleep(0.5)
 
