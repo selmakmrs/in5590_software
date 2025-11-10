@@ -27,8 +27,9 @@ class Robot:
         # self.oled = OLED()
         
         # State management
+        self.state_lock = threading.Lock()
         self.current_state = RobotState.IDLE
-        self.previous_state = None
+        self.requested_state = None
         self.current_emotion = None
         
         # Thread-safe queues for communication
@@ -36,10 +37,12 @@ class Robot:
         self.emotion_queue = queue.Queue(maxsize=1)
         
         # Control flags
+        self.control_lock = threading.Lock()
         self.running = True
         self.face_detected = False
         self.face_position = None  # (x, y) coordinates
         self.sequence_running = False
+        self.sequence_lock = threading.Lock()
 
         # Emotion confidence system
         self.emotion_history = deque(maxlen=5)
@@ -51,7 +54,8 @@ class Robot:
         self.idle_transition_time = 2.0
         self.last_face_time = 0
         self.emotion_start_time = 0
-
+        self.state_cooldown = 0.5
+        self.last_state_change = 0
 
         # Threads
         self.threads = []
@@ -59,31 +63,94 @@ class Robot:
     def start(self):
         """Start all threads"""
 
+        print("Starting Robot ... ")
         self.detector.start_camera()
         self.body.start()
         # self.oled.start()
 
         threads = [
-            threading.Thread(target=self._vision_loop, name="Vision"),
+            threading.Thread(target=self._vision_loop, name="Vision", daemon=True),
             # threading.Thread(target=self._oled_loop, name="Oled"),
-            threading.Thread(target=self._state_loop, name="State loop"),
-            threading.Thread(target=self._body_loop, name = "Body")
-            
+            threading.Thread(target=self._state_loop, name="State loop", daemon=True),
+            threading.Thread(target=self._body_loop, name = "Body",daemon=True)   
         ]
 
         for thread in threads:
-            # thread.daemon = True
             thread.start()
             self.threads.append(thread)
             
-
-        print("Robot started successfully!...")
+        print("Robot started successfully!")
 
     def close(self):
+        """Shutdown Robot"""
+        print("Shutting down robot ... ")
+        self.running = False
+
+        # Wait for threads to finish
+        for thread in self.threads:
+            thread.join(timeout=2.0)
+            
         self.body.close()
         self.detector.cleanup()
+        print("Robot Shutdown complete")
 
+    #----------------------------------------------#
+    #-------------- State Managment ---------------#
+    #----------------------------------------------#
 
+    def _get_state(self):
+        """Thread-safe state getter"""
+        with self.state_lock:
+            return self.current_state
+        
+    def _request_state_change(self, new_state):
+        """Request a state change """
+        with self.state_lock:
+            if new_state != self.current_state:
+                self.requested_state = new_state
+                return True
+        return False
+    
+    def _can_change_state(self):
+        """Check is state can change"""
+        with self.sequence_lock:
+            sequence_done = not self.sequence_running
+
+        time_ok = (time.time() - self.last_state_change) <= self.state_cooldown
+        return sequence_done and time_ok
+    
+    def _execute_state_change(self, new_state):
+        """Changes the state"""
+        with self.state_lock:
+            if new_state != self.current_state:
+                print(f"State : {self.current_state.value} -> {new_state.value}")
+                self.current_state = new_state
+                self.requested_state = None
+                self.last_state_change = time.time()
+                return True
+        return False
+    
+    def _set_sequence_running(self, running):
+        """Thread-safe sequence flag setter"""
+        with self.sequence_lock:
+            self.sequence_running = running
+
+    def _is_sequence_running(self):
+        """Thread-safe sequence flag getter"""
+        with self.sequence_lock:
+            return self.sequence_running
+
+    def _set_face_detection(self, face):
+        """Thread-safe face detection flag setter"""
+        with self.control_lock:
+            self.face_detected = (face is not None)
+            if self.face_detected:
+                self.last_face_time = time.time()
+            
+    def _get_face_detected(self):
+        """Thread-safe face detected flag getter"""
+        with self.control_lock:
+            return self.face_detected    
 
     #----------------------------------------------#
     #--------- Running Loops Functions ------------#
@@ -93,185 +160,210 @@ class Robot:
     def _vision_loop(self):
         """Continuously capture and analyze frames"""
         print("Starting vision loop ...")
+
         while self.running:
             try:
-                if self.current_state != RobotState.EMOTION:
-                    # Get frame from camera
-                    frame = self.detector.get_frame()
-                    
-                    # Detect face
-                    face = self.detector.detect_face(frame)
-                    
-                    if face is not None:
-                        self.detector.draw_face_box(frame,face)
-                        self.face_detected = True
-                        self.face_position = face[:2]
-                        
-                        # Update face position for tracking
-                        if self.detector.is_face_centered(face):
-                            emotion, confidence = self.detector.detect_emotion(frame, face)
+                current_state = self._get_state()
 
-                            self.detector.draw_emotion_text(frame,face,emotion,confidence)
-                            
-                            if not self.face_queue.full():
-                                try:
-                                    self.face_queue.get_nowait()
-                                except queue.Empty:
-                                    pass
-                                self.face_queue.put(face)
-                        
-                        if self.detector.is_face_centered(face):
-                            emotion, confidence = self.detector.detect_emotion(frame,face)
-                            self._proccess_emotion_detection(emotion,confidence)
+                # Dont process vision during emotion sequence
+                if current_state == RobotState.EMOTION:
+                    time.sleep(0.1)
+                    continue
 
-                        else:
-                            self.emotion_history.clear()
+                # Get frame from camera
+                frame = self.detector.get_frame()
+                if frame is None:
+                    continue
 
+                # Detect face
+                face = self.detector.detect_face(frame)
+
+                # Update face detection flage
+                self._set_face_detection(face)
+
+                if face is not None:
+                    # Draw Debug info
+                    self.detector.draw_face_box(frame, face)
+
+                    # Update face queue for for tracking
+                    self._update_queue(self.face_queue, face)
+
+                    # Check if face is centered for emorion detection
+                    if self.detector.is_face_centered(face):
+                        emotion, confidence = self.detector.detect_emotion(frame, face)
+                        # Debug info
+                        self.detector.draw_emotion_text(frame, face, emotion, confidence)
+                        self._proccess_emotion_detection(emotion, confidence)
                     else:
-                        self.face_detected = False
                         self.emotion_history.clear()
+                else:
+                    self.emotion_history.clear()
+            
+
+                # Debug Info
+                cv2.imshow("Frame", frame)
 
                 key = cv2.waitKey(1)
                 if key == ord('q'):
+                    self.running = False
                     break
-
-                cv2.imshow("Frame", frame)
+            
             except Exception as e:
-                print("Error in vision loop: ", e)
-                raise e
-
+                print(f"Error in vision loop: ", e)
+                import traceback
+                traceback.print_exc()
 
         print("Ending vision loop ...")
-        
 
-            
+    def _update_queue(self, q, item):
+        """Thread-safe queue update - replace old with new"""
+        try:
+            q.get_nowait()
+        except queue.Empty:
+            pass
+
+        try:
+            q.put_nowait(item)
+        except queue.Full:
+            pass
 
     def _proccess_emotion_detection(self, emotion, confidence):
         """Proccess emotion detection with confidance checking"""
-        if emotion in EMOTIONS and confidence > EMOTIONS[emotion]:
-            # Add to history
-            self.emotion_history.append((emotion, confidence, time.time()))
+        if emotion not in EMOTIONS or confidence < EMOTIONS[emotion]:
+            return
+        
+        # Add to history
+        self.emotion_history.append((emotion, confidence, time.time()))
 
-            # Clear old entry (older than 2 seconds)
-            current_time = time.time()
-            self.emotion_history = deque(
-                [e for e in self.emotion_history
-                 if current_time - e[2] < 2.0],
-                 maxlen=self.min_consitent_frames*2
-            )
+        # Clear older entries
+        current_time = time.time()
+        self.emotion_history = deque(
+            [e for e in self.emotion_history if current_time - [2] < 2.0],
+            maxlen = self.min_consitent_frames * 2
+        )
 
-            # Check for consistent emotion
-            if len(self.emotion_history) > self.min_consitent_frames:
-                emotions = [e[0] for e in list(self.emotion_history)[-self.min_consitent_frames:]]
+        # Check for consistent emotion
+        if len(self.emotion_history) >= self.min_consitent_frames:
+            recent_emotions = [e[0] for e in list(self.emotion_history)[-self.min_consitent_frames:]]
 
-                # Check if all recent emotions are the same
-                if all(e == emotions[0] for e in emotions):
-                    consistent_emotion = emotions[0]
-                    avg_confidence = sum(e[1] for e in list(self.emotion_history)[-self.min_consitent_frames:]) / self.min_consitent_frames
-                    # print(f"🎭 Consistent emotion detected: {consistent_emotion} (confidence: {avg_confidence:.2f})")
+            # Check if all recent emotions are the same
+            if all(e == recent_emotions[0] for e in recent_emotions):
+                consistent_emotion = recent_emotions[0]
+                avg_confidence = sum(
+                    e[1] for e in list(self.emotion_history)[-self.min_consitent_frames:]
+                ) / self.min_consitent_frames
 
-                
-                    if not self.emotion_queue.full():
-                        try:
-                            self.emotion_queue.get_nowait()
-                        except queue.Empty:
-                            pass
-                        self.emotion_queue.put(consistent_emotion)
-
+                print(f"Consitent Emotion {consistent_emotion} (conf: {avg_confidence:.2f})")
+                self._update_queue(self.emotion_queue, consistent_emotion)
 
     def _oled_loop(self):
-        print("Starting OLED thread ...")
-
-        while self.running:
-            try:
-                if self.current_state == RobotState.EMOTION and self.current_emotion in EMOTIONS:
-                    print("Starting emotion sequence for: ", self.current_emotion)
-                    self.oled.run_emotion(self.current_emotion)
-                    self.current_emotion = None
-                
-
-                self.oled.update()
-                # time.sleep(0.02)
-            except Exception as e:
-                print("Error in oled: ", e)
-
-
+        pass
 
     def _state_loop(self):
         """Main state machine - decides what state to be in"""
         print("Starting state loop ... ")
-        while self.running:
-            # print("Current state: ", self.current_state)
-            if self.current_state == RobotState.IDLE:
-                # Check if face detected
-                if self.face_detected:
-                    self._change_state(RobotState.TRACKING)
-                # Otherwise stay in idle
-                
-            elif self.current_state == RobotState.TRACKING:
-                # Check if face lost
-                if not self.face_detected:
-                    self._change_state(RobotState.IDLE)
-                
-                # Check if emotion detected
-                elif not self.emotion_queue.empty():
-                    emotion = self.emotion_queue.get()
-                    self.current_emotion = emotion
-                    self.emotion_start_time = time.time()
-                    self._change_state(RobotState.EMOTION)
-                    
-            elif self.current_state == RobotState.EMOTION:
-                # Hold emotion for duration
-                elapsed = time.time() - self.emotion_start_time
-                
-                if elapsed >= self.emotion_duration:
-                    # Return to previous state
-                    if self.face_detected:
-                        self._change_state(RobotState.TRACKING)
-                    else:
-                        self._change_state(RobotState.IDLE)
-            
-            time.sleep(0.05)  # Fast decision loop
 
-    def _change_state(self, new_state):
-        """Handle state transitions"""
-        if self.sequence_running:
-            return
+        while self.running:
+            try: 
+
+                # Get thread-safe state and flag
+                current_state = self._get_state()
+                face_detected = self._get_face_detected()
+
+                # State decision logic
+                if current_state == RobotState.IDLE:
+                    if face_detected:
+                        self._request_state_change(RobotState.TRACKING)
+
+                elif current_state == RobotState.TRACKING:
+                    if not face_detected:
+                        # Add grace period before going to idle
+                        time_since_face = time.time() - self.last_face_time
+                        if time_since_face > 1.0:
+                            self._request_state_change(RobotState.IDLE)
+
+                    # Check for emotion detection
+                    elif not self.emotion_queue.empty():
+                        emotion = self.emotion_queue.get()
+                        self.current_emotion = emotion
+                        self.emotion_start_time = time.time()
+                        self._request_state_change(RobotState.EMOTION)
+
+                elif current_state == RobotState.EMOTION:
+                    # Hold Emotion for duration
+                    elapsed = time.time() - self.emotion_start_time
+
+                    if elapsed >= self.emotion_duration:
+                        # Return to approriate state
+                        if face_detected:
+                            self._request_state_change(RobotState.TRACKING)
+                        else:
+                            self._request_state_change(RobotState.IDLE)
+                        
+                # Execute pending state change if sequence is done
+                with self.state_lock:
+                    if self.requested_state and self._can_change_state():
+                        self._execute_state_change(self.requested_state)
+                
+                time.sleep(0.5)
+
+            except Exception as e:
+                print("Error in state loop: ", e)
+                import traceback
+                traceback.print_exc()
         
-        if new_state != self.current_state:
-            print(f"State: {self.current_state.value} -> {new_state.value}")
-            self.previous_state = self.current_state
-            self.current_state = new_state
-            
-            # Trigger transition animations
-            # self.current_state = RobotState.TRANSITION
-            # After transition completes, move to new_state
+        print("Ending state loop ... ")
 
     def _body_loop(self):
         """Control body movements based on state"""
-        while self.running:
-            
-            if self.current_state == RobotState.IDLE:
-                # Run idle sequence (look around, small movements)
-                self.sequence_running = True
-                self.body.idle()
-                
-            elif self.current_state == RobotState.TRACKING:
-                # Follow face position
-                if not self.face_queue.empty():
-                    face_data = self.face_queue.get()
-                    # target_position = face_data['position']
-                    displacement = self._find_face_displacement(face_data)
-                    self.body.track_position(displacement)
-                
-            elif self.current_state == RobotState.EMOTION:
-                print("Emotion State :", self.current_emotion())
-    #             # Perform emotion gesture
-    #             self.body.emotion_sequence(self.current_emotion)
-                
-            self.sequence_running = False
-            time.sleep(0.02)  # Smooth motion control
+        print("Starting body loop ... ")
 
+        while self.running:
+            try: 
+                current_state = self._get_state()
+
+                if current_state == RobotState.IDLE:
+                    # Mark sequence as running
+                    self._set_sequence_running(True)
+
+                    # Run idle sequence
+                    self.body.idle()
+
+                    # Mark sequence as complete
+                    self._set_sequence_running(False)
+                
+                elif current_state == RobotState.TRACKING:
+                    # Check for face data
+                    if not self.face_queue.empty():
+                        face = self.face_queue.get()
+                        displacement = self._find_face_displacement(face)
+
+                        # Track face
+                        self.body.track_position(displacement)
+
+                    time.sleep(0.02)
+
+
+                elif current_state == EMOTIONS:
+                    if self.current_emotion:
+                        print("Performing Emotion : ", self.current_emotion)
+
+
+                        self.current_emotion = None
+
+                    time.sleep(0.1)
+
+                else:
+                    time.sleep(0.05)
+
+
+            except Exception as e:
+                print("Error in body loop: ", e)
+                import traceback
+                traceback.print_exc()
+                self.sequence_running(False)
+
+        print("Ending Body loop ... ")
 
     def _find_face_displacement(self, face):
         x, y, fw, fh = face
