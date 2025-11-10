@@ -677,6 +677,12 @@ class BODY:
             HEAD_ID: 11 / 24    # head
         }
 
+        ratios = {
+            BASE_ID: 32 / 10,   # bottom
+            BODY_ID: 32 / 16,   # middle
+            HEAD_ID: 24 / 11    # head
+        }
+
         # --- Desired cylinder rotations in degrees ---
         desired_cyl = {
             BASE_ID: bottom_target_deg,
@@ -703,7 +709,7 @@ class BODY:
         # --- Start all wheels ---
         for dxl_id, speed in speeds.items():
             print(f"Roatation id {dxl_id} at speed {speed}")
-            self.wheel_speed(dxl_id, speed)
+            # self.wheel_speed(dxl_id, speed)
 
         print("🌀 Rotating in wheel mode...")
         time.sleep(total_time)
@@ -714,8 +720,8 @@ class BODY:
         time.sleep(1)
 
         # --- Start all wheels ---
-        for dxl_id, speed in speeds.items():
-            self.wheel_speed(dxl_id, -speed)
+        # for dxl_id, speed in speeds.items():
+            # self.wheel_speed(dxl_id, -speed)
 
         print("🌀 Rotating in wheel mode...")
         time.sleep(total_time)
