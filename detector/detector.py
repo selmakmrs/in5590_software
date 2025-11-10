@@ -14,7 +14,7 @@ class DETECTOR:
     
     def __init__(self, resolution=(320, 240), 
                  model_path=r"/home/pi/in5590_software/detector/model/face_model1.tflite",
-                 yunet_path=r"/home/pi/models/face_detection_yunet_2023mar.onnx"):
+                 yunet_path=r"/home/pi/in5590_software/detector/model/face_detection_yunet_2023mar.onnx"):
         """
         Initialize camera and detection models
         
