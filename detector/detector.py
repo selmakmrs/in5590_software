@@ -12,7 +12,9 @@ class DETECTOR:
     Optimized for Raspberry Pi 3 B+
     """
     
-    def __init__(self, resolution=(320, 240), model_path=r"/home/pi/in5590_software/detector/model/face_model1.tflite"):
+    def __init__(self, resolution=(320, 240), 
+                 model_path=r"/home/pi/in5590_software/detector/model/face_model1.tflite",
+                 yunet_path=r"/home/pi/models/face_detection_yunet_2023mar.onnx"):
         """
         Initialize camera and detection models
         
@@ -51,6 +53,16 @@ class DETECTOR:
 
         self.resolution = resolution
 
+         # === YuNet face detector ===
+        self.face_detector = cv2.FaceDetectorYN_create(
+            yunet_path,
+            "",
+            self.resolution,      # (w, h)
+            score_threshold=0.7,  # can tune
+            nms_threshold=0.3,
+            top_k=1               # we only care about the main face
+        )
+
 
 
     
@@ -71,6 +83,9 @@ class DETECTOR:
         # Get frame dimensions
         self.frame_width = self.resolution[0]
         self.frame_height = self.resolution[1]
+
+        # Open face detector
+        self.face_detector.setInputSize(self.resolution)
         
         print("Picamera2 started successfully!")
 
@@ -109,33 +124,39 @@ class DETECTOR:
     # === Face Detection ===
     def detect_face(self, frame):
         """
-        Detect face in frame
-        
+        Detect face in frame using YuNet.
+
         Args:
-            frame: Input image
-            
+            frame: BGR image
+
         Returns:
-            face: list of [x,y,h,w] or None
-            """
-            # 1) Grayscale
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        # 2) Improve contrast if the image is dark
-        gray = cv2.equalizeHist(gray)
-
-        faces = self.face_cascade.detectMultiScale(
-            gray,
-            scaleFactor=1.2,
-            minNeighbors=4,
-            minSize=(40,40),
-            flags=cv2.CASCADE_SCALE_IMAGE,
-            )
-        
-        if len(faces) < 1:
+            (x, y, w, h) or None
+        """
+        if frame is None:
             return None
 
-        face = sorted(faces, key = lambda x: x[2]*x[3])[-1]
-        return face
+        h, w = frame.shape[:2]
+
+        # Resize to detector input size if needed
+        if (w, h) != self.resolution:
+            frame_resized = cv2.resize(frame, self.resolution)
+        else:
+            frame_resized = frame
+
+        # YuNet expects BGR, which we already have
+        retval, faces = self.face_detector.detect(frame_resized)
+
+        if faces is None or len(faces) == 0:
+            return None
+
+        # faces shape: (N, 15) -> [x, y, w, h, score, ...]
+        # We asked for top_k=1, so faces[0] is the best one.
+        x, y, w, h = faces[0][:4].astype(int)
+
+        # If we resized, coords are already in resized space (same as self.resolution),
+        # which is also what you use for drawing etc., so no remapping needed.
+        return (x, y, w, h)
+
     
     def is_face_centered(self, face, threshold=0.2):
         """
