@@ -15,6 +15,7 @@ BODY_ID = 3
 BASE_ID = 1
 SERVOS = [HEAD_ID, BODY_ID, BASE_ID]
 
+
 # --- Control Table addresses (AX-12A) ---
 ADDR_TORQUE_ENABLE = 24
 ADDR_CW_ANGLE_LIMIT = 6
@@ -38,6 +39,10 @@ HOME_POSITIONS = {
 # MODES
 JOINT = "joint"
 WHEEL = "wheel"
+
+# Gear Ratios
+
+GEAR_RATIO = {}
 
 
 # ========= UTILITY FUNCTIONS =========
@@ -245,7 +250,7 @@ class BODY:
         return False 
     
 
-
+    # ====== Gear Calulations =====
 
     # === UTILITY ===
 
@@ -284,7 +289,6 @@ class BODY:
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         time.sleep(0.5)
-
 
     def _look_right_slow(self, hold=1):
         """Turn head left and light body twist"""
@@ -327,7 +331,6 @@ class BODY:
         self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
 
         time.sleep(0.5)
-
 
     def _look_right_fast(self, hold=1):
         """Turn head left and light body twist"""
@@ -398,7 +401,6 @@ class BODY:
         self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
 
         time.sleep(0.5)
-
 
     def _twitch(self):
         pass
@@ -472,7 +474,6 @@ class BODY:
    
         self._run_wheel_movements([base_config, body_config])
 
-
     def jump_forward(self):
         pass
 
@@ -494,7 +495,6 @@ class BODY:
 
         self._run_wheel_movements([base_config, body_config, head_config], hold=hold)
         
-
     def jump_right(self, hold=3):
         """
         Makes robot jump left
@@ -509,7 +509,6 @@ class BODY:
         head_config = (HEAD_ID, 900, 0.7)
 
         self._run_wheel_movements([base_config, body_config, head_config])
-
 
     def sway(self, cycles=4):
 
@@ -538,7 +537,6 @@ class BODY:
         base_config_end = (BASE_ID, 1023, 1.5)
         self._run_wheel_movements([body_config_end, base_config_end], go_back=False)
 
-
     def look_up(self):
         if self.is_looking_up:
             return
@@ -549,10 +547,6 @@ class BODY:
 
         self._run_wheel_movements([base_config, head_config], go_back=False)
         self.is_looking_up = True
-
-        
-
-
 
     def look_down(self):
         if not self.is_looking_up:
@@ -664,6 +658,79 @@ class BODY:
         pass
 
 
+    def rotate_wheel_geared(self,
+                            bottom_target_deg=-90,
+                            middle_target_deg=180,
+                            head_target_deg=-90,
+                            total_time=3.0,
+                            max_speed=1023):
+        """
+        Rotate all 3 layers in wheel mode for the given target cylinder angles.
+        Automatically computes servo rotation based on gear ratios and ensures
+        all layers finish at the same time.
+        """
+
+        # --- Gear ratios (servo gear / cylinder gear) ---
+        ratios = {
+            BASE_ID: 10 / 32,   # bottom
+            BODY_ID: 16 / 32,   # middle
+            HEAD_ID: 11 / 24    # head
+        }
+
+        # --- Desired cylinder rotations in degrees ---
+        desired_cyl = {
+            BASE_ID: bottom_target_deg,
+            BODY_ID: middle_target_deg,
+            HEAD_ID: head_target_deg
+        }
+
+        # --- Compute required servo rotations in degrees ---
+        servo_rot = {k: desired_cyl[k] / ratios[k] for k in desired_cyl}
+
+        # --- Set wheel mode ---
+        self.set_wheel_mode()
+
+        # --- Compute speeds for each servo ---
+        # AX-12A wheel speed range: 0–1023 ≈ full speed (~114 rpm)
+        # Here we scale each servo speed so all finish together
+        speeds = {}
+        max_rot = max(abs(v) for v in servo_rot.values()) or 1
+        for dxl_id, deg in servo_rot.items():
+            direction = 1 if deg >= 0 else -1
+            relative = abs(deg) / max_rot
+            speeds[dxl_id] = int(relative * max_speed * direction)
+
+        # --- Start all wheels ---
+        for dxl_id, speed in speeds.items():
+            print(f"Roatation id {dxl_id} at speed {speed}")
+            self.wheel_speed(dxl_id, speed)
+
+        print("🌀 Rotating in wheel mode...")
+        time.sleep(total_time)
+
+        # --- Stop all wheels ---
+        self._stop_wheels()
+
+        time.sleep(1)
+
+        # --- Start all wheels ---
+        for dxl_id, speed in speeds.items():
+            self.wheel_speed(dxl_id, -speed)
+
+        print("🌀 Rotating in wheel mode...")
+        time.sleep(total_time)
+
+        # --- Stop all wheels ---
+        self._stop_wheels()
+
+        self.set_joint_mode()
+        print("✅ Wheel-mode geared rotation complete.")
+
+    def test(self):
+        self.rotate_wheel_geared()
+
+
+
 
 
 
@@ -688,11 +755,12 @@ if __name__ == "__main__":
         # body.jump_back()
         # body.jump_left()
         # body.jump_right()
-        body.look_up()
-        body.idle()
-        body.look_down()
-        body.idle()
+        # body.look_up()
+        # body.idle()
+        # body.look_down()
+        # body.idle()
         time.sleep(2)
+        body.test()
         
 
         
