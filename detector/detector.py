@@ -212,6 +212,9 @@ class DETECTOR:
         """
         x, y, w, h = face
 
+        fw = w
+        fh = h
+
          # Get frame height and width
         h, w = frame.shape[:2]
 
