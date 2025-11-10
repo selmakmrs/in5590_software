@@ -11,12 +11,13 @@ while True:
         break
     face = detector.detect_face(frame)
 
-    if face is not None and detector.is_face_centered(face):
-        # center = detector.is_face_centered(face)
-        emotion, emotion_prob = detector.detect_emotion(frame,face)
-        
+    if face is not None:
         detector.draw_face_box(frame,face)
-        detector.draw_emotion_text(frame,face,emotion,emotion_prob)
+        if detector.is_face_centered(face):
+            # center = detector.is_face_centered(face)
+            emotion, emotion_prob = detector.detect_emotion(frame,face)
+            
+            detector.draw_emotion_text(frame,face,emotion,emotion_prob)
 
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1)
