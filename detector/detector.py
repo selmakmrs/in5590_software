@@ -195,7 +195,17 @@ class DETECTOR:
             bool: True if face is close enough
         """
         pass
-    
+
+    def find_face_displacement(self, face):
+        """Find face diplacment from center og image"""
+        x, y, fw, fh = face
+
+        frame_center_x = self.frame_width // 2
+        face_center_x = x + fw // 2
+
+        displacement = (face_center_x - frame_center_x) / frame_center_x
+
+        return displacement
     # === Emotion Detection ===
     def detect_emotion(self, frame, face):
         """

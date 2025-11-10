@@ -350,7 +350,9 @@ class Robot:
                 elif current_state == EMOTIONS:
                     if self.current_emotion:
                         print("Performing Emotion : ", self.current_emotion)
-
+                        self._set_sequence_running(True)
+                        self.body.happy()
+                        self._set_sequence_running(False)
 
                         self.current_emotion = None
 
@@ -369,14 +371,7 @@ class Robot:
         print("Ending Body loop ... ")
 
     def _find_face_displacement(self, face):
-        x, y, fw, fh = face
-
-        frame_center_x = 320 // 2
-        face_center_x = x + fw // 2
-
-        displacement = (face_center_x - frame_center_x) / frame_center_x
-
-        return displacement
+        return self.detector.find_face_displacement(face)
     
     def _is_face_centered(self, face):
         return self.detector.is_face_centered(face)

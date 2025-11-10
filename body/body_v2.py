@@ -207,13 +207,11 @@ class BODY:
         value = speed | (direction << 10)
         self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_MOVING_SPEED, value)
 
-
     def _scurve_interpolate(self, start, end, s):
         """S-curve interpolation between start and end position"""
         s_smooth = 3 * s * s - 2 * s * s * s
         return int(start + (end - start) * s_smooth)
     
-
     def move_positions_smooth(self, layer_configs, steps=50, duration = 0.025):
         """Layer configs List with tuple [(dxl_id, start_pos, end_pos, speed)]"""
 
@@ -231,9 +229,9 @@ class BODY:
 
     def track_position(self, displacement):
         if displacement <= 0:
-            deg_change = +10
+            deg_change = +20
         else:
-            deg_change = -10
+            deg_change = -20
 
         for dxl_id in [HEAD_ID, BODY_ID, BASE_ID]:
             current_pos = self.tracked_positions[dxl_id]
@@ -475,8 +473,6 @@ class BODY:
         self._run_wheel_movements([base_config, body_config])
 
 
-
-
     def jump_forward(self):
         pass
 
@@ -641,7 +637,16 @@ class BODY:
 
 
     def happy(self):
-        pass
+        slow_look_sequences = [
+            self._look_left_slow,
+            self._look_right_slow,
+            self._curious_tilit_left,
+            self._curious_tilit_right
+        ]
+
+        for seq in slow_look_sequences:
+            seq()
+            time.sleep(0.5)
 
     def sad(self):
         pass
