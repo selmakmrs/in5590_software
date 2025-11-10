@@ -658,79 +658,51 @@ class BODY:
         pass
 
 
-    def rotate_wheel_geared(self,
-                            bottom_target_deg=-90,
-                            middle_target_deg=180,
-                            head_target_deg=-90,
-                            total_time=3.0,
-                            max_speed=1023):
-        """
-        Rotate all 3 layers in wheel mode for the given target cylinder angles.
-        Automatically computes servo rotation based on gear ratios and ensures
-        all layers finish at the same time.
-        """
-
-        # --- Gear ratios (servo gear / cylinder gear) ---
-        ratios = {
-            BASE_ID: 10 / 32,   # bottom
-            BODY_ID: 16 / 32,   # middle
-            HEAD_ID: 11 / 24    # head
+    def rotate_wheel_geared(self, bottom_target_deg=-90, middle_target_deg=180, 
+                        head_target_deg=-90, total_time=3.0, max_speed=1023):
+    
+        # FIXED gear ratios (cylinder teeth / servo teeth)
+        gear_ratios = {
+            BASE_ID: 32 / 10,   # = 3.2
+            BODY_ID: 32 / 16,   # = 2.0
+            HEAD_ID: 24 / 11    # = 2.18
         }
-
-        ratios = {
-            BASE_ID: 32 / 10,   # bottom
-            BODY_ID: 32 / 16,   # middle
-            HEAD_ID: 24 / 11    # head
-        }
-
-        # --- Desired cylinder rotations in degrees ---
-        desired_cyl = {
+        
+        targets = {
             BASE_ID: bottom_target_deg,
             BODY_ID: middle_target_deg,
             HEAD_ID: head_target_deg
         }
-
-        # --- Compute required servo rotations in degrees ---
-        servo_rot = {k: desired_cyl[k] / ratios[k] for k in desired_cyl}
-
-        # --- Set wheel mode ---
-        self.set_wheel_mode()
-
-        # --- Compute speeds for each servo ---
-        # AX-12A wheel speed range: 0–1023 ≈ full speed (~114 rpm)
-        # Here we scale each servo speed so all finish together
+        
+        # Calculate required SERVO rotations (multiply, not divide!)
+        servo_rotations = {k: targets[k] * gear_ratios[k] for k in targets}
+        
+        # Calculate required angular velocities (deg/s)
+        required_speeds = {k: abs(v) / total_time for k, v in servo_rotations.items()}
+        
+        # Convert to speed values (MUST CALIBRATE THIS VALUE!)
+        DEG_PER_SEC_AT_MAX_SPEED = 360.0  # Calibrate this!
         speeds = {}
-        max_rot = max(abs(v) for v in servo_rot.values()) or 1
-        for dxl_id, deg in servo_rot.items():
-            direction = 1 if deg >= 0 else -1
-            relative = abs(deg) / max_rot
-            speeds[dxl_id] = int(relative * max_speed * direction)
-
-        # --- Start all wheels ---
-        for dxl_id, speed in speeds.items():
-            print(f"Roatation id {dxl_id} at speed {speed}")
-            self.wheel_speed(dxl_id, speed)
-
-        print("🌀 Rotating in wheel mode...")
+        for k, deg_per_sec in required_speeds.items():
+            speed_value = int((deg_per_sec / DEG_PER_SEC_AT_MAX_SPEED) * max_speed)
+            direction = 1 if servo_rotations[k] >= 0 else 0  # 1=CW, 0=CCW
+            speeds[k] = (min(speed_value, max_speed), direction)
+        
+        # Execute
+        self.set_wheel_mode()
+        for dxl_id, (speed, direction) in speeds.items():
+            print(f"ID : {dxl_id}  speed : {speed * direction}")
+            # self.wheel_speed(dxl_id, speed * direction)  # Assuming separate direction param
+        
         time.sleep(total_time)
-
-        # --- Stop all wheels ---
         self._stop_wheels()
-
         time.sleep(1)
-
-        # --- Start all wheels ---
-        for dxl_id, speed in speeds.items():
-            self.wheel_speed(dxl_id, -speed)
-
-        print("🌀 Rotating in wheel mode...")
+        # for dxl_id, (speed, direction) in speeds.items():
+        #     self.wheel_speed(dxl_id, speed, direction)  # Assuming separate direction param
+        
         time.sleep(total_time)
-
-        # --- Stop all wheels ---
-        self._stop_wheels()
 
         self.set_joint_mode()
-        print("✅ Wheel-mode geared rotation complete.")
 
     def test(self):
         self.rotate_wheel_geared()
