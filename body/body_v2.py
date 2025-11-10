@@ -698,7 +698,7 @@ class BODY:
         self._stop_wheels()
         time.sleep(1)
         for dxl_id, (speed, direction) in speeds.items():
-            self.wheel_speed(dxl_id, speed* direction)  # Assuming separate direction param
+            self.wheel_speed(dxl_id, -speed* direction)  # Assuming separate direction param
         
         time.sleep(total_time)
 
