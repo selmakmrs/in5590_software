@@ -685,7 +685,7 @@ class BODY:
         speeds = {}
         for k, deg_per_sec in required_speeds.items():
             speed_value = int((deg_per_sec / DEG_PER_SEC_AT_MAX_SPEED) * max_speed)
-            direction = 1 if servo_rotations[k] >= 0 else 0  # 1=CW, 0=CCW
+            direction = 1 if servo_rotations[k] >= 0 else -1  # 1=CW, 0=CCW
             speeds[k] = (min(speed_value, max_speed), direction)
         
         # Execute
