@@ -78,6 +78,10 @@ class Robot:
 
         print("Robot started successfully!...")
 
+    def close(self):
+        self.body.close()
+        self.detector.cleanup()
+
 
 
     #----------------------------------------------#
