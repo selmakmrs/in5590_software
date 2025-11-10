@@ -1,1 +1,1 @@
-from .body import BODY
+from .body_v2 import BODY, HEAD_ID, BODY_ID, BASE_ID

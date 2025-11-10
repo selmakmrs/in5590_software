@@ -175,15 +175,15 @@ class DETECTOR:
         x, y, w, h = face
 
         frame_center_x = self.frame_width // 2
-        frame_center_y = self.frame_height // 2
+        # frame_center_y = self.frame_height // 2
 
         face_center_x = x + w / 2
         face_center_y = y + h / 2
 
         x_distance = abs(frame_center_x - face_center_x) / (self.frame_width / 2)
-        y_distance = abs(frame_center_y - face_center_y) / (self.frame_height / 2)
+        # y_distance = abs(frame_center_y - face_center_y) / (self.frame_height / 2)
 
-        return x_distance <= threshold and y_distance <= threshold
+        return x_distance <= threshold # and y_distance <= threshold
 
         
 
