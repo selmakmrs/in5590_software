@@ -24,7 +24,7 @@ class Robot:
     def __init__(self):
         self.detector = DETECTOR()
         self.body = BODY()
-        self.oled = OLED()
+        # self.oled = OLED()
         
         # State management
         self.current_state = RobotState.IDLE

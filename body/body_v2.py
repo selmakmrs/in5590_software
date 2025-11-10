@@ -595,32 +595,29 @@ class BODY:
             self._look_right_fast,
         ]
 
-        start = time.time()
+        # start = time.time()
 
         slow_seq_prob = 0.1
         fast_seq_prob = 0.03
         home_prob = 0.02
 
 
-        while True:
-            if random.random() < slow_seq_prob:
-                sequence = random.choice(slow_look_sequences)
-                hold = random.uniform(1,4)
-                sequence(hold)
+        
+        if random.random() < slow_seq_prob:
+            sequence = random.choice(slow_look_sequences)
+            hold = random.uniform(1,4)
+            sequence(hold)
 
-            if random.random() <= home_prob:
-                self.home_position()
+        if random.random() <= home_prob:
+            self.home_position()
 
-            if random.random() <= fast_seq_prob:
-                sequence = random.choice(fast_look_sequence)
-                hold = random.uniform(1,4)
-                sequence(hold)
+        if random.random() <= fast_seq_prob:
+            sequence = random.choice(fast_look_sequence)
+            hold = random.uniform(1,4)
+            sequence(hold)
 
 
-            if 30 < time.time() - start:
-                break
-
-            time.sleep(0.5)
+       
 
 
 
