@@ -361,7 +361,7 @@ class Robot:
                 print("Error in body loop: ", e)
                 import traceback
                 traceback.print_exc()
-                self.sequence_running(False)
+                self._set_sequence_running(False)
 
         print("Ending Body loop ... ")
 
