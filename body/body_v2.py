@@ -616,8 +616,27 @@ class BODY:
         #     hold = random.uniform(1,4)
         #     sequence(hold)
 
+    # In body.py
 
-       
+    def idle_gesture(self):
+        """Perform a single quick idle gesture - non-blocking"""
+        slow_look_sequences = [
+            self._look_left_slow,
+            self._look_right_slow,
+            self._curious_tilit_left,
+            self._curious_tilit_right
+        ]
+        
+        slow_seq_prob = 0.3
+        
+        if random.random() < slow_seq_prob:
+            sequence = random.choice(slow_look_sequences)
+            hold = random.uniform(1, 2)  # Shorter hold time
+            sequence(hold)
+        else:
+            # Just do a small movement
+            time.sleep(0.5)
+        
 
 
 

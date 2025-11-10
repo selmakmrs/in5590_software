@@ -317,21 +317,23 @@ class Robot:
     def _body_loop(self):
         """Control body movements based on state"""
         print("Starting body loop ... ")
+        last_idle_action = time.time()
+        idle_action_interval = 3.0 # Perform idle action evry 3 seconds
 
         while self.running:
             try: 
                 current_state = self._get_state()
 
                 if current_state == RobotState.IDLE:
-                    # Mark sequence as running
-                    self._set_sequence_running(True)
 
-                    # Run idle sequence
-                    self.body.idle()
-
-                    # Mark sequence as complete
-                    self._set_sequence_running(False)
-                
+                    if time.time() - last_idle_action >= idle_action_interval:
+                        # Mark sequence as running
+                        # self._set_sequence_running(True)
+                        # Run idle sequence
+                        self.body.idle_gesture()
+                        # Mark sequence as complete
+                        # self._set_sequence_running(False)
+                    
                 elif current_state == RobotState.TRACKING:
                     # Check for face data
                     if not self.face_queue.empty():
