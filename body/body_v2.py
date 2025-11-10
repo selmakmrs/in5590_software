@@ -707,7 +707,7 @@ class BODY:
         self.set_joint_mode()
 
     def test(self):
-        self.rotate_wheel_geared(bottom_target_deg=0, middle_target_deg=180, 
+        self.rotate_wheel_geared(bottom_target_deg=180, middle_target_deg=0, 
                         head_target_deg=-180, total_time=3.0,)
 
 
