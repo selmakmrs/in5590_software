@@ -299,7 +299,7 @@ class RoboEyes():
 		self.eyes_width(40,40)
 		self.eyes_height(50,50)
 		self.eyes_radius(6,6)
-		self.eyes_spacing(30)
+		self.eyes_spacing(40)
 
 	def update( self ):
 		# Check if a sequence step must be executed
