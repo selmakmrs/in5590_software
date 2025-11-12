@@ -11,7 +11,10 @@ from detector import DETECTOR
 
 EMOTIONS = {
     "happy" : 0.8,
-    "angry" : 0.4,
+    "angry" : 0.6,
+    "sad"   : 0.4,
+    "surprise" : 0.4
+
 }
 
 class RobotState(Enum):
@@ -296,19 +299,14 @@ class Robot:
                         self._request_state_change(RobotState.EMOTION)
 
                 elif current_state == RobotState.EMOTION:
-                    # Hold Emotion for duration
-                    # elapsed = time.time() - self.emotion_start_time
-                    self._run_emotion_sequence()
-                    self._request_state_change(RobotState.IDLE)
+                    
+                    if not self._is_sequence_running():
+                        self._run_emotion_sequence()
 
-                    # if elapsed >= self.emotion_duration:
-                    #     # Return to approriate state
-                    #     if face_detected:
-                    #         self._request_state_change(RobotState.TRACKING)
-                    #     else:
-                    #         self._request_state_change(RobotState.IDLE)
-                        
-                # Execute pending state change if sequence is done
+                    if not self._is_sequence_running():
+                        self._request_state_change(RobotState.IDLE)
+
+                   
                 
                 if self.requested_state and self._can_change_state():
                     self._execute_state_change(self.requested_state)
@@ -352,13 +350,11 @@ class Robot:
                             # Track face
                             self.body.track_position(displacement)
 
-                    time.sleep(0.02)
+                    
 
 
-                # elif current_state == EMOTIONS:
-                #     if self.current_emotion:
-                        
-                #     time.sleep(0.1)
+                elif current_state == EMOTIONS:
+                    time.sleep(0.1)
 
                 else:
                     time.sleep(0.05)
@@ -387,13 +383,19 @@ class Robot:
         try:
             if self.current_emotion:
                 print(f"Running emotion: {self.current_emotion}")
+
                 self._set_sequence_running(True)
+
                 self.oled.run_emotion(self.current_emotion)
                 self.body.happy()
-                time.sleep(1)
+
+
                 self.current_emotion = None
                 self._set_sequence_running(False)
+                print("Emotion sequence complete")
+
         except Exception as e:
             print(f"Error running emotion {self.current_emotion}", e)
+            self._set_sequence_running(False)
 
 

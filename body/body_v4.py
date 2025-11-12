@@ -2,6 +2,7 @@ from typing import List, Tuple, Dict, Optional
 from dataclasses import dataclass
 from enum import Enum
 import time
+import random
 import logging
 from dynamixel_sdk import *
 
@@ -41,11 +42,23 @@ class OperationMode(Enum):
     WHEEL = "wheel"
 
 
+def ratio(servo_teeth, cylinder_teeth):
+    """Calculate gear ratio"""
+
+    return cylinder_teeth/servo_teeth
+
+
 # Constraints
 HOME_POSITION = 512
 MIN_POS = 0
 MAX_POS = 1023
 MAX_SPEED = 1023
+
+GEAR_CONFIGS = {
+    ServoID.HEAD.value : ratio(servo_teeth=11, cylinder_teeth=24),
+    ServoID.BODY.value : ratio(servo_teeth=16, cylinder_teeth=32),
+    ServoID.BASE.value : ratio(servo_teeth=10, cylinder_teeth=32)
+}
 
 
 class DynamixelInterface:
@@ -135,7 +148,7 @@ class Body:
             self._enable_all_servos()
             self.set_mode(OperationMode.JOINT)
             self._set_torque_limit(MAX_SPEED)
-            self._calibare_positions()
+            self._calibrate_positions()
 
             logger.info("Body system started succsessfully")
         except Exception as e:
@@ -175,7 +188,7 @@ class Body:
             return
         
         position = self._clamp(position, 0, MAX_POS)
-        speed = self._clamo(speed, 0, MAX_SPEED)
+        speed = self._clamp(speed, 0, MAX_SPEED)
 
         self.interface.write_word(servo_id, ControlTable.MOVING_SPEED, speed)
         self.interface.write_word(servo_id, ControlTable.GOAL_POSITION, position)
@@ -203,23 +216,201 @@ class Body:
             self.set_mode(OperationMode.JOINT)
 
         for servo_id in self.servos:
-            self.move_to_position(servo_id, HOME_POSITION, 200)
+            self.move_to_position(servo_id, HOME_POSITION, 100)
 
     def rotate_geared(self,
                       base_deg = 0,
                       body_deg = 0,
-                      head_def = 0,
+                      head_deg = 0,
                       duration = 3.0,
                       max_speed = MAX_SPEED,
                       hold_duration = 1.0,
                       return_to_start = True):
-        """Rotate all layers to spesific angles"""
+        """Rotate all layers to spesific angles using wheel mode"""
         if self.current_mode != OperationMode.WHEEL:
             self.set_mode(OperationMode.WHEEL)
 
+        targets = {
+            ServoID.HEAD.value : head_deg,
+            ServoID.BODY.value : body_deg,
+            ServoID.BASE.value : base_deg
+            }
         
+        # Calculate required SERVO rotations (target_deg * gear_ratio)
+        servo_rotations = {k: targets[k] * GEAR_CONFIGS[k] for k in targets}
         
+        # Calculate required angular velocities (deg/s)
+        required_speeds = {k: abs(v) / duration for k, v in servo_rotations.items()}
+        
+        # Convert to speed values (MUST CALIBRATE THIS VALUE!)
+        DEG_PER_SEC_AT_MAX_SPEED = 360.0  # Calibrate this!
+        speeds = {}
+        for k, deg_per_sec in required_speeds.items():
+            speed_value = int((deg_per_sec / DEG_PER_SEC_AT_MAX_SPEED) * max_speed)
+            direction = 1 if servo_rotations[k] >= 0 else -1  
+            speeds[k] = (min(speed_value, max_speed), direction)
+        
+        # Execute
+        for dxl_id, (speed, direction) in speeds.items():
+            print(f"ID : {dxl_id}  speed : {speed * direction}")
+            self.set_wheel_speed(dxl_id, speed * direction)  
+        
+        time.sleep(duration)
+        self.stop_all_wheels()
+        time.sleep(hold_duration)
+        if return_to_start:
+            for dxl_id, (speed, direction) in speeds.items():
+                self.set_wheel_speed(dxl_id, -speed*direction)  
+            
+            time.sleep(duration)
+            self.stop_all_wheels()
 
+        self.set_mode(OperationMode.JOINT)
+
+
+        # Caluclate speeed 
+
+    # ========= Track and Head Modes ==========
+
+    def track_face(self, displacement):
+        """Adjust servos to track face"""
+        if self.current_mode != OperationMode.JOINT:
+            self.current_mode = OperationMode.JOINT
+
+        deg_change = -20 if displacement > 0 else 20
+
+        # Move each servo
+        for servo_id in [ServoID.HEAD.value, ServoID.BODY.value, ServoID.BASE.value]:
+            current_pos = self.tracked_positions.get(servo_id, HOME_POSITION)
+            new_pos = current_pos + deg_change
+            if MIN_POS <= new_pos <= MAX_POS:
+                self.move_to_position(servo_id, new_pos, speed=100)
+                return True
+            
+        return False 
+    
+    def look_up(self):
+        """ Make the robot look up"""
+        if self._is_looking_up:
+            return
+        
+        base_deg = 180
+        head_deg = -180
+        
+        self.rotate_geared(base_deg=base_deg, head_deg=head_deg, duration=2, return_to_start=False)
+        self._calibrate_positions()
+        self._is_looking_up = True
+        time.sleep(1)
+        logger.info("Setting in look up position")
+
+    def look_neutral(self):
+        """Make the robot look neutral"""
+        if not self._is_looking_up:
+            return
+        
+        base_deg = -180
+        head_deg = 180
+        
+        self.rotate_geared(base_deg=base_deg, head_deg=head_deg, duration=2, return_to_start=False)
+        self._calibrate_positions()
+        self._is_looking_up = False
+        time.sleep(1)
+        logger.info("Setting in neutral position")
+
+    # ============ JOINT Movements ============
+
+    def look_left(self):
+        """Makes the robot look left"""
+
+        self.move_to_position(ServoID.HEAD.value, 0)
+        self.move_to_position(ServoID.BODY.value, 0)
+
+    def look_right(self):
+        """Makes the robot look right"""
+        self.move_to_position(ServoID.HEAD.value, MAX_POS)
+        self.move_to_position(ServoID.BODY.value, MAX_POS)       
+
+    def tilt_left(self):
+        """Makes the robot tilt to the left"""
+        self.move_to_position(ServoID.BODY.value, MAX_POS)
+        self.move_to_position(ServoID.HEAD.value, MIN_POS)
+
+    def tilt_right(self):
+        """Makes the robot tilt to the right"""
+        self.move_to_position(ServoID.BODY.value, MIN_POS)
+        self.move_to_position(ServoID.HEAD.value, MAX_POS)
+
+
+    # =========== WHEEL Movements ===============
+
+    def jump_left(self, duration = 1.5, hold_duration=3):
+        "Make the robot jump left"
+        base_deg = -90
+        body_deg = 180
+        head_deg = -90
+        self.rotate_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
+
+    def jump_right(self, duration = 1.5, hold_duration=3):
+        "Make the robot jump right"
+        base_deg = 90
+        body_deg = -180
+        head_deg = 90
+        self.rotate_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
+
+    def jump_back(self, duration=2, hold_duration=2):
+        """Makes the robot jump back"""
+        base_deg = 180
+        body_deg = -180
+        self.rotate_geared(base_deg=base_deg, body_deg=body_deg, duration=duration, hold_duration=hold_duration)
+
+    def jump_forward(self, duration=2, hold_duration=3):
+        """Make the robot jump foward"""
+        body_deg = 180
+        head_deg = -180
+        self.rotate_geared(body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
+
+    def shake_head(self, duration=0.7, cycles=5):
+        for _ in range(cycles):
+            self.rotate_geared(head_deg=45, duration=duration, hold_duration=0.1)
+            self.rotate_geared(head_deg=-45, duration=duration, hold_duration=0.1)
+
+    def sway(self, duration=1, cycles=5):
+        """Makes the body sway"""
+        
+        for _ in range(cycles):
+            self.rotate_geared(base_deg=90, duration=duration, hold_duration=0.1)
+            self.rotate_geared(base_deg=-90, duration=duration, hold_duration=0.1)
+
+    # ============ Emotion Sequenses =============
+
+    def idle(self):
+        small_movements = [
+            self.look_left,
+            self.look_right,
+            self.tilt_left,
+            self.tilt_right
+        ]
+
+        _do_movment_prob=0.1
+
+        if _do_movment_prob <= random.random():
+            move = random.choice(small_movements)
+            move()
+
+    def happy(self):
+        pass
+
+    def angry(self):
+        pass
+
+    def suprise(self):
+        pass
+
+    def sad(self):
+        pass
+
+    def fear(self):
+        pass
 
     # ========== Helper Fuctions ==============
 
@@ -231,6 +422,8 @@ class Body:
         for servo_id in self.servos:
             pos = self._read_positions(servo_id)
             self.tracked_positions[servo_id] = pos
+            logger.info(f"  ID {servo_id}: position = {pos}")
+        logger.info("Calibration Complete")
 
     def _read_position(self, servo_id):
         """Read current position of servo"""
@@ -265,6 +458,59 @@ class Body:
         
     
         
+
+
+if __name__=="__main___":
+
+    body = Body()
+
+    try:
+        body.start()
+
+        print("Testing look up and neutral")
+        body.look_up()
+        time.sleep(4)
+        body.look_neutral()
+        time.sleep(3)
+
+        print("Testing Joint movemtns movemnt")
+        print("Look left")
+        time.sleep(1)
+        body.look_left()
+        print("Look right")
+        time.sleep(1)
+        body.look_right()
+        print("Tilt left")
+        time.sleep(1)
+        body.tilt_left()
+        print("Tilit Right")
+        time.sleep(1)
+        body.tilt_right()
+
+        body.move_to_home()
+
+        print("Testing Wheel movments")
+        
+        print("Jump back")
+        time.sleep(1)
+        body.jump_back()
+        print("Jump Forward")
+        time.sleep(1)
+        body.jump_forward()
+        print("Jump ledt")
+        time.sleep(1)
+        body.jump_left()
+        print("Jump right")
+        time.sleep(1)
+        body.jump_right()
+
+        time.sleep()
+        body.move_to_home()
+
+
+
+    except KeyboardInterrupt as e:
+        body.close()
 
                 
 

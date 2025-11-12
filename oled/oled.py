@@ -63,22 +63,9 @@ class OLED:
         seq.step( 500,  lambda r: r.set_mood(HAPPY) )
         seq.step( 800,  lambda r: r.laugh() )
         seq.step( 1600, lambda r: r.laugh() )
-        seq.step( 2400, lambda r: r.laugh() )
-        seq.step( 4400, lambda r: r.laugh() )
         seq.step( 5400, lambda r: r.laugh() )
-        seq.step( 6000, lambda r: r.set_mood(DEFAULT) )
-        seq.step( 6100, lambda r: print(seq.name, "done!") )
-
-
-        # Sad Sequence
-        # seq = self.roboeyes.sequences.add("happy")
-        # seq.step( 0,    lambda r: r.open() )
-        # seq.step( 500,  lambda r: r.set_mood(HAPPY) )
-        # seq.step( 800,  lambda r: r.laugh() )
-        # seq.step( 1600, lambda r: r.laugh() )
-        # seq.step( 2400, lambda r: r.laugh() )
-        # seq.step( 3000, lambda r: r.set_mood(DEFAULT) )
-        # seq.step( 3100, lambda r: print(seq.name, "done!") )
+        seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
+        seq.step( 10100, lambda r: print(seq.name, "done!") )
 
 
         # Angry Sequence
@@ -87,34 +74,51 @@ class OLED:
         seq.step( 500,  lambda r: r.set_mood(ANGRY) )
         seq.step( 1500, lambda r: r.blink() )
         seq.step( 2000, lambda r: r.blink() )
-        seq.step( 2500, lambda r: r.set_mood(DEFAULT) )
-        seq.step( 2600, lambda r: print(seq.name, "done!") )
+        seq.step( 3000, lambda r: r.confuse() )
+        seq.step( 5000, lambda r: r.blink() )
+        seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
+        seq.step( 10600, lambda r: print(seq.name, "done!") )
 
+        # Sad Sequence
+        seq = self.roboeyes.sequences.add("sad")
+        seq.step( 0,    lambda r: r.open() )
+        seq.step( 500,  lambda r: r.set_mood(TIRED) )
+        seq.step( 5000, lambda r: r.blink() )
+        seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
+        seq.step( 10600, lambda r: print(seq.name, "done!") )
 
 
         # Confused Sequence
         seq = self.roboeyes.sequences.add("confused")
         seq.step( 0,    lambda r: r.open() )
-        seq.step( 500,  lambda r: r.set_mood(CURIOUS) )
-        seq.step( 700,  lambda r: r.confuse() )
-        seq.step( 2000, lambda r: r.confuse() )
-        seq.step( 3000, lambda r: r.set_mood(DEFAULT) )
-        seq.step( 3100, lambda r: print(seq.name, "done!") )
-
+        seq.step( 500, lambda r : r.set_auto_blinker(OFF))
+        seq.step( 600, lambda r : r.set_idle_mode(OFF))
+        seq.step( 2000,  lambda r: r.set_mood(CURIOUS) )
+        seq.step( 6000, lambda r : r.default())
+        seq.step( 7000,  lambda r: r.confuse() )
+        seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
+        seq.step( 10100, lambda r: print(seq.name, "done!") )
 
 
         # Scared Sequence
         seq = self.roboeyes.sequences.add("scared")
         seq.step( 0,    lambda r: r.open() )
-        seq.step( 400,  lambda r: r.set_mood(SCARY) )
-        seq.step( 1000, lambda r: r.blink() )
-        seq.step( 1800, lambda r: r.blink() )
-        seq.step( 2500, lambda r: r.set_mood(DEFAULT) )
-        seq.step( 2600, lambda r: print(seq.name, "done!") )
+        seq.step( 500, lambda r : r.set_auto_blinker(OFF))
+        seq.step( 600, lambda r : r.set_idle_mode(OFF))
+        seq.step( 2000, lambda r : r.set_mood(FROZEN))
+        seq.step( 4000, lambda r : r.eyes_width(10,10))
+        seq.step( 4020, lambda r : r.eyes_height(10,10))
+        
+        seq.step( 7000, lambda r : r.set_mood(DEFAULT))
+        seq.step( 8000, lambda r: r.blink() )
+        seq.step( 8800, lambda r: r.blink() )        
+        seq.step( 10000, lambda r : r.default()) 
+        seq.step( 10500, lambda r: r.set_mood(DEFAULT) )
+        seq.step( 10600, lambda r: print(seq.name, "done!") )
 
 
         # Suprised Sequence
-        seq = self.roboeyes.sequences.add("surprised")
+        seq = self.roboeyes.sequences.add("surprise")
         seq.step( 0,    lambda r: r.open() )
         seq.step( 500,  lambda r: r.set_cyclops(True) )   # focus one eye
         seq.step( 800,  lambda r: r.vert_flicker(True, 3) )
