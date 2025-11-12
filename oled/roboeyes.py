@@ -294,12 +294,12 @@ class RoboEyes():
 	# -----------------------------------------------------
 
 	def default(self):
-		self.set_auto_blinker(ON,3,2)
-		self.set_idle_mode(ON,2,2)
+		self.set_auto_blinker(ON,4,2)
+		self.set_idle_mode(ON,4,2)
 		self.eyes_width(35,35)
 		self.eyes_height(50,50)
-		self.eyes_radius(6,6)
-		self.eyes_spacing(45)
+		self.eyes_radius(8,8)
+		self.eyes_spacing(50)
 
 	def update( self ):
 		# Check if a sequence step must be executed
