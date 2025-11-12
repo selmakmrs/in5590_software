@@ -312,21 +312,28 @@ class BODY:
         """Makes the robot look left"""
         self.move_position(HEAD_ID, 0)
         self.move_position(BODY_ID, 0)
+        time.sleep(3)
 
     def look_right(self):
         """Makes the robot look right"""
         self.move_position(HEAD_ID, MAX_POS)
-        self.move_position(BODY_ID, MAX_POS)       
+        self.move_position(BODY_ID, MAX_POS)
+        time.sleep(3)
+
 
     def tilt_left(self):
         """Makes the robot tilt to the left"""
         self.move_position(BODY_ID, MAX_POS)
         self.move_position(HEAD_ID, MIN_POS)
+        time.sleep(3)
+
 
     def tilt_right(self):
         """Makes the robot tilt to the right"""
         self.move_position(BODY_ID, MIN_POS)
         self.move_position(HEAD_ID, MAX_POS)
+        time.sleep(3)
+
 
 
     # =========== WHEEL Movements ===============
