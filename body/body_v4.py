@@ -460,7 +460,7 @@ class Body:
         
 
 
-if __name__=="__main___":
+if __name__=="__main__":
 
     body = Body()
     print("Satrting")
