@@ -417,7 +417,7 @@ class BODY:
         self.look_neutral()
 
     def angry(self):
-        self.jump_forward(hold_duration=6)
+        self.jump_forward(hold_duration=7)
     def suprise(self):
         pass
 

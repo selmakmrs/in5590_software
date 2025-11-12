@@ -149,7 +149,7 @@ class Sequences( list ):
 		return None
 
 class RoboEyes():
-	def __init__(self, fb, width, height, frame_rate=60, on_show=None, bgcolor=BGCOLOR, fgcolor=FGCOLOR ):
+	def __init__(self, fb, width, height, frame_rate=20, on_show=None, bgcolor=BGCOLOR, fgcolor=FGCOLOR ):
 		# on_show : callback event function( robo_eyes ) when framebuffer shoud be sent to display
 		assert on_show != None, "on_show event not defined"
 		self.fb = fb # FrameBuffer
@@ -300,7 +300,7 @@ class RoboEyes():
 		self.eyes_height(50,50)
 		self.eyes_radius(6,6)
 		self.eyes_spacing(30)
-		
+
 	def update( self ):
 		# Check if a sequence step must be executed
 		self.sequences.update() 
