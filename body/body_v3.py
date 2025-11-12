@@ -412,7 +412,7 @@ class BODY:
 
     def test(self):
         self.rotate_wheel_geared(base_deg=180, body_deg=0, 
-                        head_deg=-180, total_time=3.0,)
+                        head_deg=-180, duartion=3.0,)
 
 
 
