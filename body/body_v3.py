@@ -29,6 +29,12 @@ ADDR_MOVING = 46
 TORQUE_ENABLE = 1
 TORQUE_DISABLE = 0
 
+
+MIN_POS = 0
+MAX_POS = 1023
+MAX_SPEED = 0
+
+
 # HOME POSITIONS (center positions for each servo)
 HOME_POSITIONS = {
     HEAD_ID: 512,
@@ -209,9 +215,14 @@ class BODY:
         value = speed | (direction << 10)
         self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_MOVING_SPEED, value)
 
-    def rotate_wheel_geared(self, base_deg=0, body_deg=0, 
-                        head_deg=0, total_time=3.0, max_speed=1023,
-                        hold_position_duration = 1, go_back=True):
+    def rotate_wheel_geared(self, 
+                            base_deg=0, 
+                            body_deg=0, 
+                            head_deg=0, 
+                            duration=3.0, 
+                            max_speed=MAX_SPEED,
+                            hold_duration = 1, 
+                            return_to_start=True):
         """Rotate servos in wheel mode to positions at a time """
     
         # FIXED gear ratios (cylinder teeth / servo teeth)
@@ -231,10 +242,10 @@ class BODY:
         servo_rotations = {k: targets[k] * gear_ratios[k] for k in targets}
         
         # Calculate required angular velocities (deg/s)
-        required_speeds = {k: abs(v) / total_time for k, v in servo_rotations.items()}
+        required_speeds = {k: abs(v) / duration for k, v in servo_rotations.items()}
         
-        # Convert to speed values (MUST CALIBRATE THIS VALUE!)
-        DEG_PER_SEC_AT_MAX_SPEED = 360.0  # Calibrate this!
+        # Convert to speed values 
+        DEG_PER_SEC_AT_MAX_SPEED = 360.0  
         speeds = {}
         for k, deg_per_sec in required_speeds.items():
             speed_value = int((deg_per_sec / DEG_PER_SEC_AT_MAX_SPEED) * max_speed)
@@ -247,14 +258,14 @@ class BODY:
             print(f"ID : {dxl_id}  speed : {speed * direction}")
             self.wheel_speed(dxl_id, speed * direction)  # Assuming separate direction param
         
-        time.sleep(total_time)
+        time.sleep(duration)
         self._stop_wheels()
-        time.sleep(hold_position_duration)
-        if go_back:
+        time.sleep(hold_duration)
+        if return_to_start:
             for dxl_id, (speed, direction) in speeds.items():
                 self.wheel_speed(dxl_id, -speed* direction)  # Assuming separate direction param
             
-            time.sleep(total_time)
+            time.sleep(duration)
 
             self._stop_wheels()
 
@@ -295,145 +306,98 @@ class BODY:
         self.set_joint_mode()
         self.is_emergency_stopped = False
 
-    # ============ Base movemnts ==================
+    # ============ JOINT Movements ============
 
-    def _look_left_slow(self, hold = 1):
-        """Turn head left and light body twist"""
-        
-    def _look_right_slow(self, hold=1):
-        """Turn head left and light body twist"""
-        
-    def _look_left_fast(self, hold = 1):
-        """Turn head left and light body twist"""
-       
-    def _look_around_sweep(self):
-        pass
+    def look_left(self):
+        """Makes the robot look left"""
+        self.move_to_position(HEAD_ID, 0)
+        self.move_to_position(BODY_ID, 0)
 
-    def _curious_tilit_left(self, hold=1):
-        """Turn head left and light body twist"""
-        
-    def _curious_tilit_right(self, hold=1):
-        """Turn head left and light body twist"""
+    def look_right(self):
+        """Makes the robot look right"""
+        self.move_to_position(HEAD_ID, MAX_POS)
+        self.move_to_position(BODY_ID, MAX_POS)       
 
-    def jump_back(self):
-        """Makes Root jumb back
-        BASE 180 deg
-        BODY -180 deg """
-        base_config = (BASE_ID, 1024, 1.5)
-        body_config = (BODY_ID, -600, 1.5)
-   
-        self._run_wheel_movements([base_config, body_config])
+    def tilt_left(self):
+        """Makes the robot tilt to the left"""
+        self.move_to_position(BODY_ID, MAX_POS)
+        self.move_to_position(HEAD_ID, MIN_POS)
 
-    def jump_forward(self):
-        pass
+    def tilt_right(self):
+        """Makes the robot tilt to the right"""
+        self.move_to_position(BODY_ID, MIN_POS)
+        self.move_to_position(HEAD_ID, MAX_POS)
 
-    def jump_left(self, hold=3):
-        """
-        Makes robot jump left
-        Config:
-          - BASE : -90 deg
-          - BODY : 180 deg
-          - HEAD : -90 deg
-          
-        """
 
-        duration = 0.7
+    # =========== WHEEL Movements ===============
 
-        base_config = (BASE_ID, -900, 0.7)
-        body_config = (BODY_ID, 1024, 0.9)
-        head_config = (HEAD_ID, -900, 0.7)
+    def jump_left(self, duration = 1.5, hold_duration=3):
+        "Make the robot jump left"
+        base_deg = -90
+        body_deg = 180
+        head_deg = -90
+        self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
 
-        self._run_wheel_movements([base_config, body_config, head_config], hold=hold)
-        
-    def jump_right(self, hold=3):
-        """
-        Makes robot jump left
-        Config:
-          - BASE : 90 deg
-          - BODY : -180 deg
-          - HEAD : 90 deg
-          
-        """
-        base_config = (BASE_ID, 900, 0.7)
-        body_config = (BODY_ID, -1024, 0.9)
-        head_config = (HEAD_ID, 900, 0.7)
+    def jump_right(self, duration = 1.5, hold_duration=3):
+        "Make the robot jump right"
+        base_deg = 90
+        body_deg = -180
+        head_deg = 90
+        self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
 
-        self._run_wheel_movements([base_config, body_config, head_config])
+    def jump_back(self, duration=2, hold_duration=2):
+        """Makes the robot jump back"""
+        base_deg = 180
+        body_deg = -180
+        self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, duration=duration, hold_duration=hold_duration)
 
-    def sway(self, cycles=4):
+    def jump_forward(self, duration=2, hold_duration=3):
+        """Make the robot jump foward"""
+        body_deg = 180
+        head_deg = -180
+        self.rotate_wheel_geared(body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
 
-        body_config_start = (BODY_ID, 700, 1.5)
-        base_config_start = (BASE_ID, -1023, 1.5)
-
-        self._run_wheel_movements([body_config_start, base_config_start], go_back=False)
-
-        time.sleep(1.0)
-
-        duration = 0.01
-        steps = 40
-
+    def shake_head(self, duration=0.7, cycles=5):
         for _ in range(cycles):
-            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 0, 100)
-            self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
-            body_config = (BODY_ID, self.tracked_positions[BODY_ID], 1024, 100)
-            self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
+            self.rotate_wheel_geared(head_deg=45, duration=duration, hold_duration=0.1)
+            self.rotate_wheel_geared(head_deg=-45, duration=duration, hold_duration=0.1)
 
-        body_config = (BODY_ID, self.tracked_positions[BODY_ID], HOME_POSITIONS[BODY_ID], 400)
-        self.move_positions_smooth(layer_configs=[body_config, body_config], steps=steps, duration=duration)
+    def sway(self, duration=1, cycles=5):
+        """Makes the body sway"""
+        
+        for _ in range(cycles):
+            self.rotate_wheel_geared(base_deg=90, duration=duration, hold_duration=0.1)
+            self.rotate_wheel_geared(base_deg=-90, duration=duration, hold_duration=0.1)
 
-        time.sleep(1)
-
-        body_config_end = (BODY_ID, -700, 1.5)
-        base_config_end = (BASE_ID, 1023, 1.5)
-        self._run_wheel_movements([body_config_end, base_config_end], go_back=False)
-
-    def look_up(self):
-        """Make the robot look up"""
-        if self.is_looking_up:
-            return
-        self.rotate_wheel_geared(base_deg=-180, head_deg=180, total_time=3, go_back=False)
-        self.is_looking_up = True
-
-    def look_down(self):
-        """Make the robot look down"""
-        if not self.is_looking_up:
-            return 
-        self.rotate_wheel_geared(base_deg=180, head_deg=-180, total_time=3, go_back=False)
-        self.is_looking_up = True
-
-
-    # ================================================= #
-    # =============== Emotion Sequences =============== #
-    # ================================================= #
+    # ============ Emotion Sequenses =============
 
     def idle(self):
-        pass
-
-    def happy(self):
-        slow_look_sequences = [
-            self._look_left_slow,
-            self._look_right_slow,
-            self._curious_tilit_left,
-            self._curious_tilit_right
+        small_movements = [
+            self.look_left,
+            self.look_right,
+            self.tilt_left,
+            self.tilt_right
         ]
 
-        for seq in slow_look_sequences:
-            seq()
-            time.sleep(0.5)
+        _do_movment_prob=0.1
 
-    def sad(self):
+        if _do_movment_prob <= random.random():
+            move = random.choice(small_movements)
+            move()
+
+    def happy(self):
         pass
 
     def angry(self):
         pass
 
+    def suprise(self):
+        pass
+
+    def sad(self):
+        pass
+
     def fear(self):
-        pass
-
-    def suprised(self):
-        pass
-
-    def courious(self):
         pass
 
 
@@ -453,32 +417,53 @@ class BODY:
 
 
 # === EXAMPLE USAGE ===
-if __name__ == "__main__":
-    body = BODY()
+if __name__=="__main__":
 
+    body = Body()
+    print("Satrting")
     try:
         body.start()
 
-        time.sleep(1)
-        print("Testing Body movemnt in joint mode")
-        # body.idle()
-        # body._look_left_slow()
-        # body._look_right_slow()
-        # body._curious_tilit_left()
-        # body._curious_tilit_right()
-        # body.jump_back()
-        # body.jump_left()
-        # body.jump_right()
+        print("Testing look up and neutral")
         # body.look_up()
-        # body.idle()
-        # body.look_down()
-        # body.idle()
-        time.sleep(2)
-        body.test()
-        
+        # time.sleep(4)
+        # body.look_neutral()
+        # time.sleep(3)
 
+        print("Testing Joint movemtns movemnt")
+        print("Look left")
+        time.sleep(1)
+        body.look_left()
+        print("Look right")
+        time.sleep(2)
+        body.look_right()
+        print("Tilt left")
+        time.sleep(2)
+        body.tilt_left()
+        print("Tilit Right")
+        time.sleep(2)
+        body.tilt_right()
+
+        # body.move_to_home()
+
+        # print("Testing Wheel movments")
         
-        print("\n✅ Tests complete!")
+        # print("Jump back")
+        # time.sleep(1)
+        # body.jump_back()
+        # print("Jump Forward")
+        # time.sleep(1)
+        # body.jump_forward()
+        # print("Jump ledt")
+        # time.sleep(1)
+        # body.jump_left()
+        # print("Jump right")
+        # time.sleep(1)
+        # body.jump_right()
+
+        # time.sleep()
+        # body.move_to_home()
+
         
     except KeyboardInterrupt:
         print("\n⚠️  Interrupted by user")
