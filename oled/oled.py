@@ -64,8 +64,10 @@ class OLED:
         seq.step( 800,  lambda r: r.laugh() )
         seq.step( 1600, lambda r: r.laugh() )
         seq.step( 2400, lambda r: r.laugh() )
-        seq.step( 3000, lambda r: r.set_mood(DEFAULT) )
-        seq.step( 3100, lambda r: print(seq.name, "done!") )
+        seq.step( 4400, lambda r: r.laugh() )
+        seq.step( 5400, lambda r: r.laugh() )
+        seq.step( 6000, lambda r: r.set_mood(DEFAULT) )
+        seq.step( 6100, lambda r: print(seq.name, "done!") )
 
 
         # Sad Sequence

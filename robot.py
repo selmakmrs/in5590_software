@@ -24,7 +24,7 @@ class Robot:
     def __init__(self):
         self.detector = DETECTOR()
         self.body = BODY()
-        # self.oled = OLED()
+        self.oled = OLED()
         
         # State management
         self.state_lock = threading.Lock()
@@ -70,7 +70,7 @@ class Robot:
 
         threads = [
             threading.Thread(target=self._vision_loop, name="Vision", daemon=True),
-            # threading.Thread(target=self._oled_loop, name="Oled"),
+            threading.Thread(target=self._oled_loop, name="Oled"),
             threading.Thread(target=self._state_loop, name="State loop", daemon=True),
             threading.Thread(target=self._body_loop, name = "Body",daemon=True)   
         ]
@@ -257,7 +257,13 @@ class Robot:
                 self._update_queue(self.emotion_queue, consistent_emotion)
 
     def _oled_loop(self):
-        pass
+        print("Starting oled loop ... ")
+        while self.running:
+            try:
+                self.oled.update()
+
+            except Exception as e:
+                print(f"Failed to update oled", e)
 
     def _state_loop(self):
         """Main state machine - decides what state to be in"""
