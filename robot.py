@@ -336,7 +336,7 @@ class Robot:
                         # Mark sequence as running
                         # self._set_sequence_running(True)
                         # Run idle sequence
-                        self.body.idle_gesture()
+                        self.body.idle()
                         last_idle_action = time.time()
                         # Mark sequence as complete
                         # self._set_sequence_running(False)

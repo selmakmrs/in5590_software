@@ -300,6 +300,7 @@ class BODY:
             return
         self.rotate_wheel_geared(base_deg=180, head_deg=-180, duration=duration, return_to_start=False)
         self.calibrate()
+        self.is_looking_up = True
 
 
     def look_neutral(self, duration=2):
@@ -308,6 +309,7 @@ class BODY:
             return
         self.rotate_wheel_geared(base_deg=-180, head_deg=180, duration=duration, return_to_start=False)
         self.calibrate()
+        self.is_looking_up = False
 
         
     # === UTILITY ===
@@ -409,11 +411,13 @@ class BODY:
             move()
 
     def happy(self):
-        pass
+        """Make robot happy"""
+        self.look_up()
+        self.sway(duration=2, cycles=3)
+        self.look_neutral()
 
     def angry(self):
-        pass
-
+        self.jump_forward(hold_duration=6)
     def suprise(self):
         pass
 
@@ -475,7 +479,7 @@ if __name__=="__main__":
 
         print("Testing Wheel movments")
 
-        body.test()
+        # body.test()
         
         # print("Jump back")
         # time.sleep(1)
@@ -489,16 +493,27 @@ if __name__=="__main__":
         # print("Jump right")
         # time.sleep(1)
         # body.jump_right()
-        time.sleep(1)
-        print("Sway")
-        body.sway()
+        # time.sleep(1)
+        # print("Sway")
+        # body.sway()
 
-        print("Shake head")
-        time.sleep(1)
-        body.shake_head()
+        # print("Shake head")
+        # time.sleep(1)
+        # body.shake_head()
 
-        time.sleep(3)
+        # time.sleep(3)
         # body.move_to_home()
+
+
+        print("Testing Emotion")
+
+        print("Happy")
+        time.sleep(1)
+        body.happy()
+
+        time.sleep(2)
+        print("Angry")
+        body.angry()
 
         
     except KeyboardInterrupt:
