@@ -364,7 +364,7 @@ class BODY:
         head_deg = -180
         self.rotate_wheel_geared(body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
 
-    def shake_head(self, duration=0.7, cycles=5):
+    def shake_head(self, duration=0.08, cycles=5):
         for _ in range(cycles):
             self.rotate_wheel_geared(head_deg=45, duration=duration, hold_duration=0.1)
             self.rotate_wheel_geared(head_deg=-45, duration=duration, hold_duration=0.1)
@@ -373,8 +373,8 @@ class BODY:
         """Makes the body sway"""
         
         for _ in range(cycles):
-            self.rotate_wheel_geared(base_deg=90, duration=duration, hold_duration=0.1)
-            self.rotate_wheel_geared(base_deg=-90, duration=duration, hold_duration=0.1)
+            self.rotate_wheel_geared(body_deg=70, duration=duration, hold_duration=0.1)
+            self.rotate_wheel_geared(body_deg=-70, duration=duration, hold_duration=0.1)
 
     # ============ Emotion Sequenses =============
 
