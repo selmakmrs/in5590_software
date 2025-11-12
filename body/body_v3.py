@@ -296,12 +296,16 @@ class BODY:
     
     def look_up(self, duration=2):
         """Make to robot look up"""
+        if self.is_looking_up:
+            return
         self.rotate_wheel_geared(base_deg=180, head_deg=-180, duration=duration, return_to_start=False)
         self.calibrate()
 
 
     def look_neutral(self, duration=2):
         """Make the robot in neytral position"""
+        if not self.is_looking_up:
+            return
         self.rotate_wheel_geared(base_deg=-180, head_deg=180, duration=duration, return_to_start=False)
         self.calibrate()
 
@@ -448,7 +452,8 @@ if __name__=="__main__":
         time.sleep(4)
         body.shake_head()
         body.look_left()
-        time.sleep(100)
+        body.home_position()
+        time.sleep(10)
         body.look_neutral()
         time.sleep(3)
 
