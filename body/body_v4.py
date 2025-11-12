@@ -106,7 +106,7 @@ class DynamixelInterface:
     
     def write_word(self, servo_id, address, value):
         """Write two bytes"""
-        _, comm, err = self.packet_handler.write2ByteTxRx(self.port, servo_id, address, value)
+        comm, err = self.packet_handler.write2ByteTxRx(self.port, servo_id, address, value)
         return comm == COMM_SUCCESS and err == 0
     
     def read_word(self, servo_id, address):
