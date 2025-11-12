@@ -420,7 +420,7 @@ class Body:
         time.sleep(1)
         
         for servo_id in self.servos:
-            pos = self._read_positions(servo_id)
+            pos = self._read_position(servo_id)
             self.tracked_positions[servo_id] = pos
             logger.info(f"  ID {servo_id}: position = {pos}")
         logger.info("Calibration Complete")
