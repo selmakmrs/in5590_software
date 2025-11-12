@@ -294,6 +294,18 @@ class BODY:
         
         return False 
     
+    def look_up(self, duration=2):
+        """Make to robot look up"""
+        self.rotate_wheel_geared(base_deg=180, head_deg=-180, duration=duration, return_to_start=False)
+        self.calibrate()
+
+
+    def look_neutral(self, duration=2):
+        """Make the robot in neytral position"""
+        self.rotate_wheel_geared(base_deg=-180, head_deg=180, duration=duration, return_to_start=False)
+        self.calibrate()
+
+        
     # === UTILITY ===
 
     def emergency_stop(self):
@@ -432,10 +444,13 @@ if __name__=="__main__":
         body.start()
 
         print("Testing look up and neutral")
-        # body.look_up()
-        # time.sleep(4)
-        # body.look_neutral()
-        # time.sleep(3)
+        body.look_up()
+        time.sleep(4)
+        body.shake_head()
+        body.look_left()
+        time.sleep(100)
+        body.look_neutral()
+        time.sleep(3)
 
         # print("Testing Joint movemtns movemnt")
         # print("Look left")
