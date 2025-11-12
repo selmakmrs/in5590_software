@@ -291,14 +291,16 @@ class Robot:
 
                 elif current_state == RobotState.EMOTION:
                     # Hold Emotion for duration
-                    elapsed = time.time() - self.emotion_start_time
+                    # elapsed = time.time() - self.emotion_start_time
+                    self._run_emotion_sequence()
+                    self._request_state_change(RobotState.IDLE)
 
-                    if elapsed >= self.emotion_duration:
-                        # Return to approriate state
-                        if face_detected:
-                            self._request_state_change(RobotState.TRACKING)
-                        else:
-                            self._request_state_change(RobotState.IDLE)
+                    # if elapsed >= self.emotion_duration:
+                    #     # Return to approriate state
+                    #     if face_detected:
+                    #         self._request_state_change(RobotState.TRACKING)
+                    #     else:
+                    #         self._request_state_change(RobotState.IDLE)
                         
                 # Execute pending state change if sequence is done
                 
@@ -347,16 +349,10 @@ class Robot:
                     time.sleep(0.02)
 
 
-                elif current_state == EMOTIONS:
-                    if self.current_emotion:
-                        print("Performing Emotion : ", self.current_emotion)
-                        self._set_sequence_running(True)
-                        self.body.happy()
-                        self._set_sequence_running(False)
-
-                        self.current_emotion = None
-
-                    time.sleep(0.1)
+                # elif current_state == EMOTIONS:
+                #     if self.current_emotion:
+                        
+                #     time.sleep(0.1)
 
                 else:
                     time.sleep(0.05)
@@ -376,3 +372,22 @@ class Robot:
     def _is_face_centered(self, face):
         return self.detector.is_face_centered(face)
     
+
+
+    #--------------------------------------------#
+    #------------- Emotions ---------------------#
+    #-------------------------------------------#
+    def _run_emotion_sequence(self):
+        try:
+            if self.current_emotion:
+                print(f"Running emotion: {self.current_emotion}")
+                self._set_sequence_running(True)
+                self.body.happy()
+                # self.oled.run_emotion
+                time.sleep(1)
+                self.current_emotion = None
+                self._set_sequence_running(False)
+        except Exception as e:
+            print(f"Error running emotion {self.current_emotion}", e)
+
+

@@ -104,7 +104,6 @@ class BODY:
         self.calibrate()
         print("BODY Started")
 
-
     def close(self):
         self.home_position()
         time.sleep(1)
@@ -173,8 +172,6 @@ class BODY:
         for dxl_id in ids:
             self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_TORQUE_LIMIT, max(0, min(1023, limit)))
 
-       
-
     # ========= Postion And Speed Controll =====================
 
     def get_position(self, dxl_id):
@@ -212,23 +209,60 @@ class BODY:
         value = speed | (direction << 10)
         self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_MOVING_SPEED, value)
 
-    def _scurve_interpolate(self, start, end, s):
-        """S-curve interpolation between start and end position"""
-        s_smooth = 3 * s * s - 2 * s * s * s
-        return int(start + (end - start) * s_smooth)
+    def rotate_wheel_geared(self, base_deg=0, body_deg=0, 
+                        head_deg=0, total_time=3.0, max_speed=1023,
+                        hold_position_duration = 1, go_back=True):
+        """Rotate servos in wheel mode to positions at a time """
     
-    def move_positions_smooth(self, layer_configs, steps=50, duration = 0.025):
-        """Layer configs List with tuple [(dxl_id, start_pos, end_pos, speed)]"""
-
-        for i in range(steps):
-            t = i / steps
-            for dxl_id, start_pos, end_pos, speed in layer_configs:
-                pos = self._scurve_interpolate(start_pos, end_pos, t)
-                self.move_position(dxl_id, pos, speed)
-            time.sleep(duration)
-
+        # FIXED gear ratios (cylinder teeth / servo teeth)
+        gear_ratios = {
+            BASE_ID: 32 / 10,   # = 3.2
+            BODY_ID: 32 / 16,   # = 2.0
+            HEAD_ID: 24 / 11    # = 2.18
+        }
         
+        targets = {
+            BASE_ID: base_deg,
+            BODY_ID: body_deg,
+            HEAD_ID: head_deg
+        }
+        
+        # Calculate required SERVO rotations (multiply, not divide!)
+        servo_rotations = {k: targets[k] * gear_ratios[k] for k in targets}
+        
+        # Calculate required angular velocities (deg/s)
+        required_speeds = {k: abs(v) / total_time for k, v in servo_rotations.items()}
+        
+        # Convert to speed values (MUST CALIBRATE THIS VALUE!)
+        DEG_PER_SEC_AT_MAX_SPEED = 360.0  # Calibrate this!
+        speeds = {}
+        for k, deg_per_sec in required_speeds.items():
+            speed_value = int((deg_per_sec / DEG_PER_SEC_AT_MAX_SPEED) * max_speed)
+            direction = 1 if servo_rotations[k] >= 0 else -1  # 1=CW, 0=CCW
+            speeds[k] = (min(speed_value, max_speed), direction)
+        
+        # Execute
+        self.set_wheel_mode()
+        for dxl_id, (speed, direction) in speeds.items():
+            print(f"ID : {dxl_id}  speed : {speed * direction}")
+            self.wheel_speed(dxl_id, speed * direction)  # Assuming separate direction param
+        
+        time.sleep(total_time)
+        self._stop_wheels()
+        time.sleep(hold_position_duration)
+        if go_back:
+            for dxl_id, (speed, direction) in speeds.items():
+                self.wheel_speed(dxl_id, -speed* direction)  # Assuming separate direction param
+            
+            time.sleep(total_time)
 
+            self._stop_wheels()
+
+        self.set_joint_mode()
+
+    def _stop_wheels(self):
+        for dxl_id in self.ids:
+            self.wheel_speed(dxl_id, 0)
         
     # ==== Tracking ========
 
@@ -249,9 +283,6 @@ class BODY:
         
         return False 
     
-
-    # ====== Gear Calulations =====
-
     # === UTILITY ===
 
     def emergency_stop(self):
@@ -264,206 +295,25 @@ class BODY:
         self.set_joint_mode()
         self.is_emergency_stopped = False
 
-
-
-
     # ============ Base movemnts ==================
 
     def _look_left_slow(self, hold = 1):
         """Turn head left and light body twist"""
-        self.set_joint_mode()
-
-        steps = 5
-        duration = 0.01
-
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 200, 50)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 300, 50)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
-
-        # Hold position
-        time.sleep(hold)
-
-        # Return home
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 50)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 50)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
-
-        time.sleep(0.5)
-
+        
     def _look_right_slow(self, hold=1):
         """Turn head left and light body twist"""
-        self.set_joint_mode()
-
-        steps = 5
-        duration = 0.01
-
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 800, 50)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 700, 50)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
-
-        # Hold position
-        time.sleep(hold)
-
-        # Return home
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 50)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 50)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
-
-        time.sleep(0.5)
-
+        
     def _look_left_fast(self, hold = 1):
         """Turn head left and light body twist"""
-        self.set_joint_mode()
-
-        steps = 5
-        duration = 0.01
-
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 200, 600)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 300, 600)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
-
-        # Hold position
-        time.sleep(hold)
-
-        # Return home
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 50)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 50)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
-
-        time.sleep(0.5)
-
-    def _look_right_fast(self, hold=1):
-        """Turn head left and light body twist"""
-        self.set_joint_mode()
-
-        steps = 5
-        duration = 0.01
-
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 800, 600)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 700, 600)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
-
-        # Hold position
-        time.sleep(hold)
-
-        # Return home
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 50)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 50)
-        self.move_positions_smooth(layer_configs=[head_config, body_config], steps=steps, duration=duration)
-
-        time.sleep(0.5)
-
-    def _look_arounf_sweep(self):
+       
+    def _look_around_sweep(self):
         pass
 
     def _curious_tilit_left(self, hold=1):
         """Turn head left and light body twist"""
-        self.set_joint_mode()
-
-        steps = 5
-        duration = 0.01
-
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 0, 100)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 1000, 100)
-        base_config = (BASE_ID, self.tracked_positions[HEAD_ID], 0, 100)
-        self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
-
-        # Hold position
-        time.sleep(hold)
-
-        # Return home
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 100)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 100)
-        base_config = (BASE_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BASE_ID], 100)
-        self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
-
-        time.sleep(0.5)
-
+        
     def _curious_tilit_right(self, hold=1):
         """Turn head left and light body twist"""
-        self.set_joint_mode()
-
-        steps = 10
-        duration = 0.01
-
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], 1000, 100)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], 0, 100)
-        base_config = (BASE_ID, self.tracked_positions[HEAD_ID], 1000, 100)
-        self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
-
-        # Hold position
-        time.sleep(hold)
-
-        # Return home
-        head_config = (HEAD_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[HEAD_ID], 100)
-        body_config = (BODY_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BODY_ID], 100)
-        base_config = (BASE_ID, self.tracked_positions[HEAD_ID], HOME_POSITIONS[BASE_ID], 100)
-        self.move_positions_smooth(layer_configs=[head_config, body_config, base_config], steps=steps, duration=duration)
-
-        time.sleep(0.5)
-
-    def _twitch(self):
-        pass
-
-    def _look_up(self):
-        pass
-
-
-
-    # ============== Wheel Movements =================
-
-    def _run_wheel_movements(self, layer_config, hold=2, go_back=True):
-        self.set_wheel_mode()
-
-        for dxl_id, speed, duration in layer_config:
-            self.wheel_speed(dxl_id, speed)
-
-        start = time.time()
-        
-        while True:
-            elapsed = time.time() - start
-            all_servos_stopped = True
-            for dxl_id, speed, duration in layer_config:
-                if duration <= elapsed:
-                    self.wheel_speed(dxl_id,0)
-                else:
-                    all_servos_stopped = False
-
-            if all_servos_stopped or elapsed >= 3:
-                break
-            time.sleep(0.01)
-
-        self._stop_wheels()
-        time.sleep(hold)
-
-        if go_back:
-
-            for dxl_id, speed, duration in layer_config:
-                self.wheel_speed(dxl_id, -speed)
-
-            start = time.time()
-            
-            while True:
-                elapsed = time.time() - start
-                all_servos_stopped = True
-                for dxl_id, speed, duration in layer_config:
-                    if duration <= elapsed:
-                        self.wheel_speed(dxl_id,0)
-                    else:
-                        all_servos_stopped = False
-
-                if all_servos_stopped or elapsed >= 3:
-                    break
-
-            self._stop_wheels()
-            time.sleep(hold)
-
-
-        self.set_joint_mode()
-
-    def _stop_wheels(self):
-        for dxl_id in self.ids:
-            self.wheel_speed(dxl_id, 0)
 
     def jump_back(self):
         """Makes Root jumb back
@@ -538,30 +388,18 @@ class BODY:
         self._run_wheel_movements([body_config_end, base_config_end], go_back=False)
 
     def look_up(self):
+        """Make the robot look up"""
         if self.is_looking_up:
             return
-        self.set_wheel_mode()
-        base_config = (BASE_ID, -600, 2)
-        # body_config = (BODY_ID, 300, 1.7)
-        head_config = (HEAD_ID, 500, 2)
-
-        self._run_wheel_movements([base_config, head_config], go_back=False)
+        self.rotate_wheel_geared(base_deg=-180, head_deg=180, total_time=3, go_back=False)
         self.is_looking_up = True
 
     def look_down(self):
+        """Make the robot look down"""
         if not self.is_looking_up:
             return 
-        self.set_wheel_mode()
-        base_config = (BASE_ID, 600, 2)
-        head_config = (HEAD_ID, -500, 2)
-
-        self._run_wheel_movements([base_config, head_config], go_back=False)
-        self.is_looking_up = False
-
-        
-
-
-        
+        self.rotate_wheel_geared(base_deg=180, head_deg=-180, total_time=3, go_back=False)
+        self.is_looking_up = True
 
 
     # ================================================= #
@@ -569,66 +407,7 @@ class BODY:
     # ================================================= #
 
     def idle(self):
-        """IDLE MODE"""
-        self.set_joint_mode()
-
-
-        slow_look_sequences = [
-            self._look_left_slow,
-            self._look_right_slow,
-            self._curious_tilit_left,
-            self._curious_tilit_right
-        ]
-
-        # fast_look_sequence = [
-        #     self._look_left_fast,
-        #     self._look_right_fast,
-        # ]
-
-        # start = time.time()
-
-        slow_seq_prob = 0.03
-        fast_seq_prob = 0.03
-        home_prob = 0.02
-
-
-        
-        if random.random() < slow_seq_prob:
-            sequence = random.choice(slow_look_sequences)
-            hold = random.uniform(1,4)
-            sequence(hold)
-
-        # if random.random() <= home_prob:
-        #     self.home_position()
-
-        # if random.random() <= fast_seq_prob:
-        #     sequence = random.choice(fast_look_sequence)
-        #     hold = random.uniform(1,4)
-        #     sequence(hold)
-
-    # In body.py
-
-    def idle_gesture(self):
-        """Perform a single quick idle gesture - non-blocking"""
-        slow_look_sequences = [
-            self._look_left_slow,
-            self._look_right_slow,
-            self._curious_tilit_left,
-            self._curious_tilit_right
-        ]
-        
-        slow_seq_prob = 0.3
-        
-        if random.random() < slow_seq_prob:
-            sequence = random.choice(slow_look_sequences)
-            hold = random.uniform(1, 2)  # Shorter hold time
-            sequence(hold)
-        else:
-            # Just do a small movement
-            time.sleep(0.5)
-        
-
-
+        pass
 
     def happy(self):
         slow_look_sequences = [
@@ -658,57 +437,11 @@ class BODY:
         pass
 
 
-    def rotate_wheel_geared(self, bottom_target_deg=-90, middle_target_deg=180, 
-                        head_target_deg=-90, total_time=3.0, max_speed=1023):
-    
-        # FIXED gear ratios (cylinder teeth / servo teeth)
-        gear_ratios = {
-            BASE_ID: 32 / 10,   # = 3.2
-            BODY_ID: 32 / 16,   # = 2.0
-            HEAD_ID: 24 / 11    # = 2.18
-        }
-        
-        targets = {
-            BASE_ID: bottom_target_deg,
-            BODY_ID: middle_target_deg,
-            HEAD_ID: head_target_deg
-        }
-        
-        # Calculate required SERVO rotations (multiply, not divide!)
-        servo_rotations = {k: targets[k] * gear_ratios[k] for k in targets}
-        
-        # Calculate required angular velocities (deg/s)
-        required_speeds = {k: abs(v) / total_time for k, v in servo_rotations.items()}
-        
-        # Convert to speed values (MUST CALIBRATE THIS VALUE!)
-        DEG_PER_SEC_AT_MAX_SPEED = 360.0  # Calibrate this!
-        speeds = {}
-        for k, deg_per_sec in required_speeds.items():
-            speed_value = int((deg_per_sec / DEG_PER_SEC_AT_MAX_SPEED) * max_speed)
-            direction = 1 if servo_rotations[k] >= 0 else -1  # 1=CW, 0=CCW
-            speeds[k] = (min(speed_value, max_speed), direction)
-        
-        # Execute
-        self.set_wheel_mode()
-        for dxl_id, (speed, direction) in speeds.items():
-            print(f"ID : {dxl_id}  speed : {speed * direction}")
-            self.wheel_speed(dxl_id, speed * direction)  # Assuming separate direction param
-        
-        time.sleep(total_time)
-        self._stop_wheels()
-        time.sleep(1)
-        for dxl_id, (speed, direction) in speeds.items():
-            self.wheel_speed(dxl_id, -speed* direction)  # Assuming separate direction param
-        
-        time.sleep(total_time)
 
-        self._stop_wheels()
-
-        self.set_joint_mode()
 
     def test(self):
-        self.rotate_wheel_geared(bottom_target_deg=180, middle_target_deg=0, 
-                        head_target_deg=-180, total_time=3.0,)
+        self.rotate_wheel_geared(base_deg=180, body_deg=0, 
+                        head_deg=-180, total_time=3.0,)
 
 
 

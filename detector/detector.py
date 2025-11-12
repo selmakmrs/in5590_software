@@ -206,7 +206,9 @@ class DETECTOR:
         displacement = (face_center_x - frame_center_x) / frame_center_x
 
         return displacement
+   
     # === Emotion Detection ===
+
     def detect_emotion(self, frame, face):
         """
         Detect emotion from frame or face region
@@ -268,8 +270,7 @@ class DETECTOR:
         emotion_prob = emotions[dominant_emotion]
 
         return dominant_emotion, emotion_prob
-
-
+    
     def _pre_process_face(self, face_frame):
         # Resize to model input_size
         face_frame = cv2.resize(face_frame,(self.input_width, self.input_height), interpolation=cv2.INTER_LINEAR)
@@ -292,7 +293,7 @@ class DETECTOR:
 
     
     
-    def get_all_emotions(self, frame, face_data=None):
+    
         """
         Get confidence scores for all emotions
         

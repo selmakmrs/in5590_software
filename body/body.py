@@ -480,6 +480,22 @@ class BODY:
         """Clean up resources"""
         self.close()
 
+    def _scurve_interpolate(self, start, end, s):
+        """S-curve interpolation between start and end position"""
+        s_smooth = 3 * s * s - 2 * s * s * s
+        return int(start + (end - start) * s_smooth)
+    
+    def move_positions_smooth(self, layer_configs, steps=50, duration = 0.025):
+        """Layer configs List with tuple [(dxl_id, start_pos, end_pos, speed)]"""
+
+        for i in range(steps):
+            t = i / steps
+            for dxl_id, start_pos, end_pos, speed in layer_configs:
+                pos = self._scurve_interpolate(start_pos, end_pos, t)
+                self.move_position(dxl_id, pos, speed)
+            time.sleep(duration)
+
+
 
 # === EXAMPLE USAGE ===
 if __name__ == "__main__":
