@@ -419,7 +419,7 @@ class BODY:
 # === EXAMPLE USAGE ===
 if __name__=="__main__":
 
-    body = Body()
+    body = BODY()
     print("Satrting")
     try:
         body.start()
