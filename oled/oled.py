@@ -25,13 +25,11 @@ class OLED:
     # === Setup ====
     def setup(self):
         # Eye Configuartion
-        self.roboeyes.set_auto_blinker(ON,3,2)
-        self.roboeyes.set_idle_mode(ON,2,2)
+        self.roboeyes.default()
         
-        self.roboeyes.eyes_width(40,40)
-        self.roboeyes.eyes_height(50,50)
-        self.roboeyes.eyes_radius(6,6)
-        self.roboeyes.eyes_spacing(30)
+       
+
+        
 
 
         # Setup Eye sequences
