@@ -297,7 +297,7 @@ class RoboEyes():
 		self.set_auto_blinker(ON,4,2)
 		self.set_idle_mode(ON,4,2)
 		self.eyes_width(35,35)
-		self.eyes_height(50,50)
+		self.eyes_height(80,80)
 		self.eyes_radius(8,8)
 		self.eyes_spacing(50)
 
