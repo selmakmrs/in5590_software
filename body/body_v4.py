@@ -463,7 +463,7 @@ class Body:
 if __name__=="__main___":
 
     body = Body()
-
+    print("Satrting")
     try:
         body.start()
 
