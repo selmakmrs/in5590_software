@@ -457,20 +457,20 @@ if __name__=="__main__":
 
         body.test()
         
-        # print("Jump back")
-        # time.sleep(1)
-        # body.jump_back()
-        # print("Jump Forward")
-        # time.sleep(1)
-        # body.jump_forward()
-        # print("Jump ledt")
-        # time.sleep(1)
-        # body.jump_left()
-        # print("Jump right")
-        # time.sleep(1)
-        # body.jump_right()
+        print("Jump back")
+        time.sleep(1)
+        body.jump_back()
+        print("Jump Forward")
+        time.sleep(1)
+        body.jump_forward()
+        print("Jump ledt")
+        time.sleep(1)
+        body.jump_left()
+        print("Jump right")
+        time.sleep(1)
+        body.jump_right()
 
-        # time.sleep(3)
+        time.sleep(3)
         # body.move_to_home()
 
         
