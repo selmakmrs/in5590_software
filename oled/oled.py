@@ -29,7 +29,7 @@ class OLED:
         self.roboeyes.set_idle_mode(ON,2,2)
         
         self.roboeyes.eyes_width(40,40)
-        self.roboeyes.eyes_height(30,30)
+        self.roboeyes.eyes_height(50,50)
         self.roboeyes.eyes_radius(6,6)
         self.roboeyes.eyes_spacing(30)
 
@@ -71,14 +71,14 @@ class OLED:
 
 
         # Sad Sequence
-        seq = self.roboeyes.sequences.add("happy")
-        seq.step( 0,    lambda r: r.open() )
-        seq.step( 500,  lambda r: r.set_mood(HAPPY) )
-        seq.step( 800,  lambda r: r.laugh() )
-        seq.step( 1600, lambda r: r.laugh() )
-        seq.step( 2400, lambda r: r.laugh() )
-        seq.step( 3000, lambda r: r.set_mood(DEFAULT) )
-        seq.step( 3100, lambda r: print(seq.name, "done!") )
+        # seq = self.roboeyes.sequences.add("happy")
+        # seq.step( 0,    lambda r: r.open() )
+        # seq.step( 500,  lambda r: r.set_mood(HAPPY) )
+        # seq.step( 800,  lambda r: r.laugh() )
+        # seq.step( 1600, lambda r: r.laugh() )
+        # seq.step( 2400, lambda r: r.laugh() )
+        # seq.step( 3000, lambda r: r.set_mood(DEFAULT) )
+        # seq.step( 3100, lambda r: print(seq.name, "done!") )
 
 
         # Angry Sequence

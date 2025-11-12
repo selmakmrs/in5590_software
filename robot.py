@@ -388,8 +388,8 @@ class Robot:
             if self.current_emotion:
                 print(f"Running emotion: {self.current_emotion}")
                 self._set_sequence_running(True)
-                self.body.happy()
                 self.oled.run_emotion(self.current_emotion)
+                self.body.happy()
                 time.sleep(1)
                 self.current_emotion = None
                 self._set_sequence_running(False)
