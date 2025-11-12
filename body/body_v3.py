@@ -32,7 +32,7 @@ TORQUE_DISABLE = 0
 
 MIN_POS = 0
 MAX_POS = 1023
-MAX_SPEED = 0
+MAX_SPEED = 1023
 
 
 # HOME POSITIONS (center positions for each servo)
