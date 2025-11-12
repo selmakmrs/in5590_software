@@ -21,7 +21,7 @@ class LumaSSD1306Shim:
         self.oled0 = ssd1306(i2c0, width=128, height=64, rotate=3)
         self.oled1 = ssd1306(i2c1, width=128, height=64, rotate=1)
 
-        self.oled0 = sh1106(i2c0, width=128, height=64, rotate=3)
+        self.oled0 = sh1106(i2c0, width=128, height=64, rotate=1)
         self.oled1 = sh1106(i2c1, width=128, height=64, rotate=1)
 
 
