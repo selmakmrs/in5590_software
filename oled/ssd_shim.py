@@ -63,8 +63,11 @@ class LumaSSD1306Shim:
 
     def show(self):
         # self.device.display(self._img)
-        frame0 = self._img.crop((0,0,self.width//2, self.height))
-        frame1 = self._img.crop((self.width//2 , 0,self.width, self.height))
+        # frame0 = self._img.crop((0,0,self.width//2, self.height))
+        # frame1 = self._img.crop((self.width//2 , 0,self.width, self.height))
+        frame0 = self._img.crop((0,0,self.width, self.height//2))
+        frame1 = self._img.crop((self.width , 0,self.width//2, self.height))
+        print(frame0.size)
         self.oled0.display(frame0)
         self.oled1.display(frame1)
 
