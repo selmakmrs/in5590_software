@@ -22,8 +22,8 @@ PROTOCOL_VERSION = 1.0
 class ServoID(Enum):
     """Servo identification"""
     HEAD = 0
-    BODY = 0
-    BASE = 0
+    BODY = 3
+    BASE = 1
 
 class ControlTable:
     """AX-12A Controll Table for addresses"""
@@ -174,7 +174,7 @@ class Body:
         for servo_id in self.servos:
             if mode == OperationMode.JOINT:
                 self.interface.write_word(servo_id, ControlTable.CW_ANGLE_LIMIT, MIN_POS)
-                self.interface.write_word(servo_id, ControlTable.CWC_ANGLE_LIMIT, MAX_POS)
+                self.interface.write_word(servo_id, ControlTable.CCW_ANGLE_LIMIT, MAX_POS)
                 self.tracked_positions[servo_id] = self._read_position(servo_id)
             else:
                 self.interface.write_word(servo_id, ControlTable.CW_ANGLE_LIMIT, 0)
@@ -203,7 +203,7 @@ class Body:
         speed_value = self._clamp(speed, -MAX_SPEED, MAX_SPEED)
         value = speed_value | (direction << 10)
 
-        self.interface.write_byte(servo_id, ControlTable.MOVING_SPEED, value)
+        self.interface.write_word(servo_id, ControlTable.MOVING_SPEED, value)
 
     def stop_all_wheels(self):
         """Stop all servos (wheel mode)"""
@@ -441,7 +441,7 @@ class Body:
             self.interface.write_byte(servio_id, ControlTable.TORQUE_ENABLE, 1)
         logger.info("All servos enabled")
 
-    def _diable_all_servos(self):
+    def _disable_all_servos(self):
         """Disable torque in all servos"""
         for servo_id in self.servos:
             self.interface.write_byte(servo_id, ControlTable.TORQUE_ENABLE, 0)
