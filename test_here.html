@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gear Ratio Math for Robot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #764ba2;
+            margin-top: 30px;
+        }
+        .step {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .formula {
+            background: #e8eaf6;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            text-align: center;
+            margin: 15px 0;
+            border: 2px solid #667eea;
+        }
+        .example {
+            background: #fff9e6;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .visual {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 40px;
+        }
+        .calculator {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #764ba2;
+        }
+        .result {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦾 Gear Ratio Math for Your Robot</h1>
+        
+        <h2>📚 Step 1: Understanding Gears</h2>
+        <div class="step">
+            <p><strong>Basic Principle:</strong> When two gears mesh together, the smaller gear has to spin more times to make the larger gear complete one rotation.</p>
+            
+            <div class="visual">⚙️ → ⚙️⚙️</div>
+            
+            <p>Think of it like this: If you have a small wheel (11 teeth) connected to a big wheel (24 teeth), when the small wheel makes ONE full turn, the big wheel only turns partway.</p>
+        </div>
+
+        <h2>🎯 Step 2: The Gear Ratio Formula</h2>
+        <div class="formula">
+            Gear Ratio = Driven Gear Teeth ÷ Driving Gear Teeth
+        </div>
+        
+        <div class="step">
+            <p>In your robot:</p>
+            <ul>
+                <li><strong>Driving Gear:</strong> The servo gear (small, attached to motor)</li>
+                <li><strong>Driven Gear:</strong> The cylinder gear (big, what you want to rotate)</li>
+            </ul>
+        </div>
+
+        <table>
+            <tr>
+                <th>Layer</th>
+                <th>Servo Teeth</th>
+                <th>Cylinder Teeth</th>
+                <th>Gear Ratio</th>
+            </tr>
+            <tr>
+                <td>Head</td>
+                <td>11</td>
+                <td>24</td>
+                <td>24 ÷ 11 = 2.18</td>
+            </tr>
+            <tr>
+                <td>Body</td>
+                <td>16</td>
+                <td>32</td>
+                <td>32 ÷ 16 = 2.00</td>
+            </tr>
+            <tr>
+                <td>Base</td>
+                <td>10</td>
+                <td>32</td>
+                <td>32 ÷ 10 = 3.20</td>
+            </tr>
+        </table>
+
+        <div class="success">
+            <strong>What does this mean?</strong>
+            <ul>
+                <li>Head: Servo rotates 2.18× more than cylinder</li>
+                <li>Body: Servo rotates 2.00× more than cylinder</li>
+                <li>Base: Servo rotates 3.20× more than cylinder (hardest work!)</li>
+            </ul>
+        </div>
+
+        <h2>🔄 Step 3: How Much Should the Servo Rotate?</h2>
+        <div class="formula">
+            Servo Angle = Cylinder Angle × Gear Ratio
+        </div>
+
+        <div class="example">
+            <strong>Example 1 - Head Layer:</strong><br>
+            You want the head cylinder to rotate <strong>90°</strong><br><br>
+            
+            Servo Angle = 90° × 2.18 = <strong>196.4°</strong><br><br>
+            
+            So the servo must rotate 196.4° to make the cylinder rotate 90°!
+        </div>
+
+        <div class="example">
+            <strong>Example 2 - Base Layer:</strong><br>
+            You want the base cylinder to rotate <strong>45°</strong><br><br>
+            
+            Servo Angle = 45° × 3.20 = <strong>144°</strong><br><br>
+            
+            The servo must rotate 144° to make the cylinder rotate 45°
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Common Mistake:</strong><br>
+            DON'T divide by the gear ratio! That would give you the wrong answer.<br>
+            ❌ Wrong: 90° ÷ 2.18 = 41.3° (way too small!)<br>
+            ✅ Correct: 90° × 2.18 = 196.4°
+        </div>
+
+        <h2>⚡ Step 4: How Fast Should the Servo Spin?</h2>
+        <div class="formula">
+            Angular Speed = Total Angle ÷ Time
+        </div>
+
+        <div class="example">
+            <strong>Example - Head Layer:</strong><br>
+            Servo needs to rotate: 196.4°<br>
+            Time available: 3 seconds<br><br>
+            
+            Angular Speed = 196.4° ÷ 3s = <strong>65.5 degrees per second</strong>
+        </div>
+
+        <h2>🎮 Step 5: Convert Speed to Servo Value</h2>
+        <div class="step">
+            <p>AX-12A servos use speed values from 0 to 1023.</p>
+            <p>You need to <strong>calibrate</strong> to find out what 1023 means in degrees/second.</p>
+        </div>
+
+        <div class="formula">
+            Speed Value = (Required deg/s ÷ Max deg/s) × 1023
+        </div>
+
+        <div class="example">
+            <strong>Example (assuming max speed = 360°/s):</strong><br>
+            Need: 65.5 deg/s<br>
+            Max: 360 deg/s<br><br>
+            
+            Speed Value = (65.5 ÷ 360) × 1023 = <strong>186</strong>
+        </div>
+
+        <h2>🧮 Interactive Calculator</h2>
+        <div class="calculator">
+            <h3>Calculate Your Servo Rotation</h3>
+            
+            <label>Select Layer:</label>
+            <select id="layer">
+                <option value="2.18">Head (11/24 teeth)</option>
+                <option value="2.00">Body (16/32 teeth)</option>
+                <option value="3.20">Base (10/32 teeth)</option>
+            </select><br>
+            
+            <label>Cylinder Angle (degrees):</label>
+            <input type="number" id="cylAngle" value="90"><br>
+            
+            <label>Time (seconds):</label>
+            <input type="number" id="time" value="3" step="0.1"><br>
+            
+            <label>Max Speed (deg/s):</label>
+            <input type="number" id="maxSpeed" value="360"><br>
+            
+            <button onclick="calculate()">Calculate</button>
+            
+            <div id="results"></div>
+        </div>
+
+        <h2>📝 Complete Formula Chain</h2>
+        <div class="success">
+            <strong>From Cylinder Angle to Servo Speed Value:</strong><br><br>
+            
+            <div class="formula">1. Servo Angle = Cylinder Angle × (Cylinder Teeth ÷ Servo Teeth)</div>
+            <div class="formula">2. Required Speed = Servo Angle ÷ Time</div>
+            <div class="formula">3. Speed Value = (Required Speed ÷ Max Speed) × 1023</div>
+        </div>
+
+        <h2>🔍 Complete Example</h2>
+        <div class="example">
+            <strong>Goal:</strong> Rotate head cylinder 90° in 3 seconds<br><br>
+            
+            <strong>Step 1 - Find servo angle:</strong><br>
+            Head gear ratio = 24 ÷ 11 = 2.18<br>
+            Servo angle = 90° × 2.18 = 196.4°<br><br>
+            
+            <strong>Step 2 - Find required speed:</strong><br>
+            Required speed = 196.4° ÷ 3s = 65.5 deg/s<br><br>
+            
+            <strong>Step 3 - Find speed value:</strong><br>
+            (Assuming max speed = 360 deg/s)<br>
+            Speed value = (65.5 ÷ 360) × 1023 = 186<br><br>
+            
+            <strong>✅ Answer: Set servo to speed value 186 for 3 seconds</strong>
+        </div>
+
+    </div>
+
+    <script>
+        function calculate() {
+            const ratio = parseFloat(document.getElementById('layer').value);
+            const cylAngle = parseFloat(document.getElementById('cylAngle').value);
+            const time = parseFloat(document.getElementById('time').value);
+            const maxSpeed = parseFloat(document.getElementById('maxSpeed').value);
+            
+            // Step 1: Servo angle
+            const servoAngle = cylAngle * ratio;
+            
+            // Step 2: Required speed
+            const requiredSpeed = servoAngle / time;
+            
+            // Step 3: Speed value
+            const speedValue = Math.round((requiredSpeed / maxSpeed) * 1023);
+            
+            // Check if possible
+            const possible = speedValue <= 1023;
+            
+            const results = document.getElementById('results');
+            results.innerHTML = `
+                <h3>Results:</h3>
+                <div class="result">
+                    <strong>Step 1:</strong> Servo must rotate ${servoAngle.toFixed(1)}°<br>
+                    (${cylAngle}° × ${ratio.toFixed(2)} gear ratio)
+                </div>
+                <div class="result">
+                    <strong>Step 2:</strong> Required speed = ${requiredSpeed.toFixed(1)} deg/s<br>
+                    (${servoAngle.toFixed(1)}° ÷ ${time}s)
+                </div>
+                <div class="result">
+                    <strong>Step 3:</strong> Speed value = ${speedValue}<br>
+                    (${requiredSpeed.toFixed(1)} ÷ ${maxSpeed} × 1023)
+                </div>
+                <div class="${possible ? 'success' : 'warning'}">
+                    ${possible 
+                        ? '✅ This is possible! Use speed value: ' + speedValue
+                        : '⚠️ Speed too high! Max is 1023. Increase time or reduce angle.'}
+                </div>
+            `;
+        }
+        
+        // Calculate on load
+        calculate();
+    </script>
+</body>
+</html>
