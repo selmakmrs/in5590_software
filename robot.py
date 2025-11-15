@@ -288,7 +288,7 @@ class Robot:
                     if not face_detected:
                         # Add grace period before going to idle
                         time_since_face = time.time() - self.last_face_time
-                        if time_since_face > 1.0:
+                        if time_since_face > 10.0:
                             self._request_state_change(RobotState.IDLE)
 
                     # Check for emotion detection

@@ -54,6 +54,9 @@ try:
 
         if face is not None:
             detector.draw_face_box(frame,face)
+            x, y, w, h = face
+            face_size = w * h
+            print("Face Size: ", face_size)
             if detector.is_face_centered(face):
                 # center = detector.is_face_centered(face)
                 emotion, emotion_prob = detector.detect_emotion(frame,face)

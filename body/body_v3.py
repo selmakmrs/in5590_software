@@ -414,7 +414,7 @@ class BODY:
         """Make robot happy"""
         self.home_position()
         self.look_up()
-        self.sway(duration=3, cycles=3)
+        self.sway(duration=4, cycles=1)
         self.look_neutral()
 
     def angry(self):
