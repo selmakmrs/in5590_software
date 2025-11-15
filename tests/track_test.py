@@ -76,7 +76,7 @@ try:
 
 
 
-        cv2.imshow("Frame", frame)
+        # cv2.imshow("Frame", frame)
         key = cv2.waitKey(1)
         if key == ord('q'):
             break
