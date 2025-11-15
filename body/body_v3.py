@@ -299,7 +299,7 @@ class BODY:
         if self.is_looking_up:
             return
         self.rotate_wheel_geared(base_deg=180, head_deg=-180, duration=duration, return_to_start=False)
-        self.calibrate()
+        # self.calibrate()
         self.is_looking_up = True
 
 
