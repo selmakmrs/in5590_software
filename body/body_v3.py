@@ -412,17 +412,21 @@ class BODY:
 
     def happy(self):
         """Make robot happy"""
+        self.home_position()
         self.look_up()
         self.sway(duration=3, cycles=3)
         self.look_neutral()
 
     def angry(self):
+        
         self.jump_forward(hold_duration=7)
+        self.home_position()
 
     def suprise(self):
         pass
 
     def sad(self):
+        self.home_position()
         self.look_neutral()
         self.look_left()
 
