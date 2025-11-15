@@ -2,6 +2,8 @@
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306, sh1106
 from PIL import Image, ImageDraw, ImageFont
+import time
+import threading
 
 class LumaSSD1306Shim:
     """
@@ -25,6 +27,12 @@ class LumaSSD1306Shim:
         # Cache crop regions to avoid recalculation
         self._crop_box0 = (0, 0, self.width//2, self.height)
         self._crop_box1 = (self.width//2, 0, self.width, self.height)
+
+        # Perforrmance optimazation:
+
+        self._frame_count = 0
+        self._frame_skip = 2
+        self._last_update = time.time()
 
 
 
@@ -79,6 +87,11 @@ class LumaSSD1306Shim:
         
         frame0 = self._img.crop(self._crop_box0)
         frame1 = self._img.crop(self._crop_box1)
+
+        self._frame_count += 1
+
+        if self._frame_count % self._frame_skip != 0:
+            return 
         
         t0 = threading.Thread(target=self.oled0.display, args=(frame0,))
         t1 = threading.Thread(target=self.oled1.display, args=(frame1,))
