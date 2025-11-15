@@ -20,25 +20,21 @@ class OLED:
         self.roboeyes = RoboEyes(self.lcd, width, height, on_show=self.lcd.on_show)
 
         self.setup()
+        self.current_seq = None
 
 
     # === Setup ====
     def setup(self):
         # Eye Configuartion
         self.roboeyes.default()
-        
-       
-
-        
-
-
+    
         # Setup Eye sequences
         self._create_sequences()
     
     # === Display Control ===
     def clear(self):
         """Clear display"""
-        pass
+        self.lcd.clear()
     
     def update(self):
         """Update display with current buffer"""
@@ -47,10 +43,15 @@ class OLED:
     def run_emotion(self, emotion):
         """Start the emotion sequence"""
         seq = self.roboeyes.sequences.get(emotion)
+        self.current_seq = seq
         if seq:
             seq.reset()
             seq.start()
 
+    def is_sequence_running(self):
+        if self.current_seq is not None:
+            return self.roboeyes.sequences.get(self.current_seq).done
+        return False
 
     # === Create Sequences 
     def _create_sequences(self):
@@ -124,6 +125,28 @@ class OLED:
         seq.step( 2000, lambda r: r.set_cyclops(False) )
         seq.step( 2100, lambda r: print(seq.name, "done!") )
 
+
+
+
+
+# Testing
+if __name__=="__main__":
+    import random
+    oled = OLED()
+
+    emotions = ["happy", "sad", "angry", "surprise", "scared", "scared"]
+
+    try:
+        while True:
+            oled.update()
+
+            if not oled.is_sequence_running():
+                emotion = random.choice(emotions)
+                oled.run_emotion(emotion)
+                time.sleep(0.5)
+    except KeyboardInterrupt:
+        print("Shutting down ...")
+        
 
 
 

@@ -2,13 +2,14 @@
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306, sh1106
 from PIL import Image, ImageDraw, ImageFont
+import threading
 
 class LumaSSD1306Shim:
     """
     Drop-in replacement for your previous shim, but writes to a real SPI OLED.
     Matches the MicroPython-ish API RoboEyes expects (fill, fill_rrect, etc.).
     """
-    def __init__(self, width=256, height=64):
+    def __init__(self, width=128, height=128):
         self.width, self.height = width, height
         self._img = Image.new("1", (width, height), 0)
         self._draw = ImageDraw.Draw(self._img)
@@ -20,6 +21,11 @@ class LumaSSD1306Shim:
 
         self.oled0 = ssd1306(i2c0, width=128, height=64, rotate=3)
         self.oled1 = ssd1306(i2c1, width=128, height=64, rotate=1)
+
+
+        self._crop_box0 = (0, 0, self.width//2, self.height)
+        self._crop_box1 = (self.width//2, 0, self.width, self.height)
+
 
         # self.oled0 = sh1106(i2c0, width=128, height=64, rotate=1)
         # self.oled1 = sh1106(i2c1, width=128, height=64, rotate=3)
@@ -61,6 +67,18 @@ class LumaSSD1306Shim:
     def text(self, s, x, y, c=1):
         self._draw.text((x, y), s, font=self._font, fill=1 if c else 0)
 
+    def show_async(self):
+        frame0 = self._img.crop(self._crop_box0)
+        frame1 = self._img.crop(self._crop_box1)
+
+        t0 = threading.Thread(target=self.oled0.display, args=(frame0,))
+        t1 = threading.Thread(target=self.oled1.display, args=(frame1,))
+
+        t0.start(); t1.start()
+        t0.join(); t1.join()
+
+
+
     def show(self):
         # self.device.display(self._img)
         frame0 = self._img.crop((0,0,self.width//2, self.height))
@@ -75,7 +93,8 @@ class LumaSSD1306Shim:
 
     # RoboEyes will call this per frame
     def on_show(self, _):
-        self.show()
+        # self.show()
+        self.show_async()
 
     # Filled rounded-rectangle
     def fill_rrect(self, x, y, w, h, r, c=1):
