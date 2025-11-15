@@ -52,6 +52,13 @@ class OLED:
         if self.current_seq is not None:
             return self.current_seq.done
         return False
+    
+    def idle(self):
+        self.roboeyes.set_idle_mode(ON,6,2)
+
+    def track(self):
+        self.roboeyes.position = DEFAULT
+        self.roboeyes.set_idle_mode(OFF,6,2)
 
     # === Create Sequences 
     def _create_sequences(self):

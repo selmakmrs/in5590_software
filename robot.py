@@ -265,6 +265,11 @@ class Robot:
             try:
                 self.oled.update()
 
+                if self.current_state == RobotState.IDLE:
+                    self.oled.idle()
+                elif self.current_state == RobotState.TRACKING:
+                    self.oled.track()
+
             except Exception as e:
                 print(f"Failed to update oled", e)
 
