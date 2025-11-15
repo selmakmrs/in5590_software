@@ -91,6 +91,7 @@ class LumaSSD1306Shim:
         self._frame_count += 1
 
         if self._frame_count % self._frame_skip != 0:
+            self._frame_count = 0
             return 
         
         t0 = threading.Thread(target=self.oled0.display, args=(frame0,))
