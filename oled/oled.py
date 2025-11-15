@@ -50,7 +50,7 @@ class OLED:
 
     def is_sequence_running(self):
         if self.current_seq is not None:
-            return self.roboeyes.sequences.get(self.current_seq).done
+            return self.current_seq.done
         return False
 
     # === Create Sequences 
@@ -146,7 +146,7 @@ if __name__=="__main__":
                 time.sleep(0.5)
     except KeyboardInterrupt:
         print("Shutting down ...")
-        
+
 
 
 
