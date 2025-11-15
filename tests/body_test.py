@@ -6,7 +6,7 @@ import time
 
 
 
-body = BODY
+body = BODY()
 body.start()
 cmd_queue = queue.Queue()
 EMOTIONS = ["happy","sad","angry", "confused"]
