@@ -143,7 +143,7 @@ class BODY:
     def home_position(self):
         """Return all servos to home position"""
         for dxl_id in self.ids:
-            self.move_position(dxl_id, HOME_POSITIONS[dxl_id])
+            self.move_position(dxl_id, HOME_POSITIONS[dxl_id],speed=100)
         time.sleep(1)
 
     def enable_motors(self):
@@ -413,16 +413,18 @@ class BODY:
     def happy(self):
         """Make robot happy"""
         self.look_up()
-        self.sway(duration=2, cycles=3)
+        self.sway(duration=3, cycles=3)
         self.look_neutral()
 
     def angry(self):
         self.jump_forward(hold_duration=7)
+
     def suprise(self):
         pass
 
     def sad(self):
-        pass
+        self.look_neutral()
+        self.look_left()
 
     def fear(self):
         pass
