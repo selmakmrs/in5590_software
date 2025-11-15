@@ -22,6 +22,11 @@ class LumaSSD1306Shim:
         self.oled1 = ssd1306(i2c1, rotate=1)
 
 
+        # Cache crop regions to avoid recalculation
+        self._crop_box0 = (0, 0, self.width//2, self.height)
+        self._crop_box1 = (self.width//2, 0, self.width, self.height)
+
+
 
         # Pick driver
         # if driver.lower() == "sh1106":
@@ -59,10 +64,29 @@ class LumaSSD1306Shim:
 
     def show(self):
         # self.device.display(self._img)
-        frame0 = self._img.crop((0,0,self.width//2, self.height))
-        frame1 = self._img.crop((self.width//2 , 0,self.width, self.height))
+        frame0 = self._img.crop((self._crop_box0))
+        frame1 = self._img.crop((self._crop_box1))
         self.oled0.display(frame0)
         self.oled1.display(frame1)
+
+    
+    def show_async(self):
+        """
+        Alternative: Update displays in separate threads (if threading available)
+        This can help if one I2C bus is blocking the other
+        """
+        import threading
+        
+        frame0 = self._img.crop(self._crop_box0)
+        frame1 = self._img.crop(self._crop_box1)
+        
+        t0 = threading.Thread(target=self.oled0.display, args=(frame0,))
+        t1 = threading.Thread(target=self.oled1.display, args=(frame1,))
+        
+        t0.start()
+        t1.start()
+        t0.join()
+        t1.join()
 
 
     def clear(self):
@@ -70,7 +94,9 @@ class LumaSSD1306Shim:
 
     # RoboEyes will call this per frame
     def on_show(self, _):
-        self.show()
+        # self.show()
+        self.show_async()
+
 
     # Filled rounded-rectangle
     def fill_rrect(self, x, y, w, h, r, c=1):

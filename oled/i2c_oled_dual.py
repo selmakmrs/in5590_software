@@ -8,28 +8,28 @@ import time
 oled1 = ssd1306(i2c(port=1, address=0x3C),rotate=1)   # Bus 1 -> pins 3 & 5
 oled2 = ssd1306(i2c(port=11, address=0x3C),rotate=3)   # Bus 0 -> pins 27 & 28
 
-font = ImageFont.load_default()
+# font = ImageFont.load_default()
 
-def draw_text(oled, text):
-    img = Image.new("1", (oled.width, oled.height))
-    draw = ImageDraw.Draw(img)
-    draw.rectangle((0, 0, oled.width, oled.height), outline=0, fill=0)
-    draw.text((2, 2), text, font=font, fill=255)
-    oled.display(img)
+# def draw_text(oled, text):
+#     img = Image.new("1", (oled.width, oled.height))
+#     draw = ImageDraw.Draw(img)
+#     draw.rectangle((0, 0, oled.width, oled.height), outline=0, fill=0)
+#     draw.text((2, 2), text, font=font, fill=255)
+#     oled.display(img)
 
-# --- Main loop ---
-print("Displaying messages on both OLEDs. Press Ctrl+C to exit.")
-count = 0
-try:
-    while True:
-        draw_text(oled1, f"OLED #1\nCount: {count}")
-        draw_text(oled2, f"OLED #2\nCount: {count}")
-        count += 1
-        time.sleep(1)
-        if count > 5:
-          break
-except KeyboardInterrupt:
-    print("\nExiting test...")
+# # --- Main loop ---
+# print("Displaying messages on both OLEDs. Press Ctrl+C to exit.")
+# count = 0
+# try:
+#     while True:
+#         draw_text(oled1, f"OLED #1\nCount: {count}")
+#         draw_text(oled2, f"OLED #2\nCount: {count}")
+#         count += 1
+#         time.sleep(1)
+#         if count > 5:
+#           break
+# except KeyboardInterrupt:
+#     print("\nExiting test...")
 
 
 
@@ -314,10 +314,14 @@ i = 0
 seq = sequences[i]
 seq.start()
 
-while True:
-    robo.update()
-    if seq.done and i < len(sequences)-1:
-        i += 1
-        seq = sequences[i]
-        print("Starting: ", seq.name)
-        seq.start()
+try : 
+
+    while True:
+        robo.update()
+        if seq.done and i < len(sequences)-1:
+            i += 1
+            seq = sequences[i]
+            print("Starting: ", seq.name)
+            seq.start()
+except KeyboardInterrupt:
+    pass
