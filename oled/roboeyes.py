@@ -149,7 +149,7 @@ class Sequences( list ):
 		return None
 
 class RoboEyes():
-	def __init__(self, fb, width, height, frame_rate=9, on_show=None, bgcolor=BGCOLOR, fgcolor=FGCOLOR ):
+	def __init__(self, fb, width, height, frame_rate=12, on_show=None, bgcolor=BGCOLOR, fgcolor=FGCOLOR ):
 		# on_show : callback event function( robo_eyes ) when framebuffer shoud be sent to display
 		assert on_show != None, "on_show event not defined"
 		self.fb = fb # FrameBuffer
