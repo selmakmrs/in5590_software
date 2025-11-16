@@ -33,6 +33,7 @@ try :
             cmd = None
 
         if cmd and cmd in EMOTIONS:
+            body.home_position()
             if cmd == "happy":
                 body.happy()
 
@@ -42,7 +43,7 @@ try :
             if cmd == "sad":
                 body.sad()
 
-        body.idle()
+        # body.idle()
         
             
 
