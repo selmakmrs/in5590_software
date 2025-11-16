@@ -412,23 +412,50 @@ class BODY:
 
     def happy(self):
         """Make robot happy"""
-        self.home_position()
-        self.look_up()
-        self.sway(duration=4, cycles=1)
+        happy_movements = [
+            self.look_up,
+            self.tilt_left,
+            self.tilt_right,
+            self.jump_left,
+            self.jump_right,
+
+        ]
+
+        # _do_movement_prob = 0.9
+        move = random.choice(happy_movements)
+        move()
         self.look_neutral()
+        self.home_position()
+
 
     def angry(self):
-        
         self.jump_forward(hold_duration=7)
         self.home_position()
 
     def suprise(self):
-        pass
+        suprise_movements = [
+            self.jump_left,
+            self.jump_back,
+            self.jump_right
+        ]
+
+        move = random.choice(suprise_movements)
+        move(duration = 1.5, hold_duration=7)
+        self.home_position()
 
     def sad(self):
+        sad_movements = [
+            self.tilt_left,
+            self.tilt_left,
+        ]
+        move = random.choice(sad_movements)
+        move()
+
+        time.sleep(7)
+
         self.home_position()
         self.look_neutral()
-        self.look_left()
+
 
     def fear(self):
         pass
