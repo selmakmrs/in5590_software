@@ -1,170 +1,195 @@
-"""
-Real-time Emotion Detection using TensorFlow Lite
-Optimized for Raspberry Pi with TFLite interpreter
-Requires: pip install opencv-python numpy tflite-runtime (or tensorflow)
-"""
-
 import cv2
 import numpy as np
-import time
-from ultralytics import YOLO
-from picamera2 import Picamera2   
+import onnxruntime as ort
+from collections import deque
+import cv2
+import numpy as np
+from PIL import Image
+
+from picamera2 import Picamera2
+
+picam2 = Picamera2()
+
+config = picam2.create_preview_configuration(main={"size": (640, 480)})
+picam2.configure(config)
+picam2.start()
 
 
-class EmotionDetectorTFLite:
-    def __init__(self, model_path='model/best.pt'):
-        """Initialize TFLite emotion detector"""
-        self.emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
-        
-        # Load TFLite model
-        try:
-            # self.interpreter = Interpreter(model_path=model_path)
-            # self.interpreter.allocate_tensors()
-            
-            # # Get input and output details
-            # self.input_details = self.interpreter.get_input_details()
-            # self.output_details = self.interpreter.get_output_details()
-            
-            # # Get input shape
-            # self.input_shape = self.input_details[0]['shape']
-            # self.input_height = self.input_shape[1]
-            # self.input_width = self.input_shape[2]
-            
-            # print(f"Model loaded successfully!")
-            # print(f"Input shape: {self.input_shape}")
-            # print(f"Expected input size: {self.input_width}x{self.input_height}")
-            self.clf = YOLO(model_path)
-            
-        except Exception as e:
-            print(f"Error loading model: {e}")
-            print("\nTo get a pre-trained emotion detection model:")
-            print("1. Download from: https://github.com/oarriaga/face_classification")
-            print("2. Or convert your own Keras model to TFLite")
-            print("3. Place 'emotion_model.tflite' in the same directory")
-            raise
-        
-        # Initialize face detector (Haar Cascade - very lightweight)
-        self.face_cascade = cv2.CascadeClassifier(
-            '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
-        )
+IMG_SIZE = 224  # must match training / export
+# tfm = classify_transforms(size=IMG_SIZE)
+
+
+def get_face_detector():
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    return face_cascade
+
+
+def detect_largest_face(gray, face_cascade):
+    faces = face_cascade.detectMultiScale(
+        gray, scaleFactor=1.1, minNeighbors=5, minSize=(80, 80)
+    )
+
+    if len(faces) == 0:
+        return None
     
-    def preprocess_face(self, face_img):
-        """Preprocess face image for model input"""
-        # Resize to model input size
-        face_img = cv2.resize(face_img, (self.input_width, self.input_height))
-        
-        # Convert to grayscale if needed
-        if len(face_img.shape) == 3 and self.input_shape[-1] == 1:
-            face_img = cv2.cvtColor(face_img, cv2.COLOR_BGR2GRAY)
-            face_img = np.expand_dims(face_img, axis=-1)
-        
-        # Normalize pixel values
-        face_img = face_img.astype(np.float32) / 255.0
-        
-        # Add batch dimension
-        face_img = np.expand_dims(face_img, axis=0)
-        
-        return face_img
-    
-    def predict_emotion(self, face_img):
-        """Predict emotion from face image"""
-        # Preprocess
-        input_data = self.preprocess_face(face_img)
-        
-        # Run inference
-        self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
-        self.interpreter.invoke()
-        
-        # Get output
-        output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
-        predictions = output_data[0]
-        
-        # Get emotion probabilities
-        emotions = {label: float(pred) for label, pred in zip(self.emotion_labels, predictions)}
-        dominant_emotion = max(emotions, key=emotions.get)
-        
-        return dominant_emotion, emotions
+    # Choose the largest detected face (area)
+    x, y, w, h = max(faces, key=lambda b: b[2] * b[3])
+    return x, y, w, h
 
 
-def detect_emotion_realtime(model_path='model/best.pt'):
-    """Run real-time emotion detection using Picamera2 frames."""
-    detector = EmotionDetectorTFLite(model_path)
+def preprocess_for_yolo_classification(image, input_size=(224, 224)):
+    """
+    Reproduce ultralytics.data.augment.classify_transforms() using OpenCV/NumPy.
 
-    # --- Picamera2 init (fast on Pi 3 B+) ---
-    picam2 = Picamera2()
-    config = picam2.create_preview_configuration(main={"size": (320, 240)})
-    picam2.configure(config)
-    picam2.start()
-    print("\nStarting emotion detection (Picamera2 + TFLite). Press 'q' to quit.")
+    Steps:
+    - convert gray -> BGR (if needed)
+    - BGR -> RGB
+    - Resize so the *shortest* edge == size, keep aspect ratio
+    - Center-crop to (size, size)
+    - Convert to float32, divide by 255
+    - HWC -> CHW and add batch dimension
+    """
+    size = input_size[0]  # assuming square, like 224x224
 
-    fps_start_time = time.time()
-    fps_frame_count = 0
-    fps = 0
+    # 1) make sure we have 3 channels
+    if len(image.shape) == 2 or image.shape[2] == 1:
+        image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
-    try:
-        while True:
-            # Picamera2 returns RGB; convert to BGR for OpenCV drawing and consistency
-            frame_rgb = picam2.capture_array()
-            frame = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+    # 2) BGR -> RGB
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-            # Face detection uses grayscale
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    h, w = img.shape[:2]
 
-            faces = detector.face_cascade.detectMultiScale(
-                gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
-            )
+    # 3) resize shortest side to `size`, keep aspect ratio
+    if h < w:
+        new_h = size
+        new_w = int(round(w * size / h))
+    else:
+        new_w = size
+        new_h = int(round(h * size / w))
 
-            for (x, y, w, h) in faces:
-                face_roi = frame[y:y+h, x:x+w]
+    img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
 
-                try:
-                    res = detector.clf.predict(source=face_roi, verbose=True)[0]
-                    top1 = int(res.probs.top1)
-                    conf = float(res.probs.top1conf)
-                    label = detector.clf.names[top1]
-                    # predictions.append((label, conf))
+    # 4) center crop to size x size (like torchvision.CenterCrop)
+    y1 = max(0, (new_h - size) // 2)
+    x1 = max(0, (new_w - size) // 2)
+    img = img[y1:y1 + size, x1:x1 + size]
 
-                    # Draws on BGR frame
-                    cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-                    cv2.putText(frame, f"{label}: {conf:.2f}",
-                                (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+    # 5) ToTensor(): HWC uint8 [0,255] -> float32 CHW [0,1]
+    img = img.astype(np.float32) / 255.0
 
-                    # top3 = sorted(emotions.items(), key=lambda kv: kv[1], reverse=True)[:3]
-                    y_off = y + h + 25
-                    # for lab, p in top3:
-                    #     cv2.putText(frame, f"{lab}: {p:.2f}", (x, y_off),
-                    #                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-                    #     y_off += 20
-                except Exception as e:
-                    print(f"Error processing face: {e}")
+    # 6) HWC -> CHW and add batch dim
+    img = np.transpose(img, (2, 0, 1))   # [C, H, W]
+    img = np.expand_dims(img, axis=0)    # [1, C, H, W]
 
-            # FPS
-            fps_frame_count += 1
-            if time.time() - fps_start_time > 1:
-                fps = fps_frame_count
-                fps_frame_count = 0
-                fps_start_time = time.time()
-
-            cv2.putText(frame, f"FPS: {fps} | Faces: {len(faces)}", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-
-            cv2.imshow('Emotion Detection (Picamera2)', frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-    except Exception as e:
-        print(e)
-    finally:
-        picam2.stop()
-        cv2.destroyAllWindows()
-
-def _pick_face(faces):
-    sortes_faces = sorted(faces, key=lambda x: x[2]*x[3])
-    return sortes_faces[0]
+    return img
 
 
-if __name__ == "__main__":
-    import sys
-    
-    # Run real-time detection
-    model_path = sys.argv[1] if len(sys.argv) > 1 else 'model/best.pt'
-    detect_emotion_realtime(model_path)
+
+
+
+# Load ONNX model
+onnx_model_path = r"model\best.onnx"
+session = ort.InferenceSession(onnx_model_path)
+
+# Get input/output info
+input_name = session.get_inputs()[0].name
+output_name = session.get_outputs()[0].name
+input_shape = session.get_inputs()[0].shape
+
+print(f"Model input name: {input_name}")
+print(f"Model input shape: {input_shape}")
+print(f"Model output name: {output_name}")
+
+# Determine input size
+input_size = (input_shape[2], input_shape[3]) if len(input_shape) == 4 else (224, 224)
+print(f"Using input size: {input_size}")
+
+# Define emotion labels (adjust based on your training)
+# To get the exact labels from your original model, run:
+# from ultralytics import YOLO
+# model = YOLO("runs/classify/train3/weights/best.pt")
+# print(model.names)
+emotion_labels = {
+    0: "angry",
+    1: "disgust", 
+    2: "fear",
+    3: "happy",
+    4: "neutral",
+    5: "sad",
+    6: "suprise"
+}
+
+
+face_cascade = get_face_detector()
+predictions = deque(maxlen=5)
+
+label_txt = ""
+conf_txt = "0.00"
+
+while True:
+    frame = picam2.capture_array()
+    # if not frame:
+    #     break
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    bbox = detect_largest_face(gray, face_cascade)
+
+    if bbox is not None:
+        x, y, w, h = bbox
+
+        pad = int(0.15 * max(w, h))
+        x1 = max(0, x - pad)
+        y1 = max(0, y - pad)
+        x2 = min(frame.shape[1], x + w + pad)
+        y2 = min(frame.shape[0], y + h + pad)
+
+        face_crop = gray[y1:y2, x1:x2]
+
+        if face_crop.size > 0:
+            try:
+                # Preprocess for ONNX (YOLO style)
+                input_tensor = preprocess_for_yolo_classification(face_crop)
+                
+                # Run inference
+                outputs = session.run([output_name], {input_name: input_tensor})
+                
+                # Process outputs - YOLO classification returns logits
+                logits = outputs[0][0]  # Remove batch dimension
+                
+                # Apply softmax
+                exp_logits = np.exp(logits - np.max(logits))  # Subtract max for numerical stability
+                probs = exp_logits / np.sum(exp_logits)
+                
+                # Get top prediction
+                top1_idx = np.argmax(probs)
+                conf = float(probs[top1_idx])
+                label = emotion_labels.get(top1_idx, f"class_{top1_idx}")
+                
+                predictions.append((label, conf))
+
+                # Smooth predictions over the last N frames
+                if len(predictions) > 0:
+                    labels = [p[0] for p in predictions]
+                    best_label = max(set(labels), key=labels.count)
+                    avg_conf = np.mean([p[1] for p in predictions if p[0] == best_label])
+                    label_txt = best_label
+                    conf_txt = f"{avg_conf:.2f}"
+                    
+            except Exception as e:
+                print(f"Inference error: {e}")
+
+        # Draw bbox
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+        # Put text
+        cv2.putText(frame, f"{label_txt} {conf_txt}", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2, cv2.LINE_AA)
+
+    cv2.imshow("Emotion Recognition (q to quit)", frame)
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord("q"):
+        break
+
+picam2.stop()
+cv2.destroyAllWindows()
