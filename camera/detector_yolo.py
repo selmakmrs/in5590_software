@@ -319,7 +319,8 @@ if __name__=="__main__":
                 detector.draw_emotion_text(frame, face, emotion, cnf)
 
 
-            cv2.imshow(frame)
+            cv2.imshow("Camera Preview", frame)
+            
 
     except KeyboardInterrupt:
         print("stop")
