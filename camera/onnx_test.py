@@ -86,7 +86,7 @@ class EmotionDetectorTFLite:
         return dominant_emotion, emotions
 
 
-def detect_emotion_realtime(model_path='model/face_model.tflite'):
+def detect_emotion_realtime(model_path='model/best.pt'):
     """Run real-time emotion detection using Picamera2 frames."""
     detector = EmotionDetectorTFLite(model_path)
 
