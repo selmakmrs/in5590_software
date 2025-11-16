@@ -151,6 +151,8 @@ def detect_emotion_realtime(model_path='model/face_model.tflite'):
             cv2.imshow('Emotion Detection (Picamera2)', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+    except Exception as e:
+        print(e)
     finally:
         picam2.stop()
         cv2.destroyAllWindows()
