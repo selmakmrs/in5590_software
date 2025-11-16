@@ -166,5 +166,5 @@ if __name__ == "__main__":
     import sys
     
     # Run real-time detection
-    model_path = sys.argv[1] if len(sys.argv) > 1 else 'model/face_model.tflite'
+    model_path = sys.argv[1] if len(sys.argv) > 1 else 'model/best.pt'
     detect_emotion_realtime(model_path)
