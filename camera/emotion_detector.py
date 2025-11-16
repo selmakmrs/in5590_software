@@ -92,7 +92,7 @@ def detect_emotion_realtime(model_path='model/face_model.tflite'):
 
     # --- Picamera2 init (fast on Pi 3 B+) ---
     picam2 = Picamera2()
-    config = picam2.create_preview_configuration(main={"size": (640, 480)})
+    config = picam2.create_preview_configuration(main={"size": (320, 240)})
     picam2.configure(config)
     picam2.start()
     print("\nStarting emotion detection (Picamera2 + TFLite). Press 'q' to quit.")
