@@ -89,7 +89,7 @@ def preprocess_for_yolo_classification(image, input_size=(224, 224)):
 
 
 # Load ONNX model
-onnx_model_path = r'\model\best.onnx'
+onnx_model_path = r'model/best.onnx'
 session = ort.InferenceSession(onnx_model_path)
 
 # Get input/output info
