@@ -24,17 +24,23 @@ def get_face_detector():
     return face_cascade
 
 
-def detect_largest_face(gray, face_cascade):
+def detect_largest_face_scaled(gray, face_cascade, scale=0.5):
+    small = cv2.resize(gray, (0, 0), fx=scale, fy=scale)
     faces = face_cascade.detectMultiScale(
-        gray, scaleFactor=1.1, minNeighbors=5, minSize=(80, 80)
+        small, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40)
     )
-
     if len(faces) == 0:
         return None
-    
-    # Choose the largest detected face (area)
+
     x, y, w, h = max(faces, key=lambda b: b[2] * b[3])
+
+    # Scale back to original coordinates
+    x = int(x / scale)
+    y = int(y / scale)
+    w = int(w / scale)
+    h = int(h / scale)
     return x, y, w, h
+
 
 
 def preprocess_for_yolo_classification(image, input_size=(224, 224)):
@@ -90,7 +96,17 @@ def preprocess_for_yolo_classification(image, input_size=(224, 224)):
 
 # Load ONNX model
 onnx_model_path = r'model/best.onnx'
-session = ort.InferenceSession(onnx_model_path)
+
+sess_options = ort.SessionOptions()
+sess_options.intra_op_num_threads = 1  # Pi has few cores, avoid overhead
+sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+
+session = ort.InferenceSession(
+    onnx_model_path,
+    sess_options,
+    providers=["CPUExecutionProvider"]
+)
+
 
 # Get input/output info
 input_name = session.get_inputs()[0].name
@@ -127,64 +143,50 @@ predictions = deque(maxlen=5)
 label_txt = ""
 conf_txt = "0.00"
 
+
+frame_idx = 0
+
 while True:
     frame = picam2.capture_array()
-    # if not frame:
-    #     break
-
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    bbox = detect_largest_face(gray, face_cascade)
+    bbox = detect_largest_face_scaled(gray, face_cascade, scale=0.5)
 
     if bbox is not None:
         x, y, w, h = bbox
-
         pad = int(0.15 * max(w, h))
         x1 = max(0, x - pad)
         y1 = max(0, y - pad)
         x2 = min(frame.shape[1], x + w + pad)
         y2 = min(frame.shape[0], y + h + pad)
-
         face_crop = gray[y1:y2, x1:x2]
 
-        if face_crop.size > 0:
+        # only run ONNX every 3rd frame
+        if face_crop.size > 0 and frame_idx % 3 == 0:
             try:
-                # Preprocess for ONNX (YOLO style)
                 input_tensor = preprocess_for_yolo_classification(face_crop)
-                
-                # Run inference
                 outputs = session.run([output_name], {input_name: input_tensor})
-                
-                # Process outputs - YOLO classification returns logits
-                logits = outputs[0][0]  # Remove batch dimension
-                
-                # Apply softmax
-                exp_logits = np.exp(logits - np.max(logits))  # Subtract max for numerical stability
+                logits = outputs[0][0]
+                exp_logits = np.exp(logits - np.max(logits))
                 probs = exp_logits / np.sum(exp_logits)
-                
-                # Get top prediction
-                top1_idx = np.argmax(probs)
+                top1_idx = int(np.argmax(probs))
                 conf = float(probs[top1_idx])
                 label = emotion_labels.get(top1_idx, f"class_{top1_idx}")
-                
                 predictions.append((label, conf))
-
-                # Smooth predictions over the last N frames
-                if len(predictions) > 0:
-                    labels = [p[0] for p in predictions]
-                    best_label = max(set(labels), key=labels.count)
-                    avg_conf = np.mean([p[1] for p in predictions if p[0] == best_label])
-                    label_txt = best_label
-                    conf_txt = f"{avg_conf:.2f}"
-                    
             except Exception as e:
-                print(f"Inference error: {e}")
+                print("Inference error:", e)
 
-        # Draw bbox
+        if len(predictions) > 0:
+            labels = [p[0] for p in predictions]
+            best_label = max(set(labels), key=labels.count)
+            avg_conf = float(np.mean([p[1] for p in predictions if p[0] == best_label]))
+            label_txt = best_label
+            conf_txt = f"{avg_conf:.2f}"
+
         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
-        # Put text
         cv2.putText(frame, f"{label_txt} {conf_txt}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2, cv2.LINE_AA)
+
+  
 
     cv2.imshow("Emotion Recognition (q to quit)", frame)
     key = cv2.waitKey(1) & 0xFF
