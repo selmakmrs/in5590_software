@@ -315,8 +315,8 @@ if __name__=="__main__":
 
             if face is not None:
                 detector.draw_face_box()
-                emotion, cnf = detector.detect_emotion(frame, face)
-                detector.draw_emotion_text(frame, face, emotion, cnf)
+                # emotion, cnf = detector.detect_emotion(frame, face)
+                # detector.draw_emotion_text(frame, face, emotion, cnf)
 
 
             cv2.imshow("Camera Preview", frame)
