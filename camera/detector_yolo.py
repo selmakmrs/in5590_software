@@ -196,65 +196,36 @@ class DETECTOR:
     # === Emotion Detection ===
 
     def detect_emotion(self, frame, face):
-        """
-        Detect emotion from frame or face region
-        
-        Args:
-            frame: Input image
-            face_data: Optional face detection data (for cropping)
-            
-        Returns:
-            (emotion, confidence): tuple
-                emotion: str ('happy', 'sad', 'angry', 'surprise', 'neutral', etc.)
-                confidence: float (0.0-1.0)
-        """
         x, y, w, h = face
 
-        fw = w
-        fh = h
+        # Frame dims
+        H, W = frame.shape[:2]
 
-         # Get frame height and width
-        h, w = frame.shape[:2]
-
-        # Clamp the box so it stays inside the frame
+        # Clamp box inside frame
         x = max(0, x)
         y = max(0, y)
-        fw = min(fw, w - x)
-        fh = min(fh, h - y)
+        fw = min(w, W - x)
+        fh = min(h, H - y)
 
-        # If box is invalid after clamping, bail out
         if fw <= 0 or fh <= 0:
             print("Invalid face box, skipping emotion detection")
             return None, 0.0
 
-        face_frame = frame[y:y+h, x:x+w]
+        face_frame = frame[y:y+fh, x:x+fw]
 
-        # Double-check slice result
         if face_frame is None or face_frame.size == 0:
-            print("Empty face_frame after crop, skipping resize")
+            print("Empty face_frame after crop, skipping")
             return None, 0.0
 
-        # try:
-        #     face_frame = cv2.resize(face_frame, (self.input_width, self.input_height))
-        # except cv2.error as e:
-        #     print("Resize failed:", e)
-        #     return None, 0.0
-        
-        # input_data = self._pre_process_face(face_frame)
-        gray = cv2.cvtColor(face_frame, cv2.COLOR_BGR2GRAY)
-        
-        # Run inference
-        res = self.clf.predict(source=gray, verbose=True)[0]
+        # If your model was trained on color images, use color:
+        res = self.clf.predict(source=face_frame, verbose=False)[0]
+
         top1 = int(res.probs.top1)
         conf = float(res.probs.top1conf)
         label = self.clf.names[top1]
-        
-        # # Get emotion probabilities
-        # emotions = {label: float(pred) for label, pred in zip(self.emotion_labels, predictions)}
-        # dominant_emotion = max(emotions, key=emotions.get)
-        # emotion_prob = emotions[dominant_emotion]
 
         return label, conf
+
     
     def _pre_process_face(self, face_frame):
         # Resize to model input_size
@@ -273,19 +244,6 @@ class DETECTOR:
 
         return face_frame
 
-
-        
-
-    
-    
-    
-        """
-        Get confidence scores for all emotions
-        
-        Returns:
-            dict: {'happy': 0.8, 'sad': 0.1, 'angry': 0.05, ...}
-        """
-        pass
     
     # === Utility ===
     def preprocess_face(self, frame, bbox):
@@ -343,3 +301,28 @@ class DETECTOR:
         cv2.putText(frame, text, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
     
 
+
+
+if __name__=="__main__":
+
+    detector = DETECTOR()
+    detector.start_camera()
+    try:
+        while True:
+
+            frame = detector.get_frame()
+            face = detector.detect_face(frame)
+
+            if face is not None:
+                detector.draw_face_box()
+                emotion, cnf = detector.detect_emotion(frame, face)
+                detector.draw_emotion_text(frame, face, emotion, cnf)
+
+
+            cv2.imshow(frame)
+
+    except KeyboardInterrupt:
+        print("stop")
+
+    finally:
+        detector.stop_camera()
