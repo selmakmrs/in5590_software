@@ -409,6 +409,7 @@ class BODY:
         if _do_movment_prob <= random.random():
             move = random.choice(small_movements)
             move()
+            self.home_position()
 
     def happy(self):
         """Make robot happy"""
