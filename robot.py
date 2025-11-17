@@ -451,6 +451,7 @@ class Robot:
         self._set_sequence_running(True)
 
         cmd = cmd.strip()
+        print(f"Command {cmd} accepted")
 
         if cmd in ["stop", "quit", "exit"]:
             self.running = False
