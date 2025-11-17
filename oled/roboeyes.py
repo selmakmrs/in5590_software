@@ -621,7 +621,8 @@ class RoboEyes():
 		self.eyeLy += (self.eyeLheightDefault-self.eyeLheightCurrent)//2 # vertical centering of eye when closing
 		self.eyeLy -= self.eyeLheightOffset//2
 		# Right eye height
-		self.eyeRheightCurrent = (self.eyeRheightCurrent + self.eyeRheightNext + self.eyeRheightOffset)//2
+		# self.eyeRheightCurrent = (self.eyeRheightCurrent + self.eyeRheightNext + self.eyeRheightOffset)//2
+		self.eyeRheightCurrent = int((self.eyeRheightCurrent * (1-weight) + self.eyeRheightNext + self.eyeRheightOffset)*weight)
 		self.eyeRy += (self.eyeRheightDefault-self.eyeRheightCurrent)//2 # vertical centering of eye when closing
 		self.eyeRy -= self.eyeRheightOffset//2
 
