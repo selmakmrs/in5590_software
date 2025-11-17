@@ -45,6 +45,13 @@ class DETECTOR:
             self.input_name = self.session.get_inputs()[0].name
             self.output_name = self.session.get_outputs()[0].name
             self.input_shape = self.session.get_inputs()[0].shape
+
+            print("Emotion Detection Model loded successfully!")
+            print("Input name: ", self.input_name)
+            print("Output name: ", self.output_name)
+            print("Input shape: ", self.input_shape)
+
+
                         
 
         except Exception as e:
