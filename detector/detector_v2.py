@@ -42,9 +42,9 @@ class DETECTOR:
             )
 
             # Get input/output info
-            self.input_name = session.get_inputs()[0].name
-            self.output_name = session.get_outputs()[0].name
-            self.input_shape = session.get_inputs()[0].shape
+            self.input_name = self.session.get_inputs()[0].name
+            self.output_name = self.session.get_outputs()[0].name
+            self.input_shape = self.session.get_inputs()[0].shape
                         
 
         except Exception as e:
