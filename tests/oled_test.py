@@ -37,7 +37,7 @@ while True:
     if cmd and cmd in EMOTIONS:
         oled.run_emotion(cmd)
 
-    elif cmd == 'idle':
+    elif cmd and cmd == 'idle':
         oled.idle()
         
 

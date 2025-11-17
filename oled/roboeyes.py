@@ -289,9 +289,9 @@ class RoboEyes():
 		self.set_framerate(frame_rate) # calculate frame interval based on defined frameRate	
 
 		# Add these properties to __init__
-		self.movementMinX = 0
+		self.movementMinX = 20
 		self.movementMinY = 40
-		self.movementMaxX = None  # None means use full width
+		self.movementMaxX = 120  # None means use full width
 		self.movementMaxY = 120  # None means use full height	
 
 
@@ -301,6 +301,7 @@ class RoboEyes():
 
 	def default(self):
 		self.set_auto_blinker(ON,5,2)
+		self.set_mood(DEFAULT)
 		self.set_idle_mode(ON,5,3)
 		self.eyes_width(35,35)
 		self.eyes_height(40,40)
