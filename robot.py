@@ -11,9 +11,9 @@ from detector import DETECTOR
 
 EMOTIONS = {
     "happy" : 0.9,
-    "angry" : 0.4,
+    "angry" : 0.7,
     "sad"   : 0.4,
-    "surprise" : 0.4,
+    "surprise" : 0.3,
     "fear" : 0.4
 
 }
@@ -51,7 +51,7 @@ class Robot:
         # Emotion confidence system
         self.emotion_history = deque(maxlen=5)
         self.emotion_confidence_threshold = 0.7
-        self.min_consitent_frames = 5  # Require 3 consitent detections
+        self.min_consitent_frames = 3  # Require 3 consitent detections
         
         # Timing parameters
         self.emotion_duration = 6.0  # How long to hold emotion
