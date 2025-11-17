@@ -22,9 +22,9 @@ def find_direction(face):
 
 def move_servo(error):
     if error > 0: # Move right
-        angle = -20
+        angle = -30
     else:
-        angle = +20 # Move left
+        angle = +30 # Move left
 
     for dxl_id in [HEAD_ID, BODY_ID, BASE_ID]:
         current_deg = body.tracked_positions[dxl_id]
