@@ -274,7 +274,7 @@ class DETECTOR:
     
     def _pre_process_face(self, face_frame):
         # Resize to model input_size
-        face_frame = cv2.resize(face_frame,self.input_shape, interpolation=cv2.INTER_LINEAR)
+        face_frame = cv2.resize(face_frame,(self.input_shape[2], self.input_shape[3]), interpolation=cv2.INTER_LINEAR)
 
         # Convert to grayscale
         if len(face_frame.shape) == 3 and self.input_shape[-1] == 1:
