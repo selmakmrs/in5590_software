@@ -43,7 +43,7 @@ try :
             if cmd == "sad":
                 body.sad()
 
-        elif cmd and cmd == "look up":
+        elif cmd and cmd.strip() == "look up":
             body.look_up()
         
         elif cmd and cmd == "idle":
