@@ -272,20 +272,39 @@ class DETECTOR:
 
         return label, conf
     
-    def _pre_process_face(self, face_frame):
-        # Resize to model input_size
-        face_frame = cv2.resize(face_frame,(self.input_shape[2], self.input_shape[3]), interpolation=cv2.INTER_LINEAR)
+    def _pre_process_face(self, face_frame, input_size=(224,224)):
+        size = input_size[0]  # assuming square, like 224x224
 
-        # Convert to grayscale
-        if len(face_frame.shape) == 3 and self.input_shape[-1] == 1:
-            face_frame = cv2.cvtColor(face_frame, cv2.COLOR_BGR2GRAY)
-            face_frame = np.expand_dims(face_frame, axis=-1)
+        # 1) make sure we have 3 channels
+        if len(face_frame.shape) == 2 or face_frame.shape[2] == 1:
+            image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
-        # Normalize pixel values
+        # 2) BGR -> RGB
+        face_frame = cv2.cvtColor(face_frame, cv2.COLOR_BGR2RGB)
+
+        h, w = face_frame.shape[:2]
+
+        # 3) resize shortest side to `size`, keep aspect ratio
+        if h < w:
+            new_h = size
+            new_w = int(round(w * size / h))
+        else:
+            new_w = size
+            new_h = int(round(h * size / w))
+
+        face_frame = cv2.resize(face_frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+
+        # 4) center crop to size x size (like torchvision.CenterCrop)
+        y1 = max(0, (new_h - size) // 2)
+        x1 = max(0, (new_w - size) // 2)
+        face_frame = face_frame[y1:y1 + size, x1:x1 + size]
+
+        # 5) ToTensor(): HWC uint8 [0,255] -> float32 CHW [0,1]
         face_frame = face_frame.astype(np.float32) / 255.0
 
-        # Added batch dimention
-        face_frame = np.expand_dims(face_frame, axis=0)
+        # 6) HWC -> CHW and add batch dim
+        face_frame = np.transpose(face_frame, (2, 0, 1))   # [C, H, W]
+        face_frame = np.expand_dims(face_frame, axis=0)    # [1, C, H, W]
 
         return face_frame
 
