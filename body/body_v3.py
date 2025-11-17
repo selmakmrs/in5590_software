@@ -108,6 +108,8 @@ class BODY:
             lambda: self.jump_right(duration=4,hold_duration=4),
             lambda: self.look_left(speed=random.randint(50,130)),
             lambda: self.look_right(speed=random.randint(50,130)),
+            lambda: self.move_position(HEAD_ID,random.randint(300,400),speed=random.randint(50,100)),
+            lambda: self.move_position(HEAD_ID,random.randint(600,700),speed=random.randint(50,100)),
 
         ]
 
@@ -125,6 +127,9 @@ class BODY:
             lambda: self.jump_left(duration=0.5,hold_duration=4),
             lambda: self.jump_right(duration=0.5,hold_duration=4),
             lambda: self.jump_forward(duration=1, hold_duration=7),
+            lambda: self.move_position(HEAD_ID,random.randint(300,400),speed=random.randint(200,300)),
+            lambda: self.move_position(HEAD_ID,random.randint(600,700),speed=random.randint(200,300)),
+
             ]
         
         self._sad_sequence = [
@@ -313,6 +318,7 @@ class BODY:
             self._stop_wheels()
 
         self.set_joint_mode()
+        self.home_position()
 
     def _stop_wheels(self):
         for dxl_id in self.ids:

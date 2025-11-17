@@ -51,7 +51,7 @@ class Robot:
         # Emotion confidence system
         self.emotion_history = deque(maxlen=5)
         self.emotion_confidence_threshold = 0.7
-        self.min_consitent_frames = 3  # Require 3 consitent detections
+        self.min_consitent_frames = 5  # Require 3 consitent detections
         
         # Timing parameters
         self.emotion_duration = 6.0  # How long to hold emotion
@@ -193,7 +193,7 @@ class Robot:
                     self._update_queue(self.face_queue, face)
 
                     # Check if face is centered for emorion detection
-                    if self.detector.is_face_centered(face):
+                    if self.detector.is_face_centered(face) and self.detector.is_face_close(face):
                         emotion, confidence = self.detector.detect_emotion(frame, face)
                         # Debug info
                         self.detector.draw_emotion_text(frame, face, emotion, confidence)
@@ -391,14 +391,24 @@ class Robot:
                 print(f"Running emotion: {self.current_emotion}")
 
                 self._set_sequence_running(True)
-
                 self.oled.run_emotion(self.current_emotion)
-                self.body.happy()
+                match self.current_emotion:
+                    case "happy":
+                        self.body.happy()
+                    case "sad":
+                        self.body.sad()
+                    case "angry":
+                        self.body.angry()
+                    case "suprise":
+                        self.body.suprise()
+                    case "fear":
+                        self.body.fear()
 
-
+                time.sleep(1)
+                self.body.idle()
+                print(f"Emotion sequence {self.current_emotion} complete")
                 self.current_emotion = None
                 self._set_sequence_running(False)
-                print("Emotion sequence complete")
 
         except Exception as e:
             print(f"Error running emotion {self.current_emotion}", e)

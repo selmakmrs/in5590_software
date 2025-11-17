@@ -54,7 +54,7 @@ class OLED:
         return False
     
     def idle(self):
-        self.roboeyes.set_idle_mode(ON,6,2)
+        self.roboeyes.idle()
 
     def track(self):
         self.roboeyes.position = DEFAULT
@@ -62,15 +62,14 @@ class OLED:
 
     # === Create Sequences 
     def _create_sequences(self):
-
         # Happy Sequence
         seq = self.roboeyes.sequences.add("happy")
         seq.step( 0,    lambda r: r.open() )
         seq.step( 500,  lambda r: r.set_mood(HAPPY) )
-        seq.step( 800,  lambda r: r.laugh() )
-        seq.step( 1600, lambda r: r.laugh() )
-        seq.step( 5400, lambda r: r.laugh() )
-        seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
+        seq.step( 2000,  lambda r: r.laugh() )
+        seq.step( 4600, lambda r: r.laugh() )
+        seq.step( 9400, lambda r: r.laugh() )
+        # seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
         seq.step( 10100, lambda r: print(seq.name, "done!") )
 
 
@@ -82,7 +81,7 @@ class OLED:
         seq.step( 2000, lambda r: r.blink() )
         seq.step( 3000, lambda r: r.confuse() )
         seq.step( 5000, lambda r: r.blink() )
-        seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
+        # seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
         seq.step( 10600, lambda r: print(seq.name, "done!") )
 
         # Sad Sequence
@@ -90,7 +89,7 @@ class OLED:
         seq.step( 0,    lambda r: r.open() )
         seq.step( 500,  lambda r: r.set_mood(TIRED) )
         seq.step( 5000, lambda r: r.blink() )
-        seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
+        # seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
         seq.step( 10600, lambda r: print(seq.name, "done!") )
 
 
@@ -102,20 +101,19 @@ class OLED:
         seq.step( 2000,  lambda r: r.set_mood(CURIOUS) )
         seq.step( 6000, lambda r : r.default())
         seq.step( 7000,  lambda r: r.confuse() )
-        seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
+        # seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
         seq.step( 10100, lambda r: print(seq.name, "done!") )
 
 
         # Scared Sequence
-        seq = self.roboeyes.sequences.add("scared")
+        seq = self.roboeyes.sequences.add("fear")
         seq.step( 0,    lambda r: r.open() )
         seq.step( 500, lambda r : r.set_auto_blinker(OFF))
         seq.step( 600, lambda r : r.set_idle_mode(OFF))
         seq.step( 2000, lambda r : r.set_mood(FROZEN))
         seq.step( 4000, lambda r : r.eyes_width(10,10))
         seq.step( 4020, lambda r : r.eyes_height(10,10))
-        
-        seq.step( 7000, lambda r : r.set_mood(DEFAULT))
+        # seq.step( 7000, lambda r : r.set_mood(DEFAULT))
         seq.step( 8000, lambda r: r.blink() )
         seq.step( 8800, lambda r: r.blink() )        
         seq.step( 10000, lambda r : r.default()) 

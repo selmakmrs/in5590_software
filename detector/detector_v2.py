@@ -206,7 +206,7 @@ class DETECTOR:
         Returns:
             bool: True if face is close enough
         """
-        pass
+        return face_data[2]*face_data[3] > 10000
 
     def find_face_displacement(self, face):
         """Find face diplacment from center og image"""
