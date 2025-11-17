@@ -107,12 +107,14 @@ class OLED:
         seq.step(200, lambda r: r.set_blink_speed(1.5))
         seq.step(300, lambda r: r.set_auto_blinker(ON,6,4))
         seq.step(400, lambda r: r.set_position(DEFAULT))
-        seq.step( 500, lambda r : r.set_auto_blinker(OFF))
-        seq.step( 600, lambda r : r.set_idle_mode(OFF))
+        seq.step( 450, lambda r : r.set_idle_mode(OFF))
+        seq.step( 500,  lambda r: r.set_cyclops(True) )
+        seq.step( 1000, lambda r : r.set_auto_blinker(OFF))
         seq.step( 2000,  lambda r: r.set_mood(CURIOUS) )
         # seq.step( 6000, lambda r : r.default())
         seq.step( 7000,  lambda r: r.confuse() )
         # seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
+        seq.step( 9000,  lambda r: r.set_cyclops(False) )
         seq.step( 10100, lambda r: print(seq.name, "done!") )
 
 
@@ -140,14 +142,14 @@ class OLED:
 
 
         # Suprised Sequence
-        seq = self.roboeyes.sequences.add("surprise")
-        seq.step( 0,    lambda r: r.open() )
-        seq.step(200, lambda r: r.set_blink_speed(0.9))
-        seq.step( 500,  lambda r: r.set_cyclops(True) )   # focus one eye
-        seq.step( 800,  lambda r: r.vert_flicker(True, 3) )
-        seq.step( 1500, lambda r: r.vert_flicker(False) )
-        seq.step( 2000, lambda r: r.set_cyclops(False) )
-        seq.step( 2100, lambda r: print(seq.name, "done!") )
+        # seq = self.roboeyes.sequences.add("surprise")
+        # seq.step( 0,    lambda r: r.open() )
+        # seq.step(200, lambda r: r.set_blink_speed(0.9))
+        # seq.step( 500,  lambda r: r.set_cyclops(True) )   # focus one eye
+        # seq.step( 800,  lambda r: r.vert_flicker(True, 3) )
+        # seq.step( 1500, lambda r: r.vert_flicker(False) )
+        # seq.step( 2000, lambda r: r.set_cyclops(False) )
+        # seq.step( 2100, lambda r: print(seq.name, "done!") )
 
 
 
