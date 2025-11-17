@@ -36,7 +36,7 @@ class DETECTOR:
             sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
 
             self.session = ort.InferenceSession(
-                onnx_model_path,
+                model_path,
                 sess_options,
                 providers=["CPUExecutionProvider"]
             )
