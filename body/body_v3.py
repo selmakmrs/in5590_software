@@ -98,6 +98,49 @@ class BODY:
         self.current_mode = None
         self.is_looking_up = False
 
+
+        # Emotion Body Movemnt Sequenses
+
+        self._idle_sequence = [
+            lambda: self.tilt_left(speed=random.uniform(50,130)),
+            lambda: self.tilt_right(speed=random.uniform(50,1300)),
+            lambda: self.jump_left(duration=4,hold_duration=4),
+            lambda: self.jump_right(duration=4,hold_duration=4),
+            lambda: self.look_left(speed=random.uniform(50,130)),
+            lambda: self.look_right(speed=random.uniform(50,130)),
+
+        ]
+
+        self._happy_sequence = [
+            lambda: self.tilt_left(speed=random.uniform(100,200)),
+            lambda: self.tilt_right(speed=random.uniform(100,200)),
+            lambda: self.jump_left(duration=2,hold_duration=3),
+            lambda: self.jump_right(duration=2,hold_duration=3),
+            lambda: self.sway(duration=2, cycles=2)
+        ]
+
+        self._angry_sequence = [
+            lambda: self.tilt_left(speed=random.uniform(200,300)),
+            lambda: self.tilt_right(speed=random.uniform(200,300)),
+            lambda: self.jump_left(duration=1,hold_duration=4),
+            lambda: self.jump_right(duration=1,hold_duration=4),
+            lambda: self.jump_forward(duration=2, hold_duration=7),
+            ]
+        
+        self._sad_sequence = [
+            lambda: self.tilt_left(speed=random.uniform(50,100)),
+            lambda: self.tilt_right(speed=random.uniform(50,100)),
+            lambda: self.sway(duration=3, cycles=1)
+        ]
+
+        self._suprise_sequence = [
+            lambda: self.jump_back(duration=1.5, hold_duration=6),
+            lambda: self.jump_left(duration=1.5, hold_duration=6),
+            lambda: self.jump_right(duration=1.5, hold_duration=6)
+        ]
+
+        
+
         print("Body initialized")
 
     # ============ Start and close ==========
@@ -326,30 +369,30 @@ class BODY:
 
     # ============ JOINT Movements ============
 
-    def look_left(self):
+    def look_left(self, speed=200):
         """Makes the robot look left"""
-        self.move_position(HEAD_ID, 200, 200)
-        self.move_position(BODY_ID, 200, 200)
+        self.move_position(HEAD_ID, 200, 200, speed=speed)
+        self.move_position(BODY_ID, 200, 200, speed=speed)
         time.sleep(3)
 
-    def look_right(self):
+    def look_right(self,speed=200):
         """Makes the robot look right"""
-        self.move_position(HEAD_ID, 700, 200)
-        self.move_position(BODY_ID, 800, 200)
+        self.move_position(HEAD_ID, 700, 200,speed=speed)
+        self.move_position(BODY_ID, 800, 200,speed=speed)
         time.sleep(3)
 
 
-    def tilt_left(self):
+    def tilt_left(self,speed=200):
         """Makes the robot tilt to the left"""
-        self.move_position(BODY_ID, MAX_POS)
-        self.move_position(HEAD_ID, MIN_POS)
+        self.move_position(BODY_ID, MAX_POS, speed=speed)
+        self.move_position(HEAD_ID, MIN_POS, speed=speed)
         time.sleep(3)
 
 
-    def tilt_right(self):
+    def tilt_right(self,speed=200):
         """Makes the robot tilt to the right"""
-        self.move_position(BODY_ID, MIN_POS)
-        self.move_position(HEAD_ID, MAX_POS)
+        self.move_position(BODY_ID, MIN_POS,speed=speed)
+        self.move_position(HEAD_ID, MAX_POS,speed=speed)
         time.sleep(3)
 
 
@@ -397,71 +440,44 @@ class BODY:
     # ============ Emotion Sequenses =============
 
     def idle(self):
-        small_movements = [
-            self.look_left,
-            self.look_right,
-            self.tilt_left,
-            self.tilt_right
-        ]
-
         _do_movment_prob=0.1
 
+
         if _do_movment_prob <= random.random():
-            move = random.choice(small_movements)
+            move = random.choice(self._idle_sequence)
             move()
             self.home_position()
 
     def happy(self):
         """Make robot happy"""
-        happy_movements = [
-            self.look_up,
-            self.tilt_left,
-            self.tilt_right,
-            self.jump_left,
-            self.jump_right,
-
-        ]
-
         # _do_movement_prob = 0.9
-        move = random.choice(happy_movements)
+        move = random.choice(self._happy_sequence)
         move()
+     
         self.look_neutral()
         self.home_position()
 
 
     def angry(self):
-        self.jump_forward(hold_duration=7)
+        move = random.choice(self._angry_sequence)
+        move()
         self.home_position()
 
     def suprise(self):
-        suprise_movements = [
-            self.jump_left,
-            self.jump_back,
-            self.jump_right
-        ]
-
-        move = random.choice(suprise_movements)
-        move(duration = 1.5, hold_duration=7)
+        move = random.choice(self._suprise_sequence)
+        move()
         self.home_position()
 
     def sad(self):
-        sad_movements = [
-            self.tilt_left,
-            self.tilt_left,
-        ]
-        move = random.choice(sad_movements)
+        move = random.choice(self._sad_sequence)
         move()
-
-        time.sleep(7)
-
+        time.sleep(4)
         self.home_position()
         self.look_neutral()
 
 
     def fear(self):
         pass
-
-
 
 
     def test(self):
