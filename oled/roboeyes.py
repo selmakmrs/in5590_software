@@ -620,15 +620,24 @@ class RoboEyes():
 
 		# Left eye height
 		# self.eyeLheightCurrent = (self.eyeLheightCurrent + self.eyeLheightNext + self.eyeLheightOffset)//2
-		self.eyeLheightCurrent = int((self.eyeLheightCurrent * (1-weight) + self.eyeLheightNext + self.eyeLheightOffset)*weight)
-		self.eyeLy += (self.eyeLheightDefault-self.eyeLheightCurrent)//2 # vertical centering of eye when closing
-		self.eyeLy -= self.eyeLheightOffset//2
+		# self.eyeLy += (self.eyeLheightDefault-self.eyeLheightCurrent)//2 # vertical centering of eye when closing
+		# self.eyeLy -= self.eyeLheightOffset//2
 		# Right eye height
 		# self.eyeRheightCurrent = (self.eyeRheightCurrent + self.eyeRheightNext + self.eyeRheightOffset)//2
+		# self.eyeRy += (self.eyeRheightDefault-self.eyeRheightCurrent)//2 # vertical centering of eye when closing
+		# self.eyeRy -= self.eyeRheightOffset//2
+
+		self.eyeLheightCurrent = int((self.eyeLheightCurrent * (1-weight) + self.eyeLheightNext + self.eyeLheightOffset)*weight)
+		self.eyeLheightCurrent = max(1, self.eyeLheightCurrent)  # Ensure minimum height of 1
+		self.eyeLy += (self.eyeLheightDefault-self.eyeLheightCurrent)//2 # vertical centering of eye when closing
+		self.eyeLy -= self.eyeLheightOffset//2
+		self.eyeLy = max(0, min(self.eyeLy, self.screenHeight - 1))  # Clamp to screen bounds
+
 		self.eyeRheightCurrent = int((self.eyeRheightCurrent * (1-weight) + self.eyeRheightNext + self.eyeRheightOffset)*weight)
+		self.eyeRheightCurrent = max(1, self.eyeRheightCurrent)  # Ensure minimum height of 1
 		self.eyeRy += (self.eyeRheightDefault-self.eyeRheightCurrent)//2 # vertical centering of eye when closing
 		self.eyeRy -= self.eyeRheightOffset//2
-
+		self.eyeRy = max(0, min(self.eyeRy, self.screenHeight - 1))  # Clamp to screen bounds
 
 		# Open eyes again after closing them
 		if self.eyeL_open :
