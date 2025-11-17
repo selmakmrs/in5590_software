@@ -300,6 +300,7 @@ class RoboEyes():
 		self.eyes_height(40,40)
 		self.eyes_radius(8,8)
 		self.eyes_spacing(55)
+		self.set_blink_speed(1.2)
 
 	def update( self ):
 		# Check if a sequence step must be executed
@@ -320,6 +321,9 @@ class RoboEyes():
 	# Calculate frame interval based on defined frameRate
 	def set_framerate( self, fps ):
 		self.frameInterval = 1000//fps
+
+	def set_blink_speed(self, speed=1):
+		self.blinkSpeed = speed
 
 
 	def eyes_width( self, leftEye=None, rightEye=None):
@@ -612,7 +616,6 @@ class RoboEyes():
 			self.eyeLheightOffset = 0 # reset height offset for left eye
 			self.eyeRheightOffset = 0 # reset height offset for right eye
 
-		self.blinkSpeed = 1.2
 		weight = min(0.5 + (self.blinkSpeed) * 0.3, 0.9)
 
 		# Left eye height

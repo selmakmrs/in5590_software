@@ -65,6 +65,7 @@ class OLED:
         # Happy Sequence
         seq = self.roboeyes.sequences.add("happy")
         seq.step( 0,    lambda r: r.open() )
+        seq.step(200, lambda r: r.set_blink_speed(0.9))
         seq.step( 500,  lambda r: r.set_mood(HAPPY) )
         seq.step( 2000,  lambda r: r.laugh() )
         seq.step( 4600, lambda r: r.laugh() )
@@ -76,6 +77,7 @@ class OLED:
         # Angry Sequence
         seq = self.roboeyes.sequences.add("angry")
         seq.step( 0,    lambda r: r.open() )
+        seq.step(200, lambda r: r.set_blink_speed(0.9))
         seq.step( 500,  lambda r: r.set_mood(ANGRY) )
         seq.step( 1500, lambda r: r.blink() )
         seq.step( 2000, lambda r: r.blink() )
@@ -87,6 +89,7 @@ class OLED:
         # Sad Sequence
         seq = self.roboeyes.sequences.add("sad")
         seq.step( 0,    lambda r: r.open() )
+        seq.step(200, lambda r: r.set_blink_speed(0.9))
         seq.step( 500,  lambda r: r.set_mood(TIRED) )
         seq.step( 5000, lambda r: r.blink() )
         # seq.step( 10000, lambda r: r.set_mood(DEFAULT) )
@@ -96,6 +99,7 @@ class OLED:
         # Confused Sequence
         seq = self.roboeyes.sequences.add("confused")
         seq.step( 0,    lambda r: r.open() )
+        seq.step(200, lambda r: r.set_blink_speed(0.9))
         seq.step( 500, lambda r : r.set_auto_blinker(OFF))
         seq.step( 600, lambda r : r.set_idle_mode(OFF))
         seq.step( 2000,  lambda r: r.set_mood(CURIOUS) )
@@ -108,6 +112,7 @@ class OLED:
         # Scared Sequence
         seq = self.roboeyes.sequences.add("fear")
         seq.step( 0,    lambda r: r.open() )
+        seq.step(200, lambda r: r.set_blink_speed(0.9))
         seq.step( 500, lambda r : r.set_auto_blinker(OFF))
         seq.step( 600, lambda r : r.set_idle_mode(OFF))
         seq.step( 2000, lambda r : r.set_mood(FROZEN))
@@ -124,6 +129,7 @@ class OLED:
         # Suprised Sequence
         seq = self.roboeyes.sequences.add("surprise")
         seq.step( 0,    lambda r: r.open() )
+        seq.step(200, lambda r: r.set_blink_speed(0.9))
         seq.step( 500,  lambda r: r.set_cyclops(True) )   # focus one eye
         seq.step( 800,  lambda r: r.vert_flicker(True, 3) )
         seq.step( 1500, lambda r: r.vert_flicker(False) )
