@@ -612,8 +612,12 @@ class RoboEyes():
 			self.eyeLheightOffset = 0 # reset height offset for left eye
 			self.eyeRheightOffset = 0 # reset height offset for right eye
 
+		self.blinkSpeed = 2.0
+		weight = min(0.5 + (self.blinkSpeed) * 0.3, 0.9)
+
 		# Left eye height
-		self.eyeLheightCurrent = (self.eyeLheightCurrent + self.eyeLheightNext + self.eyeLheightOffset)//2
+		# self.eyeLheightCurrent = (self.eyeLheightCurrent + self.eyeLheightNext + self.eyeLheightOffset)//2
+		self.eyeLheightCurrent = int((self.eyeLheightCurrent * (1-weight) + self.eyeLheightNext + self.eyeLheightOffset)*weight)
 		self.eyeLy += (self.eyeLheightDefault-self.eyeLheightCurrent)//2 # vertical centering of eye when closing
 		self.eyeLy -= self.eyeLheightOffset//2
 		# Right eye height
