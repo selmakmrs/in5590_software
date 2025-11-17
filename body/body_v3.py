@@ -371,14 +371,14 @@ class BODY:
 
     def look_left(self, speed=200):
         """Makes the robot look left"""
-        self.move_position(HEAD_ID, 200, 200, speed=speed)
-        self.move_position(BODY_ID, 200, 200, speed=speed)
+        self.move_position(HEAD_ID, 250, speed=speed)
+        self.move_position(BODY_ID, 250, speed=speed)
         time.sleep(3)
 
     def look_right(self,speed=200):
         """Makes the robot look right"""
-        self.move_position(HEAD_ID, 700, 200,speed=speed)
-        self.move_position(BODY_ID, 800, 200,speed=speed)
+        self.move_position(HEAD_ID, 600, speed=speed)
+        self.move_position(BODY_ID, 700, speed=speed)
         time.sleep(3)
 
 
