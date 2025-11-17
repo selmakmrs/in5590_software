@@ -13,7 +13,7 @@ EMOTIONS = {
     "happy" : 0.9,
     "angry" : 0.7,
     "sad"   : 0.4,
-    "surprise" : 0.6,
+    "suprise" : 0.6,
     "fear" : 0.3
 
 }
@@ -234,7 +234,7 @@ class Robot:
 
     def _proccess_emotion_detection(self, emotion, confidence):
         """Proccess emotion detection with confidance checking"""
-        if emotion not in EMOTIONS or confidence >= EMOTIONS[emotion]:
+        if emotion not in EMOTIONS or confidence < EMOTIONS[emotion]:
             return
         
         # Add to history
