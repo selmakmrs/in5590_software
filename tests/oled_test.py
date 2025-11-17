@@ -10,7 +10,7 @@ import time
 
 oled = OLED()
 cmd_queue = queue.Queue()
-EMOTIONS = ["happy","sad","angry", "confused"]
+EMOTIONS = ["happy","sad","angry", "suprise", "fear"]
 
 def input_thread():
     while True:
