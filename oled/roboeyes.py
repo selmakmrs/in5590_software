@@ -526,28 +526,28 @@ class RoboEyes():
 	#
 	# -----------------------------------------------------
 
-	# # Returns the max x position for left eye
-	# def get_screen_constraint_X( self ):
-	# 	return self.screenWidth-self.eyeLwidthCurrent-self.spaceBetweenCurrent-self.eyeRwidthCurrent
+	# Returns the max x position for left eye
+	def get_screen_constraint_X( self ):
+		return self.screenWidth-self.eyeLwidthCurrent-self.spaceBetweenCurrent-self.eyeRwidthCurrent
 
 
-	# # Returns the max y position for left eye
-	# def get_screen_constraint_Y( self ):
-	# 	# using default height here, because height will vary when blinking and in curious mode
-	# 	return self.screenHeight-self.eyeLheightDefault 
+	# Returns the max y position for left eye
+	def get_screen_constraint_Y( self ):
+		# using default height here, because height will vary when blinking and in curious mode
+		return self.screenHeight-self.eyeLheightDefault 
 
-	# Modify the getter methods
-	def get_screen_constraint_X(self):
-		max_x = self.screenWidth - self.eyeLwidthCurrent - self.spaceBetweenCurrent - self.eyeRwidthCurrent
-		if self.movementMaxX is not None:
-			max_x = min(max_x, self.movementMaxX)
-		return max(self.movementMinX, max_x)
+	# # Modify the getter methods
+	# def get_screen_constraint_X(self):
+	# 	max_x = self.screenWidth - self.eyeLwidthCurrent - self.spaceBetweenCurrent - self.eyeRwidthCurrent
+	# 	if self.movementMaxX is not None:
+	# 		max_x = min(max_x, self.movementMaxX)
+	# 	return max(self.movementMinX, max_x)
 
-	def get_screen_constraint_Y(self):
-		max_y = self.screenHeight - self.eyeLheightDefault
-		if self.movementMaxY is not None:
-			max_y = min(max_y, self.movementMaxY)
-		return max(self.movementMinY, max_y)
+	# def get_screen_constraint_Y(self):
+	# 	max_y = self.screenHeight - self.eyeLheightDefault
+	# 	if self.movementMaxY is not None:
+	# 		max_y = min(max_y, self.movementMaxY)
+	# 	return max(self.movementMinY, max_y)
 
 
 
