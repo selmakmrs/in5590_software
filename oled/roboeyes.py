@@ -286,7 +286,13 @@ class RoboEyes():
 		self.on_show( self ) # show empty screen
 		self.eyeLheightCurrent = 1 # start with closed eyes
 		self.eyeRheightCurrent = 1 # start with closed eyes
-		self.set_framerate(frame_rate) # calculate frame interval based on defined frameRate		
+		self.set_framerate(frame_rate) # calculate frame interval based on defined frameRate	
+
+		# Add these properties to __init__
+		self.movementMinX = 20
+		self.movementMinY = 20
+		self.movementMaxX = 100  # None means use full width
+		self.movementMaxY = 100  # None means use full height	
 
 
 	# --- GENERAL METHODS ---------------------------------
@@ -519,15 +525,29 @@ class RoboEyes():
 	#
 	# -----------------------------------------------------
 
-	# Returns the max x position for left eye
-	def get_screen_constraint_X( self ):
-		return self.screenWidth-self.eyeLwidthCurrent-self.spaceBetweenCurrent-self.eyeRwidthCurrent
+	# # Returns the max x position for left eye
+	# def get_screen_constraint_X( self ):
+	# 	return self.screenWidth-self.eyeLwidthCurrent-self.spaceBetweenCurrent-self.eyeRwidthCurrent
 
 
-	# Returns the max y position for left eye
-	def get_screen_constraint_Y( self ):
-		# using default height here, because height will vary when blinking and in curious mode
-		return self.screenHeight-self.eyeLheightDefault 
+	# # Returns the max y position for left eye
+	# def get_screen_constraint_Y( self ):
+	# 	# using default height here, because height will vary when blinking and in curious mode
+	# 	return self.screenHeight-self.eyeLheightDefault 
+
+	# Modify the getter methods
+	def get_screen_constraint_X(self):
+		max_x = self.screenWidth - self.eyeLwidthCurrent - self.spaceBetweenCurrent - self.eyeRwidthCurrent
+		if self.movementMaxX is not None:
+			max_x = min(max_x, self.movementMaxX)
+		return max(self.movementMinX, max_x)
+
+	def get_screen_constraint_Y(self):
+		max_y = self.screenHeight - self.eyeLheightDefault
+		if self.movementMaxY is not None:
+			max_y = min(max_y, self.movementMaxY)
+		return max(self.movementMinY, max_y)
+
 
 
 	# --- BASIC ANIMATION METHODS -------------------------
