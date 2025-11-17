@@ -300,7 +300,7 @@ class RoboEyes():
 	# -----------------------------------------------------
 
 	def default(self):
-		self.set_auto_blinker(ON,2,2)
+		self.set_auto_blinker(ON,5,2)
 		self.set_idle_mode(ON,6,2)
 		self.eyes_width(35,35)
 		self.eyes_height(40,40)
