@@ -30,7 +30,7 @@ def move_servo(error):
         current_deg = body.tracked_positions[dxl_id]
         if current_deg + angle <= 0 or current_deg + angle >= 1023:
             continue
-        body.move_position(dxl_id,current_deg+angle, 200)
+        body.move_position(dxl_id,current_deg+angle, 300)
         return True
     
     return False
