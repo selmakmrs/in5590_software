@@ -36,6 +36,9 @@ while True:
 
     if cmd and cmd in EMOTIONS:
         oled.run_emotion(cmd)
+
+    elif cmd == 'idle':
+        oled.idle()
         
 
     # 3) small sleep so we don’t burn CPU
