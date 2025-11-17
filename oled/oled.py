@@ -54,7 +54,7 @@ class OLED:
         return False
     
     def idle(self):
-        self.roboeyes.idle()
+        self.roboeyes.default()
 
     def track(self):
         self.roboeyes.position = DEFAULT
