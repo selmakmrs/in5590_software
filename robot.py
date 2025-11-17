@@ -193,9 +193,10 @@ class Robot:
                     self._update_queue(self.face_queue, face)
 
                     # Check if face is centered for emorion detection
-                    if self.detector.is_face_centered(face) and self.detector.is_face_close(face):
+                    if self.detector.is_face_centered(face):# and self.detector.is_face_close(face):
                         emotion, confidence = self.detector.detect_emotion(frame, face)
                         # Debug info
+                        print(f"Emotion :  {emotion.upper()}  |  {confidence}")
                         self.detector.draw_emotion_text(frame, face, emotion, confidence)
                         self._proccess_emotion_detection(emotion, confidence)
                     else:
