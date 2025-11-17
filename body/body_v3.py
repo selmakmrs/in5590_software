@@ -103,7 +103,7 @@ class BODY:
 
         self._idle_sequence = [
             lambda: self.tilt_left(speed=random.randint(50,130)),
-            lambda: self.tilt_right(speed=random.randint(50,1300)),
+            lambda: self.tilt_right(speed=random.randint(50,130)),
             lambda: self.jump_left(duration=4,hold_duration=4),
             lambda: self.jump_right(duration=4,hold_duration=4),
             lambda: self.look_left(speed=random.randint(50,130)),
@@ -122,9 +122,9 @@ class BODY:
         self._angry_sequence = [
             lambda: self.tilt_left(speed=random.randint(200,300)),
             lambda: self.tilt_right(speed=random.randint(200,300)),
-            lambda: self.jump_left(duration=1,hold_duration=4),
-            lambda: self.jump_right(duration=1,hold_duration=4),
-            lambda: self.jump_forward(duration=2, hold_duration=7),
+            lambda: self.jump_left(duration=0.5,hold_duration=4),
+            lambda: self.jump_right(duration=0.5,hold_duration=4),
+            lambda: self.jump_forward(duration=1, hold_duration=7),
             ]
         
         self._sad_sequence = [
@@ -384,14 +384,14 @@ class BODY:
 
     def tilt_left(self,speed=200):
         """Makes the robot tilt to the left"""
-        self.move_position(BODY_ID, MAX_POS, speed=speed)
+        self.move_position(BODY_ID, 900, speed=speed)
         self.move_position(HEAD_ID, MIN_POS, speed=speed)
         time.sleep(3)
 
 
     def tilt_right(self,speed=200):
         """Makes the robot tilt to the right"""
-        self.move_position(BODY_ID, MIN_POS,speed=speed)
+        self.move_position(BODY_ID, 100,speed=speed)
         self.move_position(HEAD_ID, MAX_POS,speed=speed)
         time.sleep(3)
 
@@ -403,14 +403,14 @@ class BODY:
         "Make the robot jump left"
         base_deg = -90
         body_deg = 180
-        head_deg = -90
+        head_deg = -100
         self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
 
     def jump_right(self, duration = 1.5, hold_duration=3):
         "Make the robot jump right"
         base_deg = 90
         body_deg = -180
-        head_deg = 90
+        head_deg = 100
         self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
 
     def jump_back(self, duration=2, hold_duration=2):
