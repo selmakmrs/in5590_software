@@ -119,11 +119,11 @@ class OLED:
         # Scared Sequence
         seq = self.roboeyes.sequences.add("fear")
         seq.step( 0,    lambda r: r.open() )
-        seq.step(200, lambda r: r.set_blink_speed(0.9))
+        seq.step(200, lambda r: r.set_blink_speed(1.5))
         seq.step(300, lambda r: r.set_auto_blinker(ON,8,4))
         seq.step(400, lambda r: r.set_position(DEFAULT))
         seq.step( 500, lambda r : r.set_auto_blinker(OFF))
-        seq.step( 600, lambda r : r.set_idle_mode(OFF))
+        seq.step( 500, lambda r : r.set_idle_mode(OFF))
         seq.step( 2000, lambda r : r.set_mood(FROZEN))
         seq.step( 4000, lambda r : r.eyes_width(20,20))
         seq.step( 4020, lambda r : r.eyes_height(20,20))
