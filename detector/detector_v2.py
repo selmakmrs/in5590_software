@@ -248,11 +248,11 @@ class DETECTOR:
             print("Empty face_frame after crop, skipping resize")
             return None, 0.0
 
-        try:
-            face_frame = cv2.resize(face_frame, self.input_shape)
-        except cv2.error as e:
-            print("Resize failed:", e)
-            return None, 0.0
+        # try:
+        #     face_frame = cv2.resize(face_frame, self.input_shape)
+        # except cv2.error as e:
+        #     print("Resize failed:", e)
+        #     return None, 0.0
         
         input_data = self._pre_process_face(face_frame)
         
