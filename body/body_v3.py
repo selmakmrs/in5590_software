@@ -102,34 +102,34 @@ class BODY:
         # Emotion Body Movemnt Sequenses
 
         self._idle_sequence = [
-            lambda: self.tilt_left(speed=random.uniform(50,130)),
-            lambda: self.tilt_right(speed=random.uniform(50,1300)),
+            lambda: self.tilt_left(speed=random.randint(50,130)),
+            lambda: self.tilt_right(speed=random.randint(50,1300)),
             lambda: self.jump_left(duration=4,hold_duration=4),
             lambda: self.jump_right(duration=4,hold_duration=4),
-            lambda: self.look_left(speed=random.uniform(50,130)),
-            lambda: self.look_right(speed=random.uniform(50,130)),
+            lambda: self.look_left(speed=random.randint(50,130)),
+            lambda: self.look_right(speed=random.randint(50,130)),
 
         ]
 
         self._happy_sequence = [
-            lambda: self.tilt_left(speed=random.uniform(100,200)),
-            lambda: self.tilt_right(speed=random.uniform(100,200)),
+            lambda: self.tilt_left(speed=random.randint(100,200)),
+            lambda: self.tilt_right(speed=random.randint(100,200)),
             lambda: self.jump_left(duration=2,hold_duration=3),
             lambda: self.jump_right(duration=2,hold_duration=3),
             lambda: self.sway(duration=2, cycles=2)
         ]
 
         self._angry_sequence = [
-            lambda: self.tilt_left(speed=random.uniform(200,300)),
-            lambda: self.tilt_right(speed=random.uniform(200,300)),
+            lambda: self.tilt_left(speed=random.randint(200,300)),
+            lambda: self.tilt_right(speed=random.randint(200,300)),
             lambda: self.jump_left(duration=1,hold_duration=4),
             lambda: self.jump_right(duration=1,hold_duration=4),
             lambda: self.jump_forward(duration=2, hold_duration=7),
             ]
         
         self._sad_sequence = [
-            lambda: self.tilt_left(speed=random.uniform(50,100)),
-            lambda: self.tilt_right(speed=random.uniform(50,100)),
+            lambda: self.tilt_left(speed=random.randint(50,100)),
+            lambda: self.tilt_right(speed=random.randint(50,100)),
             lambda: self.sway(duration=3, cycles=1)
         ]
 
