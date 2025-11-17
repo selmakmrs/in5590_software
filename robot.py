@@ -478,10 +478,6 @@ class Robot:
         elif cmd in ["look down", "down", "neutral", "look neutral"]:
             self.body.look_neutral()
 
-        
-
-        
-
 
         self._set_sequence_running(False)
 
