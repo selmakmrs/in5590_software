@@ -199,7 +199,7 @@ class Robot:
                     if self.detector.is_face_centered(face):# and self.detector.is_face_close(face):
                         emotion, confidence = self.detector.detect_emotion(frame, face)
                         # Debug info
-                        print(f"Emotion :  {emotion.upper()}  |  {confidence}")
+                        # print(f"Emotion :  {emotion.upper()}  |  {confidence}")
                         self.detector.draw_emotion_text(frame, face, emotion, confidence)
                         self._proccess_emotion_detection(emotion, confidence)
                     else:
@@ -466,8 +466,11 @@ class Robot:
             print(f"===================\n")
 
         elif cmd in EMOTIONS:
+            print("Triggered Emotion: ", cmd)
             self.current_emotion = cmd
-            self._run_emotion_sequence()
+            self.emotion_start_time = time.time()
+            self._request_state_change(RobotState.EMOTION)
+            
 
         elif cmd in ["look up", "up"]:
             self.body.look_up()

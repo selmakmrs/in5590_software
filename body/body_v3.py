@@ -303,7 +303,7 @@ class BODY:
         # Execute
         self.set_wheel_mode()
         for dxl_id, (speed, direction) in speeds.items():
-            print(f"ID : {dxl_id}  speed : {speed * direction}")
+            # print(f"ID : {dxl_id}  speed : {speed * direction}")
             self.wheel_speed(dxl_id, speed * direction)  # Assuming separate direction param
         
         time.sleep(duration)
