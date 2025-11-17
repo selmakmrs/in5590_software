@@ -65,7 +65,7 @@ class OLED:
         # Happy Sequence
         seq = self.roboeyes.sequences.add("happy")
         seq.step( 0,    lambda r: r.open() )
-        seq.step(200, lambda r: r.set_blink_speed(0.9))
+        seq.step(200, lambda r: r.set_blink_speed(1))
         seq.step(300, lambda r: r.set_auto_blinker(ON,6,4))
         seq.step(400, lambda r: r.set_position(DEFAULT))
         seq.step( 500,  lambda r: r.set_mood(HAPPY) )
@@ -79,7 +79,7 @@ class OLED:
         # Angry Sequence
         seq = self.roboeyes.sequences.add("angry")
         seq.step( 0,    lambda r: r.open() )
-        seq.step(200, lambda r: r.set_blink_speed(0.9))
+        seq.step(200, lambda r: r.set_blink_speed(1))
         seq.step(300, lambda r: r.set_auto_blinker(ON,6,4))
         seq.step(400, lambda r: r.set_position(DEFAULT))
         seq.step( 500,  lambda r: r.set_mood(ANGRY) )
@@ -93,7 +93,7 @@ class OLED:
         # Sad Sequence
         seq = self.roboeyes.sequences.add("sad")
         seq.step( 0,    lambda r: r.open() )
-        seq.step(200, lambda r: r.set_blink_speed(0.9))
+        seq.step(200, lambda r: r.set_blink_speed(1))
         seq.step(300, lambda r: r.set_auto_blinker(ON,6,4))
         seq.step( 500,  lambda r: r.set_mood(TIRED) )
         seq.step( 5000, lambda r: r.blink() )
