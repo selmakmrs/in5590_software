@@ -39,6 +39,7 @@ class Robot:
         # Thread-safe queues for communication
         self.face_queue = queue.Queue(maxsize=1)
         self.emotion_queue = queue.Queue(maxsize=1)
+        self.command_queue = queue.Queue()
         
         # Control flags
         self.control_lock = threading.Lock()
@@ -76,7 +77,9 @@ class Robot:
             threading.Thread(target=self._vision_loop, name="Vision", daemon=True),
             threading.Thread(target=self._oled_loop, name="Oled"),
             threading.Thread(target=self._state_loop, name="State loop", daemon=True),
-            threading.Thread(target=self._body_loop, name = "Body",daemon=True)   
+            threading.Thread(target=self._body_loop, name = "Body",daemon=True),
+            threading.Thread(target=self._command_loop, name = "Commands",daemon=True)   
+
         ]
 
         for thread in threads:
@@ -282,6 +285,8 @@ class Robot:
         while self.running:
             try: 
 
+                self._proccess_commands()
+
                 # Get thread-safe state and flag
                 current_state = self._get_state()
                 face_detected = self._get_face_detected()
@@ -381,11 +386,24 @@ class Robot:
     def _is_face_centered(self, face):
         return self.detector.is_face_centered(face)
     
+    def _command_loop(self):
+        """Reads command from terminal"""
+        print("Command listener started")
+        while self.running:
+            try:
+                cmd = input("> ").strip().lower()
+                if cmd:
+                    self._update_queue(self.command_queue, cmd)
 
+            except EOFError:
+                break
+            except Exception as e:
+                print("Input error: ", e)
+                
 
     #--------------------------------------------#
-    #------------- Emotions ---------------------#
-    #-------------------------------------------#
+    #---------------- Emotions ------------------#
+    #--------------------------------------------#
     def _run_emotion_sequence(self):
         try:
             if self.current_emotion:
@@ -415,4 +433,33 @@ class Robot:
             print(f"Error running emotion {self.current_emotion}", e)
             self._set_sequence_running(False)
 
+
+
+    # ========== Command Center ==================
+
+    def _proccess_commands(self):
+        """Procceses commands"""
+        while not self.command_queue.empty():
+            try:
+                cmd = self.command_queue.get_nowait()
+                self._execute_command(cmd)
+            except queue.Empty:
+                break
+
+
+    def _execute_command(self, cmd):
+        self._set_sequence_running(True)
+
+        cmd = cmd.strip()
+
+        if cmd in ["stop", "quit", "exit"]:
+            self.running = False
+            self.close()
+
+        elif cmd == "happy":
+            self.current_emotion = "happy"
+            self._run_emotion_sequence()
+
+
+        self._set_sequence_running(False)
 
