@@ -612,7 +612,7 @@ class RoboEyes():
 			self.eyeLheightOffset = 0 # reset height offset for left eye
 			self.eyeRheightOffset = 0 # reset height offset for right eye
 
-		self.blinkSpeed = 2.0
+		self.blinkSpeed = 1.5
 		weight = min(0.5 + (self.blinkSpeed) * 0.3, 0.9)
 
 		# Left eye height
