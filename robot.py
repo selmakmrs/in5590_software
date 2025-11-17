@@ -456,9 +456,27 @@ class Robot:
             self.running = False
             self.close()
 
-        elif cmd == "happy":
-            self.current_emotion = "happy"
+        elif cmd == "status":
+            print(f"\n=== Robot Status ===")
+            print(f"  State: {self.current_state.value}")
+            print(f"  Face Detected: {self.face_detected}")
+            print(f"  Sequence Running: {self.sequence_running}")
+            print(f"  Current Emotion: {self.current_emotion}")
+            print(f"===================\n")
+
+        elif cmd in EMOTIONS:
+            self.current_emotion = cmd
             self._run_emotion_sequence()
+
+        elif cmd in ["look up", "up"]:
+            self.body.look_up()
+
+        elif cmd in ["look down", "down", "neutral", "look neutral"]:
+            self.body.look_neutral()
+
+        
+
+        
 
 
         self._set_sequence_running(False)
