@@ -16,10 +16,12 @@ while True:
         if detector.is_face_centered(face):
             # center = detector.is_face_centered(face)
             emotion, emotion_prob = detector.detect_emotion(frame,face)
+
+            print(f"Emotion : {emotion.upper()}   |    {emotion_prob}")
             
             detector.draw_emotion_text(frame,face,emotion,emotion_prob)
 
-    cv2.imshow("Frame", frame)
+    # cv2.imshow("Frame", frame)
     key = cv2.waitKey(1)
     if key == ord('q'):
         break
