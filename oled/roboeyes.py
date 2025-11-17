@@ -306,7 +306,7 @@ class RoboEyes():
 		self.eyes_width(40,40)
 		self.eyes_height(45,45)
 		self.eyes_radius(8,8)
-		self.eyes_spacing(50)
+		self.eyes_spacing(45)
 		self.set_blink_speed(1.2)
 
 	def update( self ):
