@@ -183,10 +183,10 @@ class BODY:
 
         print("Calibration complete ")
         
-    def home_position(self):
+    def home_position(self,speed=50):
         """Return all servos to home position"""
         for dxl_id in self.ids:
-            self.move_position(dxl_id, HOME_POSITIONS[dxl_id],speed=100)
+            self.move_position(dxl_id, HOME_POSITIONS[dxl_id],speed=speed)
         time.sleep(1)
 
     def enable_motors(self):
