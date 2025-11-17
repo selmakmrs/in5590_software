@@ -10,10 +10,11 @@ from oled import OLED
 from detector import DETECTOR
 
 EMOTIONS = {
-    "happy" : 0.8,
-    "angry" : 0.6,
+    "happy" : 0.9,
+    "angry" : 0.4,
     "sad"   : 0.4,
-    "surprise" : 0.4
+    "surprise" : 0.4,
+    "fear" : 0.4
 
 }
 
