@@ -318,7 +318,7 @@ class BODY:
             self._stop_wheels()
 
         self.set_joint_mode()
-        self.home_position()
+        # self.home_position()
 
     def _stop_wheels(self):
         for dxl_id in self.ids:
