@@ -328,9 +328,9 @@ class BODY:
 
     def track_position(self, displacement):
         if displacement <= 0:
-            deg_change = +30
+            deg_change = +20
         else:
-            deg_change = -30
+            deg_change = -20
 
         for dxl_id in [HEAD_ID, BODY_ID, BASE_ID]:
             current_pos = self.tracked_positions[dxl_id]
