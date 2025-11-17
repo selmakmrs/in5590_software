@@ -95,7 +95,7 @@ while True:
         y1 = max(0, y - pad)
         x2 = min(frame.shape[1], x + w + pad)
         y2 = min(frame.shape[0], y + h + pad)
-        face_crop = face[y1:y2, x1:x2]
+        face_crop = frame[y1:y2, x1:x2]
 
         detector.draw_face_box(frame,face)
         if detector.is_face_centered(face):
