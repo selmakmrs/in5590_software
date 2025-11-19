@@ -435,19 +435,30 @@ class Robot:
                 print(f"Running emotion: {current_emotion}")
 
                 self._set_sequence_running(True)
+
+                if hasattr(self.body, current_emotion):
+                    body = getattr(self.body, current_emotion)
+
+                th_body = threading.Thread(target=body)
+                th_led = threading.Thread(target=self.led.run_emotion, args=(current_emotion, ))
                 self.oled.run_emotion(current_emotion)
-                self.led.run_emotion(current_emotion)
-                match current_emotion:
-                    case "happy":
-                        self.body.happy()
-                    case "sad":
-                        self.body.sad()
-                    case "angry":
-                        self.body.angry()
-                    case "suprise":
-                        self.body.suprise()
-                    case "fear":
-                        self.body.fear()
+
+                th_body.start(); th_led.start()
+
+                th_body.join()
+                # led = threading.Thread(target=)
+                # self.led.run_emotion(current_emotion)
+                # match current_emotion:
+                #     case "happy":
+                #         self.body.happy()
+                #     case "sad":
+                #         self.body.sad()
+                #     case "angry":
+                #         self.body.angry()
+                #     case "suprise":
+                #         self.body.suprise()
+                #     case "fear":
+                #         self.body.fear()
 
                 time.sleep(1)
                 self.body.idle()
