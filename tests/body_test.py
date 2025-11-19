@@ -63,6 +63,7 @@ def input_thread():
 
 def main():
     obj = BODY()
+    obj.start()
 
     while True:
         func_name = input("Enter function to run (or 'quit'): ")
