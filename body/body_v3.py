@@ -309,6 +309,8 @@ class BODY:
         
         time.sleep(duration)
         self._stop_wheels()
+        time.sleep(0.02)
+        self._stop_wheels()
         time.sleep(hold_duration)
         if return_to_start:
             for dxl_id, (speed, direction) in speeds.items():
