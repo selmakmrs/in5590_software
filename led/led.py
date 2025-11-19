@@ -191,7 +191,7 @@ class LED:
 
             self.change_color("happy")
             self.blinking_sequence(
-                ("magenta",
+                ("suprise",
                 "yellow",
                 ),
                 time_on=0.4,

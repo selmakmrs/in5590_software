@@ -65,8 +65,9 @@ class OLED:
         # Happy Sequence
         seq = self.roboeyes.sequences.add("happy")
         seq.step( 0,    lambda r: r.open() )
-        seq.step( 100, lambda r : r.eyes_width(50,50))
+        seq.step( 100, lambda r : r.eyes_width(40,40))
         seq.step( 120, lambda r : r.eyes_height(50,50))
+        seq.step( 130, lambda r: r.eyes_radius(10))
         seq.step(200, lambda r: r.set_blink_speed(1.1))
         seq.step(300, lambda r: r.set_auto_blinker(ON,6,4))
         seq.step(400, lambda r: r.set_position(DEFAULT))
