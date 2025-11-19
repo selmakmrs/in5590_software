@@ -302,8 +302,8 @@ class Robot:
                     self.oled.track()
 
                 elif self.current_state == RobotState.EMOTION:
-                    print("OLED", self._current_emotion)
-                    self.oled.run_emotion(self._current_emotion)
+                    if not self._is_sequence_running():
+                        self.oled.run_emotion(self._current_emotion)
 
             except Exception as e:
                 print(f"Failed to update oled", e)
