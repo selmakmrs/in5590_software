@@ -387,18 +387,16 @@ class BODY:
         self.move_position(BODY_ID, 700, speed=speed)
         time.sleep(3)
 
-
     def tilt_left(self,speed=200):
         """Makes the robot tilt to the left"""
         self.move_position(BODY_ID, 900, speed=speed)
         self.move_position(HEAD_ID, MIN_POS, speed=speed)
         time.sleep(3)
 
-
     def tilt_right(self,speed=200):
         """Makes the robot tilt to the right"""
         self.move_position(BODY_ID, 100,speed=speed)
-        self.move_position(HEAD_ID, MAX_POS,speed=speed)
+        self.move_position(HEAD_ID, 900,speed=speed)
         time.sleep(3)
 
 
@@ -463,7 +461,6 @@ class BODY:
         self.look_neutral()
         self.home_position()
 
-
     def angry(self):
         move = random.choice(self._angry_sequence)
         move()
@@ -481,10 +478,8 @@ class BODY:
         self.home_position()
         self.look_neutral()
 
-
     def fear(self):
         pass
-
 
     def test(self):
         self.rotate_wheel_geared(base_deg=180, body_deg=0, 

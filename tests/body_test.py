@@ -65,28 +65,34 @@ def main():
     obj = BODY()
     obj.start()
 
-    while True:
-        func_name = input("Enter function to run (or 'quit'): ")
+    try:
 
-        if func_name == "quit":
-            break
+        while True:
+            func_name = input("Enter function to run (or 'quit'): ")
 
-        # Check if function exists
-        if not hasattr(obj, func_name):
-            print(f"Function '{func_name}' does not exist.\n")
-            continue
+            if func_name == "quit":
+                break
 
-        func = getattr(obj, func_name)
+            # Check if function exists
+            if not hasattr(obj, func_name):
+                print(f"Function '{func_name}' does not exist.\n")
+                continue
 
-        # If it's callable, call it
-        if callable(func):
-            try:
-                result = func()
-                print(f"Result: {result}\n")
-            except Exception as e:
-                print(f"Error while running {func_name}: {e}\n")
-        else:
-            print(f"'{func_name}' is not a function.\n")
+            func = getattr(obj, func_name)
+
+            # If it's callable, call it
+            if callable(func):
+                try:
+                    result = func()
+                    print(f"Result: {result}\n")
+                except Exception as e:
+                    print(f"Error while running {func_name}: {e}\n")
+            else:
+                print(f"'{func_name}' is not a function.\n")
+    except KeyboardInterrupt:
+        pass
+    finally:
+        obj.close()
 
 if __name__ == "__main__":
     main()
