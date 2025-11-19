@@ -302,6 +302,7 @@ class Robot:
                     self.oled.track()
 
                 elif self.current_state == RobotState.EMOTION:
+                    print("OLED", self._current_emotion)
                     self.oled.run_emotion(self._current_emotion)
 
             except Exception as e:
@@ -347,7 +348,8 @@ class Robot:
                     # if not self._is_sequence_running():
                     #     self._run_emotion_sequence()
 
-                    if (not self._is_sequence_running() and time.time() - self.emotion_start_time >= 4):
+                    if (not self._is_sequence_running()) and (time.time() - self.emotion_start_time > 5):
+                        self._set_current_emotion(None)
                         self._request_state_change(RobotState.IDLE)
 
                    
