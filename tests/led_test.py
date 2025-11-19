@@ -37,7 +37,7 @@ try:
             cmd = None
 
         if cmd and cmd in EMOTIONS or cmd == "idle":
-            led.show_emotion(cmd)
+            led.run_emotion(cmd)
 
         elif cmd and cmd in COLORS:
             led.change_color(cmd)
