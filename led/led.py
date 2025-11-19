@@ -8,7 +8,7 @@ class LED:
         self,
         pixel_pin=board.D18,
         num_pixels=22,
-        brightness=0.5,
+        brightness=0.9,
         pixel_order=neopixel.GRB,
     ):
         # Hardware config
@@ -182,50 +182,57 @@ class LED:
 
         if emotion == "idle":
             # Slow breathing warm white
-            self.breathing("idle", cycles=1, period=3.0)
+            # self.breathing("idle", cycles=1, period=3.0)
+            self.change_color("idle")
 
         elif emotion == "happy":
             # Bright yellow + a few quick soft blinks
-            self.blinking_sequence(
-                sequence=("happy", "off"),
-                time_on=0.2,
-                time_off=0.1,
-                loops=3,
-            )
+            # self.blinking_sequence(
+            #     sequence=("happy", "off"),
+            #     time_on=0.2,
+            #     time_off=0.1,
+            #     loops=3,
+            # )
             self.change_color("happy")
 
         elif emotion == "sad":
             # Static blue or very slow breathing
             self.breathing("sad", cycles=1, period=4.0)
+            self.change_color("blue")
+            
 
         elif emotion == "angry":
             # Strong red, fast repeating flashes
+            self.change_color("red")
+            time.sleep(3)
             self.blinking_sequence(
                 sequence=("angry", "off"),
-                time_on=0.1,
-                time_off=0.1,
+                time_on=0.5,
+                time_off=0.5,
                 loops=6,
             )
             self.change_color("angry")
 
         elif emotion == "surprise":
             # One strong white flash, then idle color
-            self.blinking_sequence(
-                sequence=("surprise", "off"),
-                time_on=0.15,
-                time_off=0.15,
-                loops=1,
-            )
-            self.change_color("idle")
+            self.change_color("magenta")
+            # self.blinking_sequence(
+            #     sequence=("surprise", "off"),
+            #     time_on=0.15,
+            #     time_off=0.15,
+            #     loops=1,
+            # )
+            # self.change_color("idle")
 
         elif emotion == "fear":
             # Purple, a bit flickery
-            for _ in range(10):
-                self.change_color("fear")
-                time.sleep(0.05)
-                self.change_color("off")
-                time.sleep(0.03)
             self.change_color("fear")
+            # for _ in range(10):
+            #     self.change_color("fear")
+            #     time.sleep(0.05)
+            #     self.change_color("off")
+            #     time.sleep(0.03)
+            # self.change_color("fear")
 
         else:
             # Unknown emotion → fallback to idle
