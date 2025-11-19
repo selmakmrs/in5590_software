@@ -377,7 +377,7 @@ class BODY:
 
     def look_left(self, speed=200):
         """Makes the robot look left"""
-        self.move_position(HEAD_ID, 250, speed=speed)
+        self.move_position(HEAD_ID, 400, speed=speed)
         self.move_position(BODY_ID, 250, speed=speed)
         time.sleep(3)
 
