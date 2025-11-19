@@ -461,7 +461,7 @@ class Robot:
                 #         self.body.fear()
 
                 time.sleep(1)
-                self.body.idle()
+                self.body.home_position()
                 self.led.default()
                 print(f"Emotion sequence {current_emotion} complete")
                 self._set_current_emotion(None)
