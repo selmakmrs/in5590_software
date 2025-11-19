@@ -190,6 +190,14 @@ class LED:
         elif emotion == "happy":
 
             self.change_color("happy")
+            self.blinking_sequence(
+                ("magenta",
+                "yellow",
+                ),
+                time_on=0.4,
+                loops=6
+            )
+            self.change_color("happy")
 
         elif emotion == "sad":
             # Static blue or very slow breathing
