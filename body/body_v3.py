@@ -351,7 +351,6 @@ class BODY:
         # self.calibrate()
         self.is_looking_up = True
 
-
     def look_neutral(self, duration=2):
         """Make the robot in neytral position"""
         if not self.is_looking_up:
@@ -438,8 +437,8 @@ class BODY:
         """Makes the body sway"""
         
         for _ in range(cycles):
-            self.rotate_wheel_geared(body_deg=70, duration=duration, hold_duration=0.1)
-            self.rotate_wheel_geared(body_deg=-70, duration=duration, hold_duration=0.1)
+            self.rotate_wheel_geared(body_deg=50, duration=duration, hold_duration=0.001)
+            self.rotate_wheel_geared(body_deg=-50, duration=duration, hold_duration=0.001)
 
     # ============ Emotion Sequenses =============
 
