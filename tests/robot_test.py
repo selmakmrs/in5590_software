@@ -1,4 +1,4 @@
-from robot_v2 import Robot
+from robot import Robot
 import time
 
 def main():

@@ -15,6 +15,7 @@ BODY_ID = 3
 BASE_ID = 1
 SERVOS = [HEAD_ID, BODY_ID, BASE_ID]
 
+
 # --- Control Table addresses (AX-12A) ---
 ADDR_TORQUE_ENABLE = 24
 ADDR_CW_ANGLE_LIMIT = 6
@@ -28,6 +29,12 @@ ADDR_MOVING = 46
 TORQUE_ENABLE = 1
 TORQUE_DISABLE = 0
 
+
+MIN_POS = 0
+MAX_POS = 1023
+MAX_SPEED = 1023
+
+
 # HOME POSITIONS (center positions for each servo)
 HOME_POSITIONS = {
     HEAD_ID: 512,
@@ -35,27 +42,24 @@ HOME_POSITIONS = {
     BASE_ID: 512
 }
 
-FAST = 1023
+# Modes
+JOINT = "joint"
+WHEEL = "wheel"
 
-# MOVEMENT THRESHOLDS
-BIG_MOVE_THRESHOLD = 200  # Use wheel mode only for movements larger than this
-WHEEL_MODE_SLOWDOWN = 30  # Start slowing down when this close to target
+# Gear Ratios
 
-# WHEEL MODE USAGE:
-# For your robot with small gears:
-# - Option 1: NEVER use wheel mode for positioning (safest)
-# - Option 2: Only use wheel mode for FULL SPINS where position doesn't matter
-# - Option 3: Add limit switches or encoders for absolute positioning
+GEAR_RATIO = {}
+
 
 # ========= UTILITY FUNCTIONS =========
 def open_bus(dev, baud):
     port = PortHandler(dev)
     pkt = PacketHandler(PROTOCOL_VERSION)
     if not port.openPort():
-        raise RuntimeError("❌ Failed to open port")
+        raise RuntimeError("Failed to open port!")
     if not port.setBaudRate(baud):
-        raise RuntimeError("❌ Failed to set baudrate")
-    print("✅ Port opened at", baud, "bps")
+        raise RuntimeError("Failed to set baudrate!")
+    print("Port opened at", baud, "bps")
     return port, pkt
 
 def scan_ids(port, pkt, ids):
@@ -76,162 +80,182 @@ def scan_ids(port, pkt, ids):
 
 class BODY:
     """
-    Controls robot body movements (servos, motors)
-    Handles head tracking and emotion gestures
+    Controls robot body movements
     """
     def __init__(self):
-    
+        
         self.port, self.pkt = open_bus(DEVICENAME, BAUDRATE)
         self.ids = scan_ids(self.port, self.pkt, SERVOS)
-        
-        # Movement state
-        self.speed_multiplier = 1.0
-        self.is_emergency_stopped = False
-        
+
+
         # Position tracking (CRITICAL for wheel mode)
         self.tracked_positions = {
             HEAD_ID: HOME_POSITIONS[HEAD_ID],
             BODY_ID: HOME_POSITIONS[BODY_ID],
             BASE_ID: HOME_POSITIONS[BASE_ID]
         }
-        
-        # Mode tracking
-        self.current_modes = {
-            HEAD_ID: "joint",
-            BODY_ID: "joint", 
-            BASE_ID: "joint"
-        }
-        
-        # Idle state
-        self.idle_counter = 0
-        
-        print("🤖 BODY initialized")
 
-    # === Start & Close ===
+        self.current_mode = None
+        self.is_looking_up = False
+
+
+        # Emotion Body Movemnt Sequenses
+
+        self._idle_sequence = [
+            lambda: self.tilt_left(speed=random.randint(50,130)),
+            lambda: self.tilt_right(speed=random.randint(50,130)),
+            lambda: self.jump_left(duration=4,hold_duration=4),
+            lambda: self.jump_right(duration=4,hold_duration=4),
+            lambda: self.look_left(speed=random.randint(50,130)),
+            lambda: self.look_right(speed=random.randint(50,130)),
+            lambda: self.move_position(HEAD_ID,random.randint(300,400),speed=random.randint(50,100)),
+            lambda: self.move_position(HEAD_ID,random.randint(600,700),speed=random.randint(50,100)),
+
+        ]
+
+        self._happy_sequence = [
+            lambda: self.tilt_left(speed=random.randint(100,200)),
+            lambda: self.tilt_right(speed=random.randint(100,200)),
+            lambda: self.home_position(speed=random.randint(100,200)),
+            # lambda: self.jump_left(duration=2,hold_duration=3),
+            # lambda: self.jump_right(duration=2,hold_duration=3),
+            lambda: self.sway(duration=2, cycles=1)
+        ]
+
+        self._angry_sequence = [
+            lambda: self.tilt_left(speed=random.randint(200,300)),
+            lambda: self.tilt_right(speed=random.randint(200,300)),
+            lambda: self.jump_left(duration=1,hold_duration=1),
+            lambda: self.jump_right(duration=1,hold_duration=1),
+            lambda: self.jump_forward(duration=1, hold_duration=7),
+            lambda: self.move_position(HEAD_ID,random.randint(300,400),speed=random.randint(200,300)),
+            lambda: self.move_position(HEAD_ID,random.randint(600,700),speed=random.randint(200,300)),
+
+            ]
+        
+        self._sad_sequence = [
+            lambda: self.tilt_left(speed=random.randint(100,120)),
+            lambda: self.tilt_right(speed=random.randint(100,120)),
+            lambda: self.look_left(speed=100),
+            lambda: self.look_right(speed=100),
+            lambda: self.home_position(speed=100),
+            lambda: self.sway(duration=3, cycles=1)
+        ]
+
+        self._suprise_sequence = [
+            lambda: self.jump_back(duration=1.5, hold_duration=6),
+            lambda: self.jump_left(duration=1.5, hold_duration=6),
+            lambda: self.jump_right(duration=1.5, hold_duration=6)
+        ]
+
+        
+
+        print("Body initialized")
+
+    # ============ Start and close ==========
+
     def start(self):
         """Start the body system"""
         self.enable_motors()
         self.set_joint_mode()
-        self.set_torque_limit(1023)  # 50% torque to start
+        self.set_torque_limit()
         self.calibrate()
-        print("▶️  BODY started")
+        print("BODY Started")
 
     def close(self):
-        """Shutdown the body system safely"""
         self.home_position()
         time.sleep(1)
         self.disable_motors()
         self.port.closePort()
-        print("⏹️  BODY closed")
+        print("BODY closed")
 
-    # === Initialization & Calibration ===
+
+    # ========= Initialization And Calibration =================
+
     def calibrate(self):
-        """Move all servos to known positions for calibration"""
-        print("🔧 Calibrating...")
-        
-        # Ensure all servos are in joint mode
-        for servo_id in self.ids:
-            self.set_joint_mode(servo_id)
-            time.sleep(0.1)
-        
-        # Move to home and update tracked positions
-        self.home_position()
-        time.sleep(0.5)
-        
-        # Read actual positions to sync tracking
-        for servo_id in self.ids:
-            actual_pos = self.get_position_safe(servo_id)
-            self.tracked_positions[servo_id] = actual_pos
-            print(f"  ID {servo_id}: position = {actual_pos}")
-        
-        print("✅ Calibration complete")
+        """Moves al servos to known positions for calibartion"""
+        print("Calibrating ...")
 
-    def recalibrate_after_spin(self, layer_id):
-        """
-        Recalibrate a single servo after it's been in wheel mode
-        Attempts to return to home position
-        """
-        print(f"🔄 Recalibrating ID {layer_id}...")
-        self.set_joint_mode(layer_id)
+        # Ensure all servos in joint mode
+        self.set_joint_mode()
         time.sleep(0.1)
-        self.move_position(layer_id, HOME_POSITIONS[layer_id])
-        time.sleep(1.0)
-        actual = self.get_position_safe(layer_id)
-        print(f"  ID {layer_id} home position: {actual}")
 
-    def home_position(self):
-        """Return to neutral/home position"""
-        for servo_id in self.ids:
-            self.move_position(servo_id, HOME_POSITIONS[servo_id])
-        time.sleep(0.3)
+        # Move all servos to home position
+        self.home_position()
+        time.sleep(0.1)
+
+        # Read and store positions
+        for dxl_id in self.ids:
+            pos = self.get_position(dxl_id)
+            self.tracked_positions[dxl_id] = pos
+            print(f" ID {dxl_id}: position = {pos}")
+
+        print("Calibration complete ")
+        
+    def home_position(self,speed=100):
+        """Return all servos to home position"""
+        for dxl_id in self.ids:
+            self.move_position(dxl_id, HOME_POSITIONS[dxl_id],speed=speed)
+        time.sleep(1)
 
     def enable_motors(self):
         """Enable servo power"""
-        for i in self.ids:
-            self.pkt.write1ByteTxRx(self.port, i, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
+        for dxl_id in self.ids:
+            self.pkt.write1ByteTxRx(self.port, dxl_id, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
+        print("Servos enabled")
 
     def disable_motors(self):
-        """Disable servo power (to prevent overheating)"""
-        for i in self.ids:
-            self.pkt.write1ByteTxRx(self.port, i, ADDR_TORQUE_ENABLE, TORQUE_DISABLE)
-
-    def set_joint_mode(self, dxl_id=None):
-        """Set servos to joint mode (angle servo)"""
-        ids = [dxl_id] if dxl_id else self.ids
-        for i in ids:
-            self.pkt.write2ByteTxRx(self.port, i, ADDR_CW_ANGLE_LIMIT, 0)
-            self.pkt.write2ByteTxRx(self.port, i, ADDR_CCW_ANGLE_LIMIT, 1023)
-            self.current_modes[i] = "joint"
+        """Enable servo power"""
+        for dxl_id in self.ids:
+            self.pkt.write1ByteTxRx(self.port, dxl_id, ADDR_TORQUE_ENABLE, TORQUE_DISABLE)
+        print("Servos disabled")
+        
+    def set_joint_mode(self):
+         for dxl_id in self.ids:
+            self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_CW_ANGLE_LIMIT, 0)
+            self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_CCW_ANGLE_LIMIT, 1023)
+            self.current_mode = JOINT
             # Update tracked position when entering joint mode
-            self.tracked_positions[i] = self.get_position_safe(i)
+            self.tracked_positions[dxl_id] = self.get_position(dxl_id)
 
-    def set_wheel_mode(self, dxl_id=None):
-        """Set servos to wheel mode (infinite rotation, no target angle)"""
-        ids = [dxl_id] if dxl_id else self.ids
-        for i in ids:
-            # Save current position BEFORE entering wheel mode
-            if self.current_modes[i] == "joint":
-                self.tracked_positions[i] = self.get_position_safe(i)
-            
-            self.pkt.write2ByteTxRx(self.port, i, ADDR_CW_ANGLE_LIMIT, 0)
-            self.pkt.write2ByteTxRx(self.port, i, ADDR_CCW_ANGLE_LIMIT, 0)
-            self.current_modes[i] = "wheel"
+    def set_wheel_mode(self):
+        for dxl_id in self.ids:
+            self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_CW_ANGLE_LIMIT, 0)
+            self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_CCW_ANGLE_LIMIT, 0)
+            self.current_mode = WHEEL
 
     def set_torque_limit(self, limit=1023, dxl_id=None):
         """Sets motor strength (0 = no torque, 1023 = full)"""
         ids = [dxl_id] if dxl_id else self.ids
-        for i in ids:
-            self.pkt.write2ByteTxRx(self.port, i, ADDR_TORQUE_LIMIT, max(0, min(1023, limit)))
+        for dxl_id in ids:
+            self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_TORQUE_LIMIT, max(0, min(1023, limit)))
 
-    # === Position/Speed Control ===
-    def get_position_safe(self, dxl_id):
+    # ========= Postion And Speed Controll =====================
+
+    def get_position(self, dxl_id):
         """
         Get position - returns tracked position if in wheel mode
         Only reads from servo if in joint mode
         """
-        # if self.current_modes[dxl_id] == "wheel":
-        #     # In wheel mode, position reading is unreliable
-        #     return self.tracked_positions[dxl_id]
+        if self.current_mode == WHEEL:
+            # In wheel mode, position reading is unreliable
+            return self.tracked_positions[dxl_id]
         
         # In joint mode, read actual position
         pos, comm, err = self.pkt.read2ByteTxRx(self.port, dxl_id, ADDR_PRESENT_POSITION)
         if comm == COMM_SUCCESS:
             self.tracked_positions[dxl_id] = pos
             return pos
+        
         return self.tracked_positions.get(dxl_id, HOME_POSITIONS[dxl_id])
 
-    def get_position(self, dxl_id):
-        """Get current position of servo (legacy compatibility)"""
-        return self.get_position_safe(dxl_id)
-
-    def move_position(self, dxl_id, pos, speed = 600):
+    def move_position(self, dxl_id, pos, speed = 300):
         """Move to position (simple, joint mode only)"""
         pos = max(0, min(1023, pos))
         speed = max(0,min(1023, speed))
         self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_MOVING_SPEED, speed)
         self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_GOAL_POSITION, pos)
         self.tracked_positions[dxl_id] = pos  # Update tracked position
-
 
     def wheel_speed(self, dxl_id, speed):
         """
@@ -243,385 +267,307 @@ class BODY:
         value = speed | (direction << 10)
         self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_MOVING_SPEED, value)
 
-    # === PRIMITIVE MOVEMENTS ===
-
-    def rotate_layer(self, layer_id, degrees, speed="normal", use_smart=True):
-        """
-        Rotate a layer by degrees from current position
-        speed: 'slow', 'normal', 'fast'
-        """
-        current = self.get_position(layer_id)
-        steps_per_degree = 1023 / 300.0  # AX-12A is ~300 degrees range
-        target = int(current + (degrees * steps_per_degree))
-        target = max(0, min(1023, target))
+    def rotate_wheel_geared(self, 
+                            base_deg=0, 
+                            body_deg=0, 
+                            head_deg=0, 
+                            duration=3.0, 
+                            max_speed=MAX_SPEED,
+                            hold_duration = 1, 
+                            return_to_start=True):
+        """Rotate servos in wheel mode to positions at a time """
+    
+        # FIXED gear ratios (cylinder teeth / servo teeth)
+        gear_ratios = {
+            BASE_ID: 32 / 10,   # = 3.2
+            BODY_ID: 32 / 16,   # = 2.0
+            HEAD_ID: 24 / 11    # = 2.18
+        }
         
-        if use_smart:
-            self.move_position_smart(layer_id, target)
-        else:
-            self.move_position(layer_id, target)
-
-    def wiggle(self, layer_id, amplitude=20, cycles=2, speed=3.0):
-        """Small oscillation back and forth"""
-        center = self.get_position(layer_id)
-        duration = cycles / speed
-        start = time.time()
+        targets = {
+            BASE_ID: base_deg,
+            BODY_ID: body_deg,
+            HEAD_ID: head_deg
+        }
         
-        while time.time() - start < duration:
-            if self.is_emergency_stopped:
-                return
-            t = time.time() - start
-            offset = amplitude * math.sin(2 * math.pi * speed * t)
-            self.move_position(layer_id, int(center + offset))
-            time.sleep(0.02)
+        # Calculate required SERVO rotations (multiply, not divide!)
+        servo_rotations = {k: targets[k] * gear_ratios[k] for k in targets}
         
-        # Return to center
-        self.move_position(layer_id, center)
-
-
-   # ======== Big Wheel Movemnts ================
-
-    def _run_wheel_movement(self, config : List[Tuple], speed):
-        movemnt = { FAST : {
-            BASE_ID : {90 : 0.7, 180 : 1.5, 270 : 2.3},
-            BODY_ID : {90 : 0.5, 180 : 1.0, 270 : 1.5},
-            HEAD_ID : {90 : 0.6, 180 : 1.1, 270 : 1.7},
+        # Calculate required angular velocities (deg/s)
+        required_speeds = {k: abs(v) / duration for k, v in servo_rotations.items()}
         
-        }}
-        durations = {}
-        for dxl_id, deg in config:
-            durations[dxl_id] = self._get_rotation_duration(dxl_id,deg,speed)
-
-        max_duration = max(durations)
-
-
-        # Enter wheel mode
+        # Convert to speed values 
+        DEG_PER_SEC_AT_MAX_SPEED = 360.0  
+        speeds = {}
+        for k, deg_per_sec in required_speeds.items():
+            speed_value = int((deg_per_sec / DEG_PER_SEC_AT_MAX_SPEED) * max_speed)
+            direction = 1 if servo_rotations[k] >= 0 else -1  # 1=CW, 0=CCW
+            speeds[k] = (min(speed_value, max_speed), direction)
+        
+        # Execute
         self.set_wheel_mode()
-        for dxl_id, deg in config:
-            dir_speed = speed if deg > 0 else -speed
-            self.wheel_speed(dxl_id, dir_speed)
-
-        start = time.time()
-        # Loop untill all are stopped
-        while True:
-            elapsed = time.time() - start
-            all_stopped = True
-
-            for dxl_id, deg in config:
-                if elapsed >= durations[dxl_id]:
-                    self.wheel_speed(dxl_id,0)
-                else:
-                    all_stopped = False
+        for dxl_id, (speed, direction) in speeds.items():
+            # print(f"ID : {dxl_id}  speed : {speed * direction}")
+            self.wheel_speed(dxl_id, speed * direction)  # Assuming separate direction param
+        
+        time.sleep(duration)
+        self._stop_wheels()
+        time.sleep(0.02)
+        self._stop_wheels()
+        time.sleep(hold_duration)
+        if return_to_start:
+            for dxl_id, (speed, direction) in speeds.items():
+                self.wheel_speed(dxl_id, -speed* direction)  # Assuming separate direction param
             
-            if all_stopped or elapsed > (max_duration + 0.2):
-                break
-            
-            time.sleep(0.01)
-        
-        for dxl_id, deg in config:
-            self.wheel_speed(dxl_id, 0)
+            time.sleep(duration)
 
-        
-        
+            self._stop_wheels()
 
-
-    def _get_rotation_duration(self, dxl_id, degree, speed):
-        movemnt = { FAST : {
-            BASE_ID : {90 : 0.7, 180 : 1.5, 270 : 2.3},
-            BODY_ID : {90 : 0.5, 180 : 1.0, 270 : 1.5},
-            HEAD_ID : {90 : 0.6, 180 : 1.1, 270 : 1.7},
-        
-        }}
-        duartion = movemnt[speed][dxl_id][abs(degree)]
-        return duartion
-
-
-    def _stop_wheel(self, layer_ids, wait=0.3):
-        for layer_id in layer_ids:
-            self.wheel_speed(layer_id, 0)
-        self.hold(wait)
-
-    def _run_wheels(self, layer_ids, speed, durations):
-        for id in layer_ids:
-            self.wheel_speed(id,speed)
-        
-        max_duration = max(durations)
-
-
-
-    def jump_back(self, speed=FAST):
-        """Make the robot jump back"""
-        # Rotate BASE 180 degree
-        # Rotate BODY -180 degree
-
-
-        # duration_dictonary = movemnt[speed]
-
-        self.set_wheel_mode()
-
-        config = [(BASE_ID, -180), (BODY_ID, 180)]
-        self._run_wheel_movement(config, speed)
-        self.hold(2)
-        config = [(BASE_ID, 180), (BODY_ID, -180)]
-        self._run_wheel_movement(config, speed)
         self.set_joint_mode()
-        self.home_position()
+        # self.home_position()
+
+    def _stop_wheels(self):
+        for dxl_id in self.ids:
+            self.wheel_speed(dxl_id, 0)
         
+    # ==== Tracking ========
+
+    def track_position(self, displacement):
+        if displacement <= 0:
+            deg_change = +20
+        else:
+            deg_change = -20
+
+        for dxl_id in [HEAD_ID, BODY_ID, BASE_ID]:
+            current_pos = self.tracked_positions[dxl_id]
+            pos = current_pos + deg_change
+            if pos <= 0 or pos >= 1024:
+                continue
+
+            self.move_position(dxl_id, pos, 150)
+            return True
         
+        return False 
+    
+    def look_up(self, duration=2):
+        """Make to robot look up"""
+        if self.is_looking_up:
+            return
+        self.rotate_wheel_geared(base_deg=180, head_deg=-180, duration=duration, return_to_start=False)
+        self.calibrate()
+        self.is_looking_up = True
 
-    def jump_forward(self, wait=1, go_home = True):
-        """Make the robot jump back"""
-        self.set_wheel_mode()
-        self.wheel_speed(HEAD_ID,1023)
-        self.wheel_speed(BODY_ID,-1023)
-        time.sleep(1.2)
-        self.wheel_speed(HEAD_ID,0)
-        self.wheel_speed(BODY_ID,0)
-        time.sleep(wait)
-        if go_home:
-            self.wheel_speed(HEAD_ID,-1023)
-            self.wheel_speed(BODY_ID,1023)
-            time.sleep(1.2)
-            self.wheel_speed(HEAD_ID,0)
-            self.wheel_speed(BODY_ID,0)
-            self.hold(0.3)
-            self.set_joint_mode()
-            self.home_position()
-            # self.recalibrate_after_spin()
+    def look_neutral(self, duration=2):
+        """Make the robot in neytral position"""
+        if not self.is_looking_up:
+            return
+        self.rotate_wheel_geared(base_deg=-180, head_deg=180, duration=duration, return_to_start=False)
+        self.calibrate()
+        self.is_looking_up = False
 
-
-    def jump_left(self, wait=1, go_home=True):
-        self.set_wheel_mode()
-        self.wheel_speed(HEAD_ID,-600)
-        self.wheel_speed(BODY_ID,1023)
-        self.wheel_speed(BASE_ID,-600)
-        time.sleep(0.8)
-        self.wheel_speed(HEAD_ID,0)
-        self.wheel_speed(BODY_ID,0)
-        self.wheel_speed(BASE_ID,0)
-        time.sleep(wait)
-        if go_home:
-            self.wheel_speed(HEAD_ID,600)
-            self.wheel_speed(BODY_ID,-1023)
-            self.wheel_speed(BASE_ID,600)
-            time.sleep(0.8)
-            self.wheel_speed(HEAD_ID,0)
-            self.wheel_speed(BODY_ID,0)
-            self.wheel_speed(BASE_ID,0)
-            self.hold(0.3)
-            self.set_joint_mode()
-            self.home_position()
-            # self.recalibrate_after_spin()
-
-
-    def jump_right(self, wait=1, go_home=True):
-        self.set_wheel_mode()
-        self.wheel_speed(HEAD_ID,600)
-        self.wheel_speed(BODY_ID,-1023)
-        self.wheel_speed(BASE_ID,600)
-        time.sleep(0.8)
-        self.wheel_speed(HEAD_ID,0)
-        self.wheel_speed(BODY_ID,0)
-        self.wheel_speed(BASE_ID,0)
-        time.sleep(wait)
-        if go_home:
-            self.wheel_speed(HEAD_ID,-600)
-            self.wheel_speed(BODY_ID,1023)
-            self.wheel_speed(BASE_ID,-600)
-            time.sleep(0.8)
-            self.wheel_speed(HEAD_ID,0)
-            self.wheel_speed(BODY_ID,0)
-            self.wheel_speed(BASE_ID,0)
-            time.sleep(0.3)
-            self.set_joint_mode()
-            self.home_position()
-            # self.recalibrate_after_spin()
-
-   
-
+        
     # === UTILITY ===
 
-    def hold(self, duration):
-        """Pause for duration seconds"""
-        time.sleep(duration)
-        
-    def is_moving(self, dxl_id=None):
-        """Check if servo(s) are currently moving"""
-        ids = [dxl_id] if dxl_id else self.ids
-        for i in ids:
-            moving, comm, err = self.pkt.read1ByteTxRx(self.port, i, ADDR_MOVING)
-            if comm == COMM_SUCCESS and moving:
-                return True
-        return False
-
-    def wait_for_movement(self, timeout=5.0):
-        """Block until all movements complete"""
-        start = time.time()
-        while self.is_moving() and (time.time() - start) < timeout:
-            time.sleep(0.05)
-
     def emergency_stop(self):
-        """Immediately stop all movements"""
         print("🛑 EMERGENCY STOP")
         self.is_emergency_stopped = True
-        for i in self.ids:
-            self.set_wheel_mode(i)
-            self.wheel_speed(i, 0)
+        self.set_wheel_mode()
+        for dxl_id in self.ids:
+            self.wheel_speed(dxl_id, 0)
         time.sleep(0.1)
-        for i in self.ids:
-            self.set_joint_mode(i)
+        self.set_joint_mode()
         self.is_emergency_stopped = False
 
-    def set_servo_speed(self, speed):
-        """Set global movement speed multiplier (0.1 to 2.0)"""
-        self.speed_multiplier = max(0.1, min(2.0, speed))
-        print(f"⚡ Speed set to {self.speed_multiplier}x")
+    # ============ JOINT Movements ============
 
-    def cleanup(self):
-        """Clean up resources"""
-        self.close()
+    def look_left(self, speed=200):
+        """Makes the robot look left"""
+        self.move_position(HEAD_ID, 400, speed=speed)
+        self.move_position(BODY_ID, 250, speed=speed)
+        time.sleep(3)
 
-    def _scurve_interpolate(self, start, end, s):
-        """S-curve interpolation between start and end position"""
-        s_smooth = 3 * s * s - 2 * s * s * s
-        return int(start + (end - start) * s_smooth)
-    
-    def move_positions_smooth(self, layer_configs, steps=50, duration = 0.025):
-        """Layer configs List with tuple [(dxl_id, start_pos, end_pos, speed)]"""
+    def look_right(self,speed=200):
+        """Makes the robot look right"""
+        self.move_position(HEAD_ID, 600, speed=speed)
+        self.move_position(BODY_ID, 700, speed=speed)
+        time.sleep(3)
 
-        for i in range(steps):
-            t = i / steps
-            for dxl_id, start_pos, end_pos, speed in layer_configs:
-                pos = self._scurve_interpolate(start_pos, end_pos, t)
-                self.move_position(dxl_id, pos, speed)
-            time.sleep(duration)
+    def tilt_left(self,speed=200):
+        """Makes the robot tilt to the left"""
+        self.move_position(BODY_ID, 900, speed=speed)
+        self.move_position(HEAD_ID, MIN_POS, speed=speed)
+        time.sleep(3)
+
+    def tilt_right(self,speed=200):
+        """Makes the robot tilt to the right"""
+        self.move_position(BODY_ID, 100,speed=speed)
+        self.move_position(HEAD_ID, 900,speed=speed)
+        time.sleep(3)
+
+
+
+    # =========== WHEEL Movements ===============
+
+    def jump_left(self, duration = 1.5, hold_duration=3):
+        "Make the robot jump left"
+        base_deg = -90
+        body_deg = 180
+        head_deg = -80
+        self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
+
+    def jump_right(self, duration = 1.5, hold_duration=3):
+        "Make the robot jump right"
+        base_deg = 90
+        body_deg = -180
+        head_deg = 80
+        self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
+
+    def jump_back(self, duration=2, hold_duration=2):
+        """Makes the robot jump back"""
+        base_deg = 180
+        body_deg = -180
+        self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, duration=duration, hold_duration=hold_duration)
+
+    def jump_forward(self, duration=2, hold_duration=3):
+        """Make the robot jump foward"""
+        body_deg = 180
+        head_deg = -180
+        self.rotate_wheel_geared(body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
+
+    def shake_head(self, duration=0.08, cycles=2):
+        for _ in range(cycles):
+            self.rotate_wheel_geared(head_deg=45, duration=duration, hold_duration=0.1)
+            self.rotate_wheel_geared(head_deg=-45, duration=duration, hold_duration=0.1)
+
+    def sway(self, duration=1, cycles=2):
+        """Makes the body sway"""
+        
+        for _ in range(cycles):
+            self.rotate_wheel_geared(body_deg=50, head_deg=-50, duration=duration, hold_duration=0.001)
+            self.rotate_wheel_geared(body_deg=-50, head_deg=50,duration=duration, hold_duration=0.001)
+
+    # ============ Emotion Sequenses =============ha
+
+    def idle(self):
+        _do_movment_prob=0.1
+
+
+        if _do_movment_prob <= random.random():
+            move = random.choice(self._idle_sequence)
+            move()
+            self.home_position()
+
+    def happy(self):
+        """Make robot happy"""
+        # _do_movement_prob = 0.9
+        move = random.choice(self._happy_sequence)
+        move()
+     
+        self.look_neutral()
+        self.home_position()
+
+    def angry(self):
+        move = random.choice(self._angry_sequence)
+        move()
+        self.home_position()
+
+    def suprise(self):
+        move = random.choice(self._suprise_sequence)
+        move()
+        self.home_position()
+
+    def sad(self):
+        move = random.choice(self._sad_sequence)
+        move()
+        time.sleep(4)
+        self.home_position()
+        self.look_neutral()
+
+    def fear(self):
+        pass
+
+
+
+
+
 
 
 
 # === EXAMPLE USAGE ===
-if __name__ == "__main__":
-    body = BODY()
+if __name__=="__main__":
 
+    body = BODY()
+    print("Satrting")
     try:
         body.start()
-        
-        # Test movements
-        # print("Starting testing Movemnts")
+
+        # print("Testing look up and neutral")
+        # body.look_up()
+        # time.sleep(4)
+        # body.shake_head()
+        # body.look_left()
+        # body.home_position()
+        # time.sleep(10)
+        # body.look_neutral()
+        # time.sleep(3)
+
+        # print("Testing Joint movemtns movemnt")
+        # print("Look left")
         # time.sleep(1)
-        # print("Jumping Back")
+        # body.look_left()
+        # print("Look right")
+        # time.sleep(2)
+        # body.look_right()
+        # print("Tilt left")
+        # time.sleep(2)
+        # body.tilt_left()
+        # print("Tilit Right")
+        # time.sleep(2)
+        # body.tilt_right()
+
+        # body.move_to_home()
+
+        print("Testing Wheel movments")
+
+        # body.test()
+        
+        # print("Jump back")
         # time.sleep(1)
         # body.jump_back()
-
-        # print("Jumping Forward")
+        # print("Jump Forward")
         # time.sleep(1)
         # body.jump_forward()
-
-        # time.sleep(1)
-        # print("Jumping Left")
+        # print("Jump ledt")
         # time.sleep(1)
         # body.jump_left()
-
-        # print("Jumping Right")
+        # print("Jump right")
         # time.sleep(1)
         # body.jump_right()
-
-
-
-
-        # print("Tesing how far each motor can move")
-        # positions = [0, 1000]
-        # speeds = [200,1000]
-        # for speed in speeds:
-        #     time.sleep(2)
-        #     print(f"----- Speed = {speed} -----")
-        #     body.home_position()
-        #     time.sleep(1)
-        #     for pos in positions:
-        #         print("Set in position : ", pos)
-        #         time.sleep(1)
-        #         body.move_position(BASE_ID, pos, speed)
-        #         time.sleep(5)
-
         # time.sleep(1)
+        # print("Sway")
+        # body.sway()
 
-
-        print("Testing Wheel mode:")
-
-
-                
-        FAST = 1024
-        MEDIUM = 600
-        SLOW = 250
-
-
-        ID = HEAD_ID
-
-        seconds = [0.5, 1, 2]
-        body.set_wheel_mode()
-        for sec in seconds[:]:
-            body.set_wheel_mode()
-            print(f"Second = {sec}")
-            time.sleep(1)
-            body.wheel_speed(ID, MEDIUM)
-            time.sleep(sec)
-            body.wheel_speed(ID,0)
-            time.sleep(1)
-            body.wheel_speed(ID,-MEDIUM)
-            time.sleep(sec)
-            body.wheel_speed(ID,0)
-            time.sleep(1)
-            body.set_joint_mode()
-            body.home_position()
-            time.sleep(5)
-            break
-
-
-        movemnt = { 
-            FAST : {
-                BASE_ID : {90 : 0.7, 180 : 1.5, 270 : 2.3},
-                BODY_ID : {90 : 0.5, 180 : 1.0, 270 : 1.5},
-                HEAD_ID : {90 : 0.6, 180 : 1.1, 270 : 1.7},
-        },
-            MEDIUM : {
-                BASE_ID : {90: 1.5, 180: 2.7, 270: 4.1},
-                BODY_ID : {90: 0.8, 180: 1.7, 270: 2.5},
-                HEAD_ID : {90: 0.0, 180: 0.0, 180: 0.0},
-            },
-
-            SLOW : {
-                BASE_ID : {},
-                BODY_ID : {},
-                HEAD_ID : {},
-
-            }
-
-
-        }
-
-
-
+        # print("Shake head")
+        # time.sleep(1)
         # body.shake_head()
-        # print("\n🧪 Testing basic movements...")
-        # body.look_left(30)
-        # time.sleep(1)
-        # body.look_right(30)
-        # time.sleep(1)
-        # body.look_center()
-        
-        # print("\n😊 Testing HAPPY gesture...")
-        # body.gesture_happy()
-        # time.sleep(2)
-        
-        # print("\n🔁 Testing idle sequence (5 iterations)...")
-        # idle_gen = body.idle_sequence()
-        # for _ in range(5):
-        #     action = next(idle_gen)
-        #     print(f"  Idle action: {action}")
-        #     time.sleep(1)
-        
-        print("\n✅ Tests complete!")
+
+        # time.sleep(3)
+        # body.move_to_home()
+
+
+        print("Testing Emotion")
+
+        print("Happy")
+        time.sleep(1)
+        body.happy()
+
+        time.sleep(2)
+        print("Angry")
+        body.angry()
+
         
     except KeyboardInterrupt:
         print("\n⚠️  Interrupted by user")
         body.emergency_stop()
     finally:
-        body.cleanup()
+        body.close()

@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
-import tensorflow as tf
-from tensorflow.lite.python.interpreter import Interpreter
+import onnxruntime as ort
 from picamera2 import Picamera2
 
 
@@ -13,7 +12,7 @@ class DETECTOR:
     """
     
     def __init__(self, resolution=(320, 240), 
-                 model_path=r"/home/pi/in5590_software/detector/model/face_model1.tflite",
+                 model_path=r"/home/pi/in5590_software/detector/model/best.onnx",
                  yunet_path=r"/home/pi/in5590_software/detector/model/face_detection_yunet_2023mar.onnx"):
         """
         Initialize camera and detection models
@@ -21,26 +20,39 @@ class DETECTOR:
         Args:
             resolution: (width, height) tuple
         """
-        self.emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
-
+        self.emotion_labels = {
+            0: "angry",
+            1: "disgust", 
+            2: "fear",
+            3: "happy",
+            4: "neutral",
+            5: "sad",
+            6: "suprise"
+        }
         # Load model
         try:
-            self.interpreter = Interpreter(model_path=model_path)
-            self.interpreter.allocate_tensors()
+            sess_options = ort.SessionOptions()
+            sess_options.intra_op_num_threads = 1  # Pi has few cores, avoid overhead
+            sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
 
-            # Get input and output details
-            self.input_details = self.interpreter.get_input_details()
-            self.output_details = self.interpreter.get_output_details()
+            self.session = ort.InferenceSession(
+                model_path,
+                sess_options,
+                providers=["CPUExecutionProvider"]
+            )
 
-            # Get input shape
-            self.input_shape = self.input_details[0]['shape']
-            self.input_height = self.input_shape[1]
-            self.input_width = self.input_shape[2]
+            # Get input/output info
+            self.input_name = self.session.get_inputs()[0].name
+            self.output_name = self.session.get_outputs()[0].name
+            self.input_shape = self.session.get_inputs()[0].shape
 
-            print("Model loaded successfully!")
+            print("Emotion Detection Model loded successfully!")
+            print("Input name: ", self.input_name)
+            print("Output name: ", self.output_name)
             print("Input shape: ", self.input_shape)
-            print("Input details: ", self.input_details)
-            print("Output details: ", self.output_details)
+
+
+                        
 
         except Exception as e:
             print("Error loading model: ", e)
@@ -194,7 +206,7 @@ class DETECTOR:
         Returns:
             bool: True if face is close enough
         """
-        pass
+        return face_data[2]*face_data[3] > 10000
 
     def find_face_displacement(self, face):
         """Find face diplacment from center og image"""
@@ -224,67 +236,75 @@ class DETECTOR:
         """
         x, y, w, h = face
 
-        fw = w
-        fh = h
-
-         # Get frame height and width
-        h, w = frame.shape[:2]
-
-        # Clamp the box so it stays inside the frame
-        x = max(0, x)
-        y = max(0, y)
-        fw = min(fw, w - x)
-        fh = min(fh, h - y)
+        pad = int(0.15 * max(w, h))
+        x1 = max(0, x - pad)
+        y1 = max(0, y - pad)
+        x2 = min(frame.shape[1], x + w + pad)
+        y2 = min(frame.shape[0], y + h + pad)
+        
 
         # If box is invalid after clamping, bail out
-        if fw <= 0 or fh <= 0:
+        if x2 <= 0 or y2 <= 0:
             print("Invalid face box, skipping emotion detection")
             return None, 0.0
 
-        face_frame = frame[y:y+h, x:x+w]
+        face_frame = frame[y1:y2, x1:x2]
 
         # Double-check slice result
         if face_frame is None or face_frame.size == 0:
             print("Empty face_frame after crop, skipping resize")
             return None, 0.0
 
-        try:
-            face_frame = cv2.resize(face_frame, (self.input_width, self.input_height))
-        except cv2.error as e:
-            print("Resize failed:", e)
-            return None, 0.0
+        # try:
+        #     face_frame = cv2.resize(face_frame, self.input_shape)
+        # except cv2.error as e:
+        #     print("Resize failed:", e)
+        #     return None, 0.0
         
         input_data = self._pre_process_face(face_frame)
         
-        # Run inference
-        self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
-        self.interpreter.invoke()
+        outputs = self.session.run([self.output_name],{self.input_name : input_data})
+        logits = outputs[0][0]
         
-        # Get output
-        output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
-        predictions = output_data[0]
-        
-        # Get emotion probabilities
-        emotions = {label: float(pred) for label, pred in zip(self.emotion_labels, predictions)}
-        dominant_emotion = max(emotions, key=emotions.get)
-        emotion_prob = emotions[dominant_emotion]
+        top1_idx = int(np.argmax(logits))
+        conf = logits[top1_idx]
+        label = self.emotion_labels.get(top1_idx, f"class_{top1_idx}")
 
-        return dominant_emotion, emotion_prob
+        return label, conf
     
-    def _pre_process_face(self, face_frame):
-        # Resize to model input_size
-        face_frame = cv2.resize(face_frame,(self.input_width, self.input_height), interpolation=cv2.INTER_LINEAR)
+    def _pre_process_face(self, face_frame, input_size=(224,224)):
+        size = input_size[0]  # assuming square, like 224x224
 
-        # Convert to grayscale
-        if len(face_frame.shape) == 3 and self.input_shape[-1] == 1:
-            face_frame = cv2.cvtColor(face_frame, cv2.COLOR_BGR2GRAY)
-            face_frame = np.expand_dims(face_frame, axis=-1)
+        # 1) make sure we have 3 channels
+        if len(face_frame.shape) == 2 or face_frame.shape[2] == 1:
+            image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
-        # Normalize pixel values
+        # 2) BGR -> RGB
+        face_frame = cv2.cvtColor(face_frame, cv2.COLOR_BGR2RGB)
+
+        h, w = face_frame.shape[:2]
+
+        # 3) resize shortest side to `size`, keep aspect ratio
+        if h < w:
+            new_h = size
+            new_w = int(round(w * size / h))
+        else:
+            new_w = size
+            new_h = int(round(h * size / w))
+
+        face_frame = cv2.resize(face_frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+
+        # 4) center crop to size x size (like torchvision.CenterCrop)
+        y1 = max(0, (new_h - size) // 2)
+        x1 = max(0, (new_w - size) // 2)
+        face_frame = face_frame[y1:y1 + size, x1:x1 + size]
+
+        # 5) ToTensor(): HWC uint8 [0,255] -> float32 CHW [0,1]
         face_frame = face_frame.astype(np.float32) / 255.0
 
-        # Added batch dimention
-        face_frame = np.expand_dims(face_frame, axis=0)
+        # 6) HWC -> CHW and add batch dim
+        face_frame = np.transpose(face_frame, (2, 0, 1))   # [C, H, W]
+        face_frame = np.expand_dims(face_frame, axis=0)    # [1, C, H, W]
 
         return face_frame
 

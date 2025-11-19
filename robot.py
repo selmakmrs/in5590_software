@@ -1,4 +1,6 @@
 from enum import Enum
+import select
+import sys
 import threading
 import queue
 import time
@@ -8,13 +10,14 @@ from collections import deque
 from body import BODY
 from oled import OLED
 from detector import DETECTOR
+from led import LED
 
 EMOTIONS = {
-    "happy" : 0.9,
-    "angry" : 0.7,
-    "sad"   : 0.4,
+    "happy" : 0.95,
+    "angry" : 0.6,
+    "sad"   : 0.5,
     "suprise" : 0.6,
-    "fear" : 0.3
+    "fear" : 0.5
 
 }
 
@@ -29,12 +32,13 @@ class Robot:
         self.detector = DETECTOR()
         self.body = BODY()
         self.oled = OLED()
+        self.led = LED()
         
         # State management
         self.state_lock = threading.Lock()
         self.current_state = RobotState.IDLE
         self.requested_state = None
-        self.current_emotion = None
+        self._current_emotion = None
         
         # Thread-safe queues for communication
         self.face_queue = queue.Queue(maxsize=1)
@@ -50,15 +54,16 @@ class Robot:
         self.sequence_lock = threading.Lock()
 
         # Emotion confidence system
+        self.emotion_lock = threading.Lock()
         self.emotion_history = deque(maxlen=5)
         self.emotion_confidence_threshold = 0.7
         self.min_consitent_frames = 2  # Require 3 consitent detections
         
         # Timing parameters
-        self.emotion_duration = 6.0  # How long to hold emotion
+        # self.emotion_duration = 6.0  # How long to hold emotion
         self.idle_transition_time = 2.0
         self.last_face_time = 0
-        self.emotion_start_time = 0
+        # self.emotion_start_time = 0
         self.state_cooldown = 0.5
         self.last_state_change = 0
 
@@ -71,6 +76,7 @@ class Robot:
         print("Starting Robot ... ")
         self.detector.start_camera()
         self.body.start()
+        self.led.start()
         # self.oled.start()
 
         threads = [
@@ -97,8 +103,12 @@ class Robot:
         for thread in self.threads:
             thread.join(timeout=2.0)
             
-        self.body.close()
-        self.detector.cleanup()
+        try: 
+            self.body.close()
+            self.detector.cleanup()
+            self.led.close()
+        except Exception as e:
+            print(f"Error shutting down ", e)
         print("Robot Shutdown complete")
 
     #----------------------------------------------#
@@ -159,6 +169,15 @@ class Robot:
         with self.control_lock:
             return self.face_detected    
 
+    def _set_current_emotion(self, emotion):
+        with self.emotion_lock:
+            self._current_emotion = emotion
+
+    @property
+    def current_emotion(self):
+        with self.emotion_lock:
+            return self._current_emotion
+
     #----------------------------------------------#
     #--------- Running Loops Functions ------------#
     #----------------------------------------------#
@@ -211,10 +230,10 @@ class Robot:
                 # Debug Info
                 # cv2.imshow("Frame", frame)
 
-                key = cv2.waitKey(1)
-                if key == ord('q'):
-                    self.running = False
-                    break
+                # key = cv2.waitKey(1)
+                # if key == ord('q'):
+                #     self.running = False
+                #     break
             
             except Exception as e:
                 print(f"Error in vision loop: ", e)
@@ -262,7 +281,9 @@ class Robot:
                 ) / self.min_consitent_frames
 
                 print(f"Consitent Emotion {consistent_emotion} (conf: {avg_confidence:.2f})")
-                self._update_queue(self.emotion_queue, consistent_emotion)
+                if self.emotion_queue.empty():
+                    self._update_queue(self.emotion_queue, consistent_emotion)
+                    self.emotion_history.clear()
 
     def _oled_loop(self):
         print("Starting oled loop ... ")
@@ -305,18 +326,21 @@ class Robot:
 
                     # Check for emotion detection
                     elif not self.emotion_queue.empty():
-                        emotion = self.emotion_queue.get()
-                        self.current_emotion = emotion
-                        self.emotion_start_time = time.time()
-                        self._request_state_change(RobotState.EMOTION)
+                        try:
+                            emotion = self.emotion_queue.get_nowait()
+                            self._set_current_emotion(emotion)
+                            # self.emotion_start_time = time.time()
+                            self._request_state_change(RobotState.EMOTION)
+                        except queue.Empty:
+                            pass
 
                 elif current_state == RobotState.EMOTION:
                     
                     if not self._is_sequence_running():
                         self._run_emotion_sequence()
 
-                    if not self._is_sequence_running():
-                        self._request_state_change(RobotState.IDLE)
+                        if not self._is_sequence_running():
+                            self._request_state_change(RobotState.IDLE)
 
                    
                 
@@ -365,7 +389,7 @@ class Robot:
                     
 
 
-                elif current_state == EMOTIONS:
+                elif current_state == RobotState.EMOTION:
                     time.sleep(0.1)
 
                 else:
@@ -391,26 +415,27 @@ class Robot:
         print("Command listener started")
         while self.running:
             try:
-                cmd = input("> ").strip().lower()
-                if cmd:
-                    self._update_queue(self.command_queue, cmd)
-
-            except EOFError:
-                break
+                # Check if input is available (Unix/Linux)
+                if select.select([sys.stdin], [], [], 0.5)[0]:
+                    cmd = sys.stdin.readline().strip().lower()
+                    if cmd:
+                        self._update_queue(self.command_queue, cmd)
             except Exception as e:
                 print("Input error: ", e)
-                
+                break
+                    
 
     #--------------------------------------------#
     #---------------- Emotions ------------------#
     #--------------------------------------------#
     def _run_emotion_sequence(self):
         try:
-            if self.current_emotion:
+            if self.current_emotion is not None:
                 print(f"Running emotion: {self.current_emotion}")
 
                 self._set_sequence_running(True)
                 self.oled.run_emotion(self.current_emotion)
+                self.led.run_emotion(self.current_emotion)
                 match self.current_emotion:
                     case "happy":
                         self.body.happy()
@@ -425,8 +450,9 @@ class Robot:
 
                 time.sleep(1)
                 self.body.idle()
+                self.led.default()
                 print(f"Emotion sequence {self.current_emotion} complete")
-                self.current_emotion = None
+                self._set_current_emotion(None)
                 self._set_sequence_running(False)
 
         except Exception as e:
@@ -464,8 +490,8 @@ class Robot:
 
         elif cmd in EMOTIONS:
             print("Triggered Emotion: ", cmd)
-            self.current_emotion = cmd
-            self.emotion_start_time = time.time()
+            self._set_current_emotion(cmd)
+            # self.emotion_start_time = time.time()
             self._request_state_change(RobotState.EMOTION)
             
 
