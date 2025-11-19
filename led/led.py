@@ -219,7 +219,7 @@ class LED:
                 "magenta",
                 "yellow"
                 ),
-                time_on=0.5,
+                time_on=0.3,
                 loops=6
             )
             # self.change_color(color)
