@@ -13,11 +13,11 @@ from detector import DETECTOR
 from led import LED
 
 EMOTIONS = {
-    "happy" : 0.9,
-    "angry" : 0.7,
-    "sad"   : 0.4,
+    "happy" : 0.95,
+    "angry" : 0.6,
+    "sad"   : 0.5,
     "suprise" : 0.6,
-    "fear" : 0.3
+    "fear" : 0.5
 
 }
 
@@ -281,7 +281,9 @@ class Robot:
                 ) / self.min_consitent_frames
 
                 print(f"Consitent Emotion {consistent_emotion} (conf: {avg_confidence:.2f})")
-                self._update_queue(self.emotion_queue, consistent_emotion)
+                if self.emotion_queue.empty():
+                    self._update_queue(self.emotion_queue, consistent_emotion)
+                    self.emotion_history.clear()
 
     def _oled_loop(self):
         print("Starting oled loop ... ")
