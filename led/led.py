@@ -9,7 +9,7 @@ class LED:
         self,
         pixel_pin=board.D18,
         num_pixels=22,
-        brightness=0.9,
+        brightness=1.0,
         pixel_order=neopixel.GRB,
     ):
         # Hardware config
@@ -188,13 +188,7 @@ class LED:
             self.change_color("idle")
 
         elif emotion == "happy":
-            # Bright yellow + a few quick soft blinks
-            # self.blinking_sequence(
-            #     sequence=("happy", "off"),
-            #     time_on=0.2,
-            #     time_off=0.1,
-            #     loops=3,
-            # )
+
             self.change_color("happy")
 
         elif emotion == "sad":
