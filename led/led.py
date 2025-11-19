@@ -30,7 +30,7 @@ class LED:
             "happy": (255, 255, 0),      # yellow
             "sad": (0, 0, 255),          # blue
             "angry": (255, 0, 0),        # red
-            "surprise": (255, 255, 255), # bright white
+            "suprise": (255, 255, 255), # bright white
             "fear": (128, 0, 128),       # purple
 
             # Generic colors if you want to use them
@@ -214,13 +214,12 @@ class LED:
             )
             self.change_color("angry")
 
-        elif emotion == "surprise":
+        elif emotion == "suprise":
             # One strong white flash, then idle color
             color = random.choice(self.color_codes.keys())
-            print("color")
             self.change_color(color)
             # self.blinking_sequence(
-            #     sequence=("surprise", "off"),
+            #     sequence=("suprise", "off"),
             #     time_on=0.15,
             #     time_off=0.15,
             #     loops=1,
