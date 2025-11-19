@@ -407,14 +407,14 @@ class BODY:
         "Make the robot jump left"
         base_deg = -90
         body_deg = 180
-        head_deg = -100
+        head_deg = -120
         self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
 
     def jump_right(self, duration = 1.5, hold_duration=3):
         "Make the robot jump right"
         base_deg = 90
         body_deg = -180
-        head_deg = 100
+        head_deg = 120
         self.rotate_wheel_geared(base_deg=base_deg, body_deg=body_deg, head_deg=head_deg, duration=duration, hold_duration=hold_duration)
 
     def jump_back(self, duration=2, hold_duration=2):
