@@ -1,6 +1,7 @@
 import board
 import neopixel
 import time
+import random
 
 
 class LED:
@@ -197,8 +198,8 @@ class LED:
 
         elif emotion == "sad":
             # Static blue or very slow breathing
-            self.breathing("sad", cycles=1, period=4.0)
-            self.change_color("blue")
+            # self.breathing("sad", cycles=1, period=4.0)
+            self.change_color("sad")
             
 
         elif emotion == "angry":
@@ -215,7 +216,8 @@ class LED:
 
         elif emotion == "surprise":
             # One strong white flash, then idle color
-            self.change_color("magenta")
+            color = random.choice(self.color_codes.keys())
+            self.change_color(color)
             # self.blinking_sequence(
             #     sequence=("surprise", "off"),
             #     time_on=0.15,
