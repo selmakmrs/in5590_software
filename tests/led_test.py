@@ -25,27 +25,31 @@ def input_thread():
 # start the input reader
 threading.Thread(target=input_thread, daemon=True).start()
 
-# MAIN LOOP
-while True:
-    # 1) update display / sequences
+try: 
+    # MAIN LOOP
+    while True:
+        # 1) update display / sequences
 
-    # 2) check if we got a command
-    try:
-        cmd = cmd_queue.get_nowait()
-    except queue.Empty:
-        cmd = None
+        # 2) check if we got a command
+        try:
+            cmd = cmd_queue.get_nowait()
+        except queue.Empty:
+            cmd = None
 
-    if cmd and cmd in EMOTIONS or cmd == "idle":
-        led.show_emotion(cmd)
+        if cmd and cmd in EMOTIONS or cmd == "idle":
+            led.show_emotion(cmd)
 
-    elif cmd and cmd in COLORS:
-        led.change_color(cmd)
+        elif cmd and cmd in COLORS:
+            led.change_color(cmd)
+            
+
+        # 3) small sleep so we don’t burn CPU
+        time.sleep(0.02)   # ~50 FPS
+
+except KeyboardInterrupt:
+    led.close()
+            
         
-
-    # 3) small sleep so we don’t burn CPU
-    time.sleep(0.02)   # ~50 FPS
-		
-    
 
 
 
