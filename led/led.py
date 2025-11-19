@@ -7,7 +7,7 @@ class LED:
     def __init__(
         self,
         pixel_pin=board.D18,
-        num_pixels=24,
+        num_pixels=22,
         brightness=0.5,
         pixel_order=neopixel.GRB,
     ):
