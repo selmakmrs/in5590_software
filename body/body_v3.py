@@ -116,8 +116,9 @@ class BODY:
         self._happy_sequence = [
             lambda: self.tilt_left(speed=random.randint(100,200)),
             lambda: self.tilt_right(speed=random.randint(100,200)),
-            lambda: self.jump_left(duration=2,hold_duration=3),
-            lambda: self.jump_right(duration=2,hold_duration=3),
+            lambda: self.home_position(speed=random.randint(100,200)),
+            # lambda: self.jump_left(duration=2,hold_duration=3),
+            # lambda: self.jump_right(duration=2,hold_duration=3),
             lambda: self.sway(duration=2, cycles=1)
         ]
 
