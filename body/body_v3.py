@@ -125,8 +125,8 @@ class BODY:
         self._angry_sequence = [
             lambda: self.tilt_left(speed=random.randint(200,300)),
             lambda: self.tilt_right(speed=random.randint(200,300)),
-            lambda: self.jump_left(duration=0.5,hold_duration=4),
-            lambda: self.jump_right(duration=0.5,hold_duration=4),
+            lambda: self.jump_left(duration=1,hold_duration=1),
+            lambda: self.jump_right(duration=1,hold_duration=1),
             lambda: self.jump_forward(duration=1, hold_duration=7),
             lambda: self.move_position(HEAD_ID,random.randint(300,400),speed=random.randint(200,300)),
             lambda: self.move_position(HEAD_ID,random.randint(600,700),speed=random.randint(200,300)),
@@ -134,8 +134,11 @@ class BODY:
             ]
         
         self._sad_sequence = [
-            lambda: self.tilt_left(speed=random.randint(50,100)),
-            lambda: self.tilt_right(speed=random.randint(50,100)),
+            lambda: self.tilt_left(speed=random.randint(100,120)),
+            lambda: self.tilt_right(speed=random.randint(100,120)),
+            lambda: self.look_left(speed=100),
+            lambda: self.look_right(speed=100),
+            lambda: self.home_position(speed=100),
             lambda: self.sway(duration=3, cycles=1)
         ]
 
@@ -351,7 +354,7 @@ class BODY:
         if self.is_looking_up:
             return
         self.rotate_wheel_geared(base_deg=180, head_deg=-180, duration=duration, return_to_start=False)
-        # self.calibrate()
+        self.calibrate()
         self.is_looking_up = True
 
     def look_neutral(self, duration=2):
