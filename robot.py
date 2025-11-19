@@ -431,12 +431,13 @@ class Robot:
     def _run_emotion_sequence(self):
         try:
             if self.current_emotion is not None:
-                print(f"Running emotion: {self.current_emotion}")
+                current_emotion = self.current_emotion
+                print(f"Running emotion: {current_emotion}")
 
                 self._set_sequence_running(True)
-                self.oled.run_emotion(self.current_emotion)
-                self.led.run_emotion(self.current_emotion)
-                match self.current_emotion:
+                self.oled.run_emotion(current_emotion)
+                self.led.run_emotion(current_emotion)
+                match current_emotion:
                     case "happy":
                         self.body.happy()
                     case "sad":
@@ -451,12 +452,12 @@ class Robot:
                 time.sleep(1)
                 self.body.idle()
                 self.led.default()
-                print(f"Emotion sequence {self.current_emotion} complete")
+                print(f"Emotion sequence {current_emotion} complete")
                 self._set_current_emotion(None)
                 self._set_sequence_running(False)
 
         except Exception as e:
-            print(f"Error running emotion {self.current_emotion}", e)
+            print(f"Error running emotion {current_emotion}", e)
             self._set_sequence_running(False)
 
     # ========== Command Center ==================
