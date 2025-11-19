@@ -211,8 +211,18 @@ class LED:
 
         elif emotion == "suprise":
             # One strong white flash, then idle color
-            color = random.choice(list(self.color_codes.keys()))
-            self.change_color(color)
+            # color = random.choice(list(self.color_codes.keys()))
+            self.blinking_sequence(
+                ("red",
+                "green",
+                "blue",
+                "magenta",
+                "yellow"
+                ),
+                time_on=0.5,
+                loops=6
+            )
+            # self.change_color(color)
             # self.blinking_sequence(
             #     sequence=("suprise", "off"),
             #     time_on=0.15,
