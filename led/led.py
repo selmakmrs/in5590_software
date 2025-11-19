@@ -54,7 +54,8 @@ class LED:
                 pixel_order=self.pixel_order,
             )
         # Turn everything off on start
-        self.change_color("off")
+        # self.change_color("off")
+        self.default()
 
     def close(self):
         """Turn LEDs off and release the strip."""
@@ -174,7 +175,7 @@ class LED:
 
     # --- High-level emotion helper ---
 
-    def show_emotion(self, emotion):
+    def run_emotion(self, emotion):
         """
         High-level helper: call this from your robot state machine.
         Each emotion uses a slightly different pattern.
