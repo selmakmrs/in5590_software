@@ -400,7 +400,7 @@ class Robot:
 
 
                 elif current_state == RobotState.EMOTION:
-
+                    time.sleep(0.1)
                     self._set_sequence_running(True)
                     emotion = self._current_emotion
                     
