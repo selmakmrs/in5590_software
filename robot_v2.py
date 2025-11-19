@@ -63,9 +63,13 @@ class Robot:
         # self.emotion_duration = 6.0  # How long to hold emotion
         self.idle_transition_time = 2.0
         self.last_face_time = 0
-        # self.emotion_start_time = 0
+        self.emotion_start_time = 0
         self.state_cooldown = 0.5
         self.last_state_change = 0
+
+        # LED chekck
+        self._run_emotion_led = True
+        self._run_idle_led = False
 
         # Threads
         self.threads = []
@@ -84,6 +88,7 @@ class Robot:
             threading.Thread(target=self._oled_loop, name="Oled"),
             threading.Thread(target=self._state_loop, name="State loop", daemon=True),
             threading.Thread(target=self._body_loop, name = "Body",daemon=True),
+            threading.Thread(target=self._led_loop, name = "LED",daemon=True),
             threading.Thread(target=self._command_loop, name = "Commands",daemon=True)   
 
         ]
@@ -296,6 +301,9 @@ class Robot:
                 elif self.current_state == RobotState.TRACKING:
                     self.oled.track()
 
+                elif self.current_state == RobotState.EMOTION:
+                    self.oled.run_emotion(self._current_emotion)
+
             except Exception as e:
                 print(f"Failed to update oled", e)
 
@@ -329,18 +337,18 @@ class Robot:
                         try:
                             emotion = self.emotion_queue.get_nowait()
                             self._set_current_emotion(emotion)
-                            # self.emotion_start_time = time.time()
+                            self.emotion_start_time = time.time()
                             self._request_state_change(RobotState.EMOTION)
                         except queue.Empty:
                             pass
 
                 elif current_state == RobotState.EMOTION:
                     
-                    if not self._is_sequence_running():
-                        self._run_emotion_sequence()
+                    # if not self._is_sequence_running():
+                    #     self._run_emotion_sequence()
 
-                        if not self._is_sequence_running():
-                            self._request_state_change(RobotState.IDLE)
+                    if (not self._is_sequence_running() and time.time() - self.emotion_start_time >= 4):
+                        self._request_state_change(RobotState.IDLE)
 
                    
                 
@@ -390,7 +398,22 @@ class Robot:
 
 
                 elif current_state == RobotState.EMOTION:
-                    time.sleep(0.1)
+
+                    self._set_sequence_running(True)
+                    emotion = self._current_emotion
+                    
+                    if hasattr(self.body, emotion):
+                        move = getattr(self.body, emotion)
+                        if callable(move):
+                            try:
+                                move()
+                            except Exception as e:
+                                print(f"Error while running {emotion} body: {e}\n")
+                        else:
+                            print(f"'{emotion}' is not a function.\n")
+
+                    self._set_sequence_running(False)
+                    
 
                 else:
                     time.sleep(0.05)
@@ -423,6 +446,21 @@ class Robot:
             except Exception as e:
                 print("Input error: ", e)
                 break
+
+
+    def _led_loop(self):
+        while self.running:
+            
+            if self.current_state == RobotState.EMOTION:
+                if self._run_emotion_led:
+                    self.led.run_emotion(self._current_emotion)
+                    self._run_emotion_led = False
+                    self._run_idle_led = True
+            else:
+                if self._run_idle_led:
+                    self.led.run_emotion("idle")
+                    self._run_emotion_led = True
+                    self._run_idle_led = False
                     
 
     #--------------------------------------------#
@@ -491,7 +529,7 @@ class Robot:
         elif cmd in EMOTIONS:
             print("Triggered Emotion: ", cmd)
             self._set_current_emotion(cmd)
-            # self.emotion_start_time = time.time()
+            self.emotion_start_time = time.time()
             self._request_state_change(RobotState.EMOTION)
             
 
