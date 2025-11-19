@@ -446,6 +446,7 @@ class Robot:
                 th_body.start(); th_led.start()
 
                 th_body.join()
+                th_led.join()
                 # led = threading.Thread(target=)
                 # self.led.run_emotion(current_emotion)
                 # match current_emotion:
