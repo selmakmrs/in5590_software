@@ -433,8 +433,6 @@ class Robot:
             print(f"Error running emotion {self.current_emotion}", e)
             self._set_sequence_running(False)
 
-
-
     # ========== Command Center ==================
 
     def _proccess_commands(self):
@@ -445,7 +443,6 @@ class Robot:
                 self._execute_command(cmd)
             except queue.Empty:
                 break
-
 
     def _execute_command(self, cmd):
         self._set_sequence_running(True)
@@ -477,6 +474,9 @@ class Robot:
 
         elif cmd in ["look down", "down", "neutral", "look neutral"]:
             self.body.look_neutral()
+
+        elif cmd == "home":
+            self.body.home_position()
 
 
         self._set_sequence_running(False)

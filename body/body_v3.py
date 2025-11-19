@@ -118,7 +118,7 @@ class BODY:
             lambda: self.tilt_right(speed=random.randint(100,200)),
             lambda: self.jump_left(duration=2,hold_duration=3),
             lambda: self.jump_right(duration=2,hold_duration=3),
-            lambda: self.sway(duration=2, cycles=2)
+            lambda: self.sway(duration=2, cycles=1)
         ]
 
         self._angry_sequence = [
