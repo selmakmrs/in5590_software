@@ -114,8 +114,8 @@ class BODY:
         ]
 
         self._happy_sequence = [
-            lambda: self.tilt_left(speed=random.randint(100,200)),
-            lambda: self.tilt_right(speed=random.randint(100,200)),
+            lambda: self.tilt_left(speed=random.randint(200,300)),
+            lambda: self.tilt_right(speed=random.randint(200,300)),
             # lambda: self.home_position(speed=random.randint(100,200)),
             # lambda: self.jump_left(duration=2,hold_duration=3),
             # lambda: self.jump_right(duration=2,hold_duration=3),
@@ -124,8 +124,8 @@ class BODY:
         ]
 
         self._angry_sequence = [
-            lambda: self.tilt_left(speed=random.randint(300,400)),
-            lambda: self.tilt_right(speed=random.randint(300,400)),
+            lambda: self.tilt_left(speed=random.randint(300,500)),
+            lambda: self.tilt_right(speed=random.randint(300,500)),
             lambda: self.jump_left(duration=1,hold_duration=1),
             lambda: self.jump_right(duration=1,hold_duration=1),
             lambda: self.jump_forward(duration=1, hold_duration=7),
