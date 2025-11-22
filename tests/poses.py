@@ -30,6 +30,7 @@ threading.Thread(target=input_thread, daemon=True).start()
 try: 
     # MAIN LOOP
     while True:
+        oled.update()
         # 1) update display / sequences
 
         # 2) check if we got a command
