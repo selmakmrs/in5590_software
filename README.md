@@ -62,11 +62,6 @@ $ python
 
 ## 3) Images from testing the robot
 
-<!-- delete from here-->
-Take a photo of the robot/prototype in operation. Additionally, make a GIF that shows 
-the robot moving.
-<!-- ....to here-->
-
 ![Image of the prototype in action](./poster/images/3.png)
 
 [![GIF of the prototype in action](./poster/images/3.gif)](./poster/main.pdf)
