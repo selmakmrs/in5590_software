@@ -131,5 +131,5 @@ if you started the process again.
 
 ## References
 
-[^1] (https://huggingface.co/spaces/sam749/YuNet-face-detection/blob/main/face_detection_yunet_2023mar.onnx)
-[^2] (https://www.kaggle.com/datasets/jonathanoheix/face-expression-recognition-dataset/data)
+[^1]: (https://huggingface.co/spaces/sam749/YuNet-face-detection/blob/main/face_detection_yunet_2023mar.onnx)
+[^2]: (https://www.kaggle.com/datasets/jonathanoheix/face-expression-recognition-dataset/data)
