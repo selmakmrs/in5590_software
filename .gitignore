@@ -1,3 +1,7 @@
 venv/
 */__pycache__
 test_here.html
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
