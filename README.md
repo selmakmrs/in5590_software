@@ -111,6 +111,9 @@ I adapted the MicroPython version so it could run in regular Python on the Raspb
 However, during testing, one of the screens broke, and we had to replace both with new OLED screens. These new screens used I²C instead of SPI, which made the animation significantly slower and choppier.
 
 - **Evaluation:** To make the I2C screens uasble we lowered the frame rate, modified the robot-eyes library to draw more pixels per update. After this the animations were able to run smoothly again.
+![Image of the milstone 2](./poster/images/milestrone_2.png)
+
+
 
 
 
@@ -130,15 +133,19 @@ We initially tested a small pretrained emotion-recognition model, but when runni
     - Improve accuracy for the specific emotions we needed
     - Reduce inference time to make it viable for real-time use
 After training and optimizing the model, the robot was finally able to detect emotions quickly and accurately enough for live interaction.
+![Gif of the milstone 3](./poster/images/milestone_3.gif)
+
 
 
 <!-- ....to here-->
 ## 6) Future work
 
-<!-- delete from here to end of file -->
+For future work, We would like to add a microphone and a speaker so the robot can react to sound and make small expressive noises of its own. We would also investigate ways to reduce the mechanical friction noise produced by the current design. Additionally, we would work on increasing the robot’s response time to detected emotions, so that the emotional reactions feel more immediate and natural.
 
-In one paragraph, describe future work for your prototype. Moreover, describe what you would do different
-if you started the process again.
+If we were to start the process again, we would first address the cabling issues inside the robot. The cables twist easily when the servos run in wheel mode, which is necessary because the inner tooth wheel is too small relative to the cylinder. This means the robot cannot make large movements in joint mode, so it often rotates more than intended and loses track of its position. Designing a larger gear or a more robust internal layout would avoid these problems.
+
+Another improvement would be to redesign the head mechanism so it can move in both yaw and roll. Greater head mobility would allow the robot to express more emotions and improve its overall character animation.
+
 
 
 
