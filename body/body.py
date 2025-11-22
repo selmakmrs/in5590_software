@@ -484,7 +484,7 @@ class BODY:
         self.look_neutral()
 
     def fear(self):
-        pass
+        time.sleep(6)
 
 
 
