@@ -66,19 +66,6 @@ $ python
 
 [![GIF of the prototype in action](./poster/images/3.gif)](./poster/main.pdf)
 
-<!-- delete from here-->
-**GIF instructions:** Make a GIF that shows the prototype working. The GIF should:
-
-- Not be more than 10 seconds long.
-- Not be more than 25MB.
-- Be 1:1 ratio.
-
-FFmpeg can help you with the enlisted requirements. Here is a starting point:
-
-```
-ffmpeg -i IMG_4730.MOV -t 10s -vf 'crop=600:600' -r 15  output/3.gif
-```
-**Deliverables:** Image and GIF showing the robot in action as `./poster/images/3.png` and `./poster/images/3.gif`.
 
 ## 4) Poster
 
