@@ -5,10 +5,9 @@ Siver Meek Strand & Selma Karoline Matilde Ramber Storstad
 
 ## 1) Optimization
 The optimization we performed for our robot focused on improving its ability to detect a person’s emotion. To achieve this, we used two different models: one for face detection and one for emotion classification.
-For face detection, we used the YuNet model
-(https://huggingface.co/spaces/sam749/YuNet-face-detection/blob/main/face_detection_yunet_2023mar.onnx).
+For face detection, we used the YuNet model [^1].
 This model is responsible for detecting the face used as input to the emotion classifier, and it also allows the robot to track faces in real time.
-For emotion detection, we trained a YOLO-based model using the Ultralytics Python library. We used a dataset from Kaggle (https://www.kaggle.com/datasets/jonathanoheix/face-expression-recognition-dataset/data), which contains images labeled with seven emotions: angry, disgust, fear, happy, neutral, sad, and surprise. After training, the model reached a top-1 accuracy of 0.7, and the confusion matrix looked promising [insert confusion matrix].
+For emotion detection, we trained a YOLO-based model using the Ultralytics Python library. We used a dataset from Kaggle [^2], which contains images labeled with seven emotions: angry, disgust, fear, happy, neutral, sad, and surprise. After training, the model reached a top-1 accuracy of 0.7, and the confusion matrix looked promising [insert confusion matrix].
 When using the model in a live camera feed, the quality of emotion recognition decreased, which was expected. Some emotions were very easy for the model to classify (e.g., happy and angry), while others were more difficult (e.g., sad and disgust). We also only wanted the robot to react when a person expressed the emotion clearly.
 To handle these issues, we tested the model on the Raspberry Pi camera with five different people. Each person was asked to clearly display each emotion. We then recorded the confidence scores the model produced for the predicted emotion. Using these scores, we set a custom threshold for each emotion:
 •	Emotions like happy, angry, and surprised consistently produced high confidence values → higher thresholds.
@@ -130,14 +129,7 @@ if you started the process again.
 
 
 
-## Deliverables
+## References
 
-Remove or comment out all the text in this README labeled with: 
-
-``` html
-<!-- delete from here-->
-some text
-<!-- ....to here-->
-```
-
-Feel free to use LLMs, such as [ChatGPT](https://gpt.uio.no/), to generate text. However, keep in mind that you are responsible for the content.
+[^1] (https://huggingface.co/spaces/sam749/YuNet-face-detection/blob/main/face_detection_yunet_2023mar.onnx)
+[^2] (https://www.kaggle.com/datasets/jonathanoheix/face-expression-recognition-dataset/data)
