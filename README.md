@@ -115,6 +115,22 @@ However, during testing, one of the screens broke, and we had to replace both wi
 
 
 ### Milestone 3
+- **Task/milestone:** Get face and emotion detection. 
+- **Requirements:**
+    - Detect faces fast.
+    - Detect emotions and process them fast.
+- **Implementation:** We used one model for face detection and a separate trained model for emotion recognition. The face detector finds the face, and the second model predicts the emotion shown.
+
+- **Testing:** Our goal was to use lightweight pretrained models, since the Raspberry Pi has limited processing power and multiple tasks must run at the same time.
+We initially tested a small pretrained emotion-recognition model, but when running it on the Raspberry Pi camera, the predictions were very unreliable. The model struggled to classify the correct emotion during live testing.
+
+
+- **Evaluation:** To solve this, ew trained our own YOLO-based model using a Kaggle facial-expression dataset[^2]. Training the model myself allowed me to:
+    - Use a smaller architecture suitable for the Raspberry Pi
+    - Improve accuracy for the specific emotions we needed
+    - Reduce inference time to make it viable for real-time use
+After training and optimizing the model, the robot was finally able to detect emotions quickly and accurately enough for live interaction.
+
 
 <!-- ....to here-->
 ## 6) Future work
