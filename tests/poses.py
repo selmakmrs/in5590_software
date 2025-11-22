@@ -30,7 +30,7 @@ threading.Thread(target=input_thread, daemon=True).start()
 try: 
     # MAIN LOOP
     while True:
-        # oled.update()
+        oled.update()
         # 1) update display / sequences
 
         # 2) check if we got a command
@@ -45,10 +45,8 @@ try:
                     led.change_color("yellow")
                     oled.roboeyes.set_mood(HAPPY)
                     oled.roboeyes.set_auto_blinker(OFF)
-                    oled.roboeyes.set_idle_mode(OFF)
                     oled.roboeyes.set_position(DEFAULT)
-                    time.sleep(1)
-                    oled.update()
+                
 
                 case "sad":
                     led.change_color("sad")
