@@ -1,35 +1,20 @@
 # Assignment 6 - IN5590
 <!-- replace heading to name of prototype/robot -->
-Selma
+Siver Meek Strand & Selma Karoline Matilde Ramber Storstad
 
-<!--delete from here-->
-In this assignment we'll focus on
-(1) controller optimization,
-(2) getting firmware/software to work,
-and (3) documentation for your robot.
-<!-- ....to here-->
 
 ## 1) Optimization
-<!-- delete from here-->
-Now it is time to optimize the controller of your robot for a certain task. This can be, for example, moving forward as fast as possible, or detecting emotions or people.
+The optimization we performed for our robot focused on improving its ability to detect a person’s emotion. To achieve this, we used two different models: one for face detection and one for emotion classification.
+For face detection, we used the YuNet model
+(https://huggingface.co/spaces/sam749/YuNet-face-detection/blob/main/face_detection_yunet_2023mar.onnx).
+This model is responsible for detecting the face used as input to the emotion classifier, and it also allows the robot to track faces in real time.
+For emotion detection, we trained a YOLO-based model using the Ultralytics Python library. We used a dataset from Kaggle (https://www.kaggle.com/datasets/jonathanoheix/face-expression-recognition-dataset/data), which contains images labeled with seven emotions: angry, disgust, fear, happy, neutral, sad, and surprise. After training, the model reached a top-1 accuracy of 0.7, and the confusion matrix looked promising [insert confusion matrix].
+When using the model in a live camera feed, the quality of emotion recognition decreased, which was expected. Some emotions were very easy for the model to classify (e.g., happy and angry), while others were more difficult (e.g., sad and disgust). We also only wanted the robot to react when a person expressed the emotion clearly.
+To handle these issues, we tested the model on the Raspberry Pi camera with five different people. Each person was asked to clearly display each emotion. We then recorded the confidence scores the model produced for the predicted emotion. Using these scores, we set a custom threshold for each emotion:
+•	Emotions like happy, angry, and surprised consistently produced high confidence values → higher thresholds.
+•	Emotions like sad and fear often produced lower scores → lower thresholds.
+These thresholds determine whether the robot should trigger an emotional response. To avoid false positives, the robot only reacts when the same emotion is detected for at least three consecutive frames, and the confidence score is above the corresponding threshold.
 
-This part will very likely be very different relating to what you plan to optimize. Below are some examples what you can do.
-
-- Optimize forward movement in a x-pedal robot: You can find template code for simple [hill climbing](https://en.wikipedia.org/wiki/Hill_climbing) optimization for a bipedal walker and quadruped [HERE](https://github.com/egedebruin/IN5590-optimization), feel free to use it. The template contains example code to run it on the [ROBIN-HPC cluster](https://robin.wiki.ifi.uio.no/index.php?title=Robin-hpc).
-- Using LLMs: Be aware that LLMs are huge and will likely not fit on a Raspberry Pi, so running the LLM on your own system and controlling the robot from it could be an option. If you want to run everything locally on your robot without connection to any other system, consider using [A smaller LLM](https://huggingface.co/blog/smollm). 
-- Detect faces/emotions: [YOLO](https://github.com/ultralytics/ultralytics) is a very powerful and fast computer vision model. There are [guides](https://docs.ultralytics.com/guides/raspberry-pi/) on how to use it on a Raspberry Pi.
-- You all have very different projects, so feel free to ask us for specific tips on how to implement the software.
-
-When you are "training" your robot, you will likely turn into different results when deploying your robot "in the wild". This can, for example, be the difference of movement in simulation and real life, or your robot needing to recognize people it has never seen before, or emotions on people it has never seen before. We will define this as the "Reality gap".
-OPTIONAL: With whatever you decide to optimize, you will very likely run into this "Reality gap". Find a way to deal with this, by for example making the robot more robust to different faces or environments.
-
-You can use ChatGPT or other AI to **assist** you in optimizing the robot control. For example you can not just ask "What are good control parameters?", but you could use it as starting point. Also, feel free to use AI for optimization-code generation.
-
-**Deliverables:** 
-- Explain what you have optimized, and how you have done it. 
-- Explain what you noticed relating to the "Reality gap", and (OPTIONAL) how you dealt with it.
-- Provide an mp4 video that shows the results of your optimization, save as  `./optimization/video.mp4`. This can for example be your robot reacting to your emotion, a conversation with your robot or your robot moving forward.
-<!-- ....to here-->
 
 ## 2) Firmware/software for the robot/prototype
 
