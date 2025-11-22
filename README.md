@@ -111,6 +111,8 @@ I adapted the MicroPython version so it could run in regular Python on the Raspb
 However, during testing, one of the screens broke, and we had to replace both with new OLED screens. These new screens used I²C instead of SPI, which made the animation significantly slower and choppier.
 
 - **Evaluation:** To make the I2C screens uasble we lowered the frame rate, modified the robot-eyes library to draw more pixels per update. After this the animations were able to run smoothly again.
+
+
 ![Image of the milstone 2](./poster/images/milestrone_2.png)
 
 
@@ -133,6 +135,8 @@ We initially tested a small pretrained emotion-recognition model, but when runni
     - Improve accuracy for the specific emotions we needed
     - Reduce inference time to make it viable for real-time use
 After training and optimizing the model, the robot was finally able to detect emotions quickly and accurately enough for live interaction.
+
+
 ![Gif of the milstone 3](./poster/images/milestone_3.gif)
 
 
