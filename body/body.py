@@ -116,10 +116,10 @@ class BODY:
         self._happy_sequence = [
             lambda: self.tilt_left(speed=random.randint(100,200)),
             lambda: self.tilt_right(speed=random.randint(100,200)),
-            lambda: self.home_position(speed=random.randint(100,200)),
+            # lambda: self.home_position(speed=random.randint(100,200)),
             # lambda: self.jump_left(duration=2,hold_duration=3),
             # lambda: self.jump_right(duration=2,hold_duration=3),
-            lambda: self.sway(duration=2, cycles=1),
+            lambda: self.sway(duration=1, cycles=2),
             lambda: self.shake_head(duration=0.8, cycles=2)
         ]
 
@@ -460,16 +460,26 @@ class BODY:
 
     def happy(self):
         """Make robot happy"""
-        # _do_movement_prob = 0.9
+        _do_movement_two_prob = 0.5
         move = random.choice(self._happy_sequence)
         move()
+
+        if random.random() < _do_movement_two_prob:
+            move = random.choice(self._happy_sequence)
+            move()
+
      
         self.look_neutral()
         self.home_position()
 
     def angry(self):
+        _do_movement_two_prob = 0.5
         move = random.choice(self._angry_sequence)
         move()
+        if random.random() < _do_movement_two_prob:
+            move = random.choice(self._happy_sequence)
+            move()
+
         self.home_position()
 
     def suprise(self):
@@ -478,14 +488,21 @@ class BODY:
         self.home_position()
 
     def sad(self):
+        _do_movement_two_prob = 0.5
         move = random.choice(self._sad_sequence)
         move()
-        time.sleep(4)
+        if random.random() < _do_movement_two_prob:
+            move = random.choice(self._happy_sequence)
+            move()
+        else:
+            time.sleep(4)
         self.home_position()
         self.look_neutral()
 
     def fear(self):
-        time.sleep(6)
+        time.sleep(4)
+        move = random.choice(self._sad_sequence)
+        move()
 
 
 
