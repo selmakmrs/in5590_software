@@ -67,7 +67,7 @@ Take a photo of the robot/prototype in operation. Additionally, make a GIF that 
 the robot moving.
 <!-- ....to here-->
 
-[![Image of the prototype in action](./poster/images/3.png)](./poster/main.pdf)
+![Image of the prototype in action](./poster/images/3.png)
 
 [![GIF of the prototype in action](./poster/images/3.gif)](./poster/main.pdf)
 
