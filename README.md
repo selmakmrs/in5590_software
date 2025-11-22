@@ -113,7 +113,7 @@ However, during testing, one of the screens broke, and we had to replace both wi
 - **Evaluation:** To make the I2C screens uasble we lowered the frame rate, modified the robot-eyes library to draw more pixels per update. After this the animations were able to run smoothly again.
 
 
-![Image of the milstone 2](./poster/images/milestrone_2.png)
+        ![Image of the milstone 2](./poster/images/milestrone_2.png)
 
 
 
