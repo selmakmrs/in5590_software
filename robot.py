@@ -79,6 +79,10 @@ class Robot:
         self.led.start()
         # self.oled.start()
 
+        user = input("Type 'ok' to continue: ")
+        while user.strip().lower() != "ok":
+            user = input("Please type exactly 'ok' to continue: ")
+
         threads = [
             threading.Thread(target=self._vision_loop, name="Vision", daemon=True),
             threading.Thread(target=self._oled_loop, name="Oled"),
