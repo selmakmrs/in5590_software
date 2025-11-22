@@ -9,13 +9,15 @@ The optimization we performed for our robot focused on improving its ability to 
 For face detection, we used the YuNet model [^1].
 This model is responsible for detecting the face used as input to the emotion classifier, and it also allows the robot to track faces in real time.
 
-For emotion detection, we trained a YOLO-based model using the Ultralytics Python library. We used a dataset from Kaggle [^2], which contains images labeled with seven emotions: angry, disgust, fear, happy, neutral, sad, and surprise. After training, the model reached a top-1 accuracy of 0.7, and the confusion matrix looked promising [insert confusion matrix].
+For emotion detection, we trained a YOLO-based model using the Ultralytics Python library. We used a dataset from Kaggle [^2], which contains images labeled with seven emotions: angry, disgust, fear, happy, neutral, sad, and surprise. After training, the model reached a top-1 accuracy of 0.7, and the confusion matrix looked promising.
+[![Image of confusion matrix](./optimization\confusion_matrix_normalized.png)]
 
 When using the model in a live camera feed, the quality of emotion recognition decreased, which was expected. Some emotions were very easy for the model to classify (e.g., happy and angry), while others were more difficult (e.g., sad and disgust). We also only wanted the robot to react when a person expressed the emotion clearly.
 
 To handle these issues, we tested the model on the Raspberry Pi camera with five different people. Each person was asked to clearly display each emotion. We then recorded the confidence scores the model produced for the predicted emotion. Using these scores, we set a custom threshold for each emotion:
 * Emotions like happy, angry, and surprised consistently produced high confidence values → higher thresholds.
 * Emotions like sad and fear often produced lower scores → lower thresholds.
+
 These thresholds determine whether the robot should trigger an emotional response. To avoid false positives, the robot only reacts when the same emotion is detected for at least three consecutive frames, and the confidence score is above the corresponding threshold.
 
 
