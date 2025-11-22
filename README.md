@@ -100,13 +100,21 @@ Describe at least three iterations/milestones during the process that was crucia
     - Experiment with different infill.
     - Use ball bearings instead of bushings in the joints.
   
-### Iteration 2
+### Milestone 2
+- **Task/milestone:** Make eyes for the robot.
+- **Requirements:**
+    - Make the robot eye animations run smoothly on two OLED screens.
+- **Implementation:** Connected two OLED screens to the Raspberry Pi 3 B+. The eye animations were based on a pre-made robot-eyes simulation originally created for Arduino [^3], and later ported to MicroPython[^4].
+I adapted the MicroPython version so it could run in regular Python on the Raspberry Pi. The eye images were split into two halves and displayed on each screen.
 
-...
+- **Testing:** We started with two small OLED screens that used the SPI protocol. After adjusting the library to work in Python, the animations looked fantastic.
+However, during testing, one of the screens broke, and we had to replace both with new OLED screens. These new screens used I²C instead of SPI, which made the animation significantly slower and choppier.
 
-### Iteration 3
+- **Evaluation:** To make the I2C screens uasble we lowered the frame rate, modified the robot-eyes library to draw more pixels per update. After this the animations were able to run smoothly again.
 
-...
+
+
+### Milestone 3
 
 <!-- ....to here-->
 ## 6) Future work
@@ -122,3 +130,5 @@ if you started the process again.
 
 [^1]: (https://huggingface.co/spaces/sam749/YuNet-face-detection/blob/main/face_detection_yunet_2023mar.onnx)
 [^2]: (https://www.kaggle.com/datasets/jonathanoheix/face-expression-recognition-dataset/data)
+[^3]: (https://github.com/FluxGarage/RoboEyes)
+[^4]: (https://github.com/mchobby/micropython-roboeyes).
