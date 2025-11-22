@@ -99,6 +99,9 @@ Describe at least three iterations/milestones during the process that was crucia
     - Run topology optimization on the most fragile components.
     - Experiment with different infill.
     - Use ball bearings instead of bushings in the joints.
+
+
+![Image of the milstone 1](./poster/images/milestone_1.png)
   
 ### Milestone 2
 - **Task/milestone:** Make eyes for the robot.
