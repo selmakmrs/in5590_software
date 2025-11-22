@@ -11,7 +11,7 @@ This model is responsible for detecting the face used as input to the emotion cl
 
 For emotion detection, we trained a YOLO-based model using the Ultralytics Python library. We used a dataset from Kaggle [^2], which contains images labeled with seven emotions: angry, disgust, fear, happy, neutral, sad, and surprise. After training, the model reached a top-1 accuracy of 0.7, and the confusion matrix looked promising.
 
-[![Image of confusion matrix](./optimization\confusion_matrix_normalized.png)]
+![Image of confusion matrix](./optimization\confusion_matrix_normalized.png)
 
 When using the model in a live camera feed, the quality of emotion recognition decreased, which was expected. Some emotions were very easy for the model to classify (e.g., happy and angry), while others were more difficult (e.g., sad and disgust). We also only wanted the robot to react when a person expressed the emotion clearly.
 
