@@ -79,7 +79,7 @@ class Robot:
         self.led.start()
         # self.oled.start()
 
-        user = input("Type 'ok' to continue: ")
+        user = input("Place Wiggly in start position, then type 'ok' to continue: ")
         while user.strip().lower() != "ok":
             user = input("Please type exactly 'ok' to continue: ")
 
