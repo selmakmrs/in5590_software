@@ -43,7 +43,7 @@ class Robot:
         # Thread-safe queues for communication
         self.face_queue = queue.Queue(maxsize=1)
         self.emotion_queue = queue.Queue(maxsize=1)
-        self.command_queue = queue.Queue()
+
         
         # Control flags
         self.control_lock = threading.Lock()
@@ -87,8 +87,7 @@ class Robot:
             threading.Thread(target=self._vision_loop, name="Vision", daemon=True),
             threading.Thread(target=self._oled_loop, name="Oled"),
             threading.Thread(target=self._state_loop, name="State loop", daemon=True),
-            threading.Thread(target=self._body_loop, name = "Body",daemon=True),
-            threading.Thread(target=self._command_loop, name = "Commands",daemon=True)   
+            threading.Thread(target=self._body_loop, name = "Body",daemon=True),  
 
         ]
 
@@ -310,7 +309,7 @@ class Robot:
         while self.running:
             try: 
 
-                self._proccess_commands()
+                
 
                 # Get thread-safe state and flag
                 current_state = self._get_state()
@@ -414,19 +413,7 @@ class Robot:
     def _is_face_centered(self, face):
         return self.detector.is_face_centered(face)
     
-    def _command_loop(self):
-        """Reads command from terminal"""
-        print("Command listener started")
-        while self.running:
-            try:
-                # Check if input is available (Unix/Linux)
-                if select.select([sys.stdin], [], [], 0.5)[0]:
-                    cmd = sys.stdin.readline().strip().lower()
-                    if cmd:
-                        self._update_queue(self.command_queue, cmd)
-            except Exception as e:
-                print("Input error: ", e)
-                break
+
                     
 
     #--------------------------------------------#
@@ -466,49 +453,4 @@ class Robot:
 
     # ========== Command Center ==================
 
-    def _proccess_commands(self):
-        """Procceses commands"""
-        while not self.command_queue.empty():
-            try:
-                cmd = self.command_queue.get_nowait()
-                self._execute_command(cmd)
-            except queue.Empty:
-                break
-
-    def _execute_command(self, cmd):
-        self._set_sequence_running(True)
-
-        cmd = cmd.strip()
-        print(f"Command {cmd} accepted")
-
-        if cmd in ["stop", "quit", "exit"]:
-            self.running = False
-            self.close()
-
-        elif cmd == "status":
-            print(f"\n=== Robot Status ===")
-            print(f"  State: {self.current_state.value}")
-            print(f"  Face Detected: {self.face_detected}")
-            print(f"  Sequence Running: {self.sequence_running}")
-            print(f"  Current Emotion: {self.current_emotion}")
-            print(f"===================\n")
-
-        elif cmd in EMOTIONS:
-            print("Triggered Emotion: ", cmd)
-            self._set_current_emotion(cmd)
-            # self.emotion_start_time = time.time()
-            self._request_state_change(RobotState.EMOTION)
-            
-
-        elif cmd in ["look up", "up"]:
-            self.body.look_up()
-
-        elif cmd in ["look down", "down", "neutral", "look neutral"]:
-            self.body.look_neutral()
-
-        elif cmd == "home":
-            self.body.home_position()
-
-
-        self._set_sequence_running(False)
-
+    
