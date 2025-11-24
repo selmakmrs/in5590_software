@@ -108,7 +108,7 @@ class Robot:
             
         try: 
             self.body.close()
-            self.detector.cleanup()
+            self.detector.stop_camera()
             self.led.close()
         except Exception as e:
             print(f"Error shutting down ", e)
