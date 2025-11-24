@@ -503,7 +503,7 @@ class BODY:
         self.look_neutral()
 
     def fear(self):
-        time.sleep(4)
+        time.sleep(6)
         move = random.choice(self._sad_sequence)
         move()
 
@@ -516,79 +516,4 @@ class BODY:
 
 # === EXAMPLE USAGE ===
 if __name__=="__main__":
-
-    body = BODY()
-    print("Satrting")
-    try:
-        body.start()
-
-        # print("Testing look up and neutral")
-        # body.look_up()
-        # time.sleep(4)
-        # body.shake_head()
-        # body.look_left()
-        # body.home_position()
-        # time.sleep(10)
-        # body.look_neutral()
-        # time.sleep(3)
-
-        # print("Testing Joint movemtns movemnt")
-        # print("Look left")
-        # time.sleep(1)
-        # body.look_left()
-        # print("Look right")
-        # time.sleep(2)
-        # body.look_right()
-        # print("Tilt left")
-        # time.sleep(2)
-        # body.tilt_left()
-        # print("Tilit Right")
-        # time.sleep(2)
-        # body.tilt_right()
-
-        # body.move_to_home()
-
-        print("Testing Wheel movments")
-
-        # body.test()
-        
-        # print("Jump back")
-        # time.sleep(1)
-        # body.jump_back()
-        # print("Jump Forward")
-        # time.sleep(1)
-        # body.jump_forward()
-        # print("Jump ledt")
-        # time.sleep(1)
-        # body.jump_left()
-        # print("Jump right")
-        # time.sleep(1)
-        # body.jump_right()
-        # time.sleep(1)
-        # print("Sway")
-        # body.sway()
-
-        # print("Shake head")
-        # time.sleep(1)
-        # body.shake_head()
-
-        # time.sleep(3)
-        # body.move_to_home()
-
-
-        print("Testing Emotion")
-
-        print("Happy")
-        time.sleep(1)
-        body.happy()
-
-        time.sleep(2)
-        print("Angry")
-        body.angry()
-
-        
-    except KeyboardInterrupt:
-        print("\n⚠️  Interrupted by user")
-        body.emergency_stop()
-    finally:
-        body.close()
+    pass

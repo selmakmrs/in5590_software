@@ -58,10 +58,6 @@ class DETECTOR:
             print("Error loading model: ", e)
             raise
 
-        # Initialize face detector (Haar Cascade - very lightweight)
-        # self.face_cascade = cv2.CascadeClassifier(
-        #     '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
-        # )
 
         self.resolution = resolution
 
@@ -69,8 +65,8 @@ class DETECTOR:
         self.face_detector = cv2.FaceDetectorYN_create(
             yunet_path,
             "",
-            self.resolution,      # (w, h)
-            score_threshold=0.7,  # can tune
+            self.resolution,      
+            score_threshold=0.7, 
             nms_threshold=0.3,
             top_k=1               # we only care about the main face
         )
@@ -185,15 +181,15 @@ class DETECTOR:
         x, y, w, h = face
 
         frame_center_x = self.frame_width // 2
-        # frame_center_y = self.frame_height // 2
+       
 
         face_center_x = x + w / 2
         face_center_y = y + h / 2
 
         x_distance = abs(frame_center_x - face_center_x) / (self.frame_width / 2)
-        # y_distance = abs(frame_center_y - face_center_y) / (self.frame_height / 2)
+       
 
-        return x_distance <= threshold # and y_distance <= threshold
+        return x_distance <= threshold
 
     def is_face_close(self, face_data, min_size=100):
         """
@@ -255,11 +251,6 @@ class DETECTOR:
             print("Empty face_frame after crop, skipping resize")
             return None, 0.0
 
-        # try:
-        #     face_frame = cv2.resize(face_frame, self.input_shape)
-        # except cv2.error as e:
-        #     print("Resize failed:", e)
-        #     return None, 0.0
         
         input_data = self._pre_process_face(face_frame)
         
@@ -308,64 +299,13 @@ class DETECTOR:
 
         return face_frame
 
-
-        
-
-    
-    
-    
-        """
-        Get confidence scores for all emotions
-        
-        Returns:
-            dict: {'happy': 0.8, 'sad': 0.1, 'angry': 0.05, ...}
-        """
-        pass
     
     # === Utility ===
-    def preprocess_face(self, frame, bbox):
-        """
-        Extract and preprocess face region for emotion detection
-        
-        Args:
-            frame: Full image
-            bbox: (x, y, w, h) bounding box
-            
-        Returns:
-            preprocessed_face: Ready for model input
-        """
-        pass
     
-    def draw_debug_info(self, frame, face_data=None, emotion=None):
-        """
-        Draw bounding boxes, labels for debugging
-        
-        Args:
-            frame: Image to draw on
-            face_data: Face detection result
-            emotion: (emotion_name, confidence) tuple
-            
-        Returns:
-            frame: Annotated image
-        """
-        pass
-    
-    def get_fps(self):
-        """
-        Get current detection FPS
-        
-        Returns:
-            float: Frames per second
-        """
-        pass
-    
-    def cleanup(self):
-        """Clean up resources"""
-        pass
 
 
 
-    # ==== Drawing functions for testing purpes ======
+    # ==== Drawing functions for debug purpes ======
     def draw_face_box(self, frame, face):
         """For testing draw face around the captured face"""
         x, y, w, h = face

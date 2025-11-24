@@ -27,18 +27,6 @@ class LumaSSD1306Shim:
         self._crop_box1 = (self.width//2, 0, self.width, self.height)
 
 
-        # self.oled0 = sh1106(i2c0, width=128, height=64, rotate=1)
-        # self.oled1 = sh1106(i2c1, width=128, height=64, rotate=3)
-
-
-
-
-        # Pick driver
-        # if driver.lower() == "sh1106":
-        #     self.device = sh1106(serial, width=width, height=height, rotate=rotate)
-        # else:
-        #     self.device = ssd1306(serial, width=width, height=height, rotate=rotate)
-
         
 
     # --- MicroPython-ish API used by RoboEyes ---

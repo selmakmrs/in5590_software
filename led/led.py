@@ -73,8 +73,6 @@ class LED:
         # Simple: static idle color
         self.change_color("idle")
 
-        # If you later want a breathing effect for idle, you can call:
-        # self.breathing("idle", cycles=1, period=3.0)
 
     def _resolve_color(self, color):
         """Accept either a color name or an (R,G,B) tuple."""
@@ -124,55 +122,6 @@ class LED:
                     self.change_color(color)
                     time.sleep(time_on)
 
-    def breathing(
-        self,
-        color="idle",
-        cycles=1,
-        period=2.0,
-        min_brightness=0.1,
-        max_brightness=1.0,
-        step=0.05,
-    ):
-        """
-        Simple breathing effect by changing global brightness.
-        period: time (seconds) for one full breath (in + out)
-        """
-        if self.pixels is None:
-            raise RuntimeError("LED strip not started. Call start() first.")
-
-        base_color = self._resolve_color(color)
-        self.pixels.fill(base_color)
-
-        original_brightness = self.pixels.brightness
-        self.pixels.show()
-
-        # Time per step (half-cycle)
-        steps = int((max_brightness - min_brightness) / step)
-        if steps <= 0:
-            steps = 1
-        step_time = (period / 2.0) / steps
-
-        for _ in range(cycles):
-            # Fade in
-            b = min_brightness
-            while b <= max_brightness:
-                self.pixels.brightness = b
-                self.pixels.show()
-                time.sleep(step_time)
-                b += step
-
-            # Fade out
-            b = max_brightness
-            while b >= min_brightness:
-                self.pixels.brightness = b
-                self.pixels.show()
-                time.sleep(step_time)
-                b -= step
-
-        # Restore original brightness
-        self.pixels.brightness = original_brightness
-        self.pixels.show()
-
     # --- High-level emotion helper ---
 
     def run_emotion(self, emotion):
@@ -183,8 +132,7 @@ class LED:
         emotion = emotion.lower()
 
         if emotion == "idle":
-            # Slow breathing warm white
-            # self.breathing("idle", cycles=1, period=3.0)
+           
             self.change_color("idle")
 
         elif emotion == "happy":
@@ -200,8 +148,6 @@ class LED:
             self.change_color("happy")
 
         elif emotion == "sad":
-            # Static blue or very slow breathing
-            # self.breathing("sad", cycles=1, period=4.0)
             self.change_color("sad")
             
 
@@ -219,7 +165,6 @@ class LED:
 
         elif emotion == "suprise":
             # One strong white flash, then idle color
-            # color = random.choice(list(self.color_codes.keys()))
             self.blinking_sequence(
                 ("red",
                 "green",
@@ -230,25 +175,12 @@ class LED:
                 time_on=0.3,
                 loops=6
             )
-            # self.change_color(color)
-            # self.blinking_sequence(
-            #     sequence=("suprise", "off"),
-            #     time_on=0.15,
-            #     time_off=0.15,
-            #     loops=1,
-            # )
-            # self.change_color("idle")
+            
 
         elif emotion == "fear":
-            # Purple, a bit flickery
+            # Purple
             self.change_color("fear")
-            # for _ in range(10):
-            #     self.change_color("fear")
-            #     time.sleep(0.05)
-            #     self.change_color("off")
-            #     time.sleep(0.03)
-            # self.change_color("fear")
-
+           
         else:
             # Unknown emotion → fallback to idle
             self.default()

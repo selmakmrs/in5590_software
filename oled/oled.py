@@ -134,23 +134,9 @@ class OLED:
         seq.step( 4020, lambda r : r.eyes_height(40,40))
         seq.step( 4030, lambda r : r.eyes_height(40,40))
         seq.step( 5000, lambda r : r.set_mood(SCARY))
-        # seq.step( 7000, lambda r : r.set_mood(DEFAULT))
         seq.step( 8000, lambda r: r.blink() )
-        seq.step( 8800, lambda r: r.blink() )        
-        # seq.step( 10000, lambda r : r.default()) 
-        seq.step( 10500, lambda r: r.set_mood(DEFAULT) )
-        # seq.step( 10600, lambda r: print(seq.name, "done!") )
+        seq.step( 11400, lambda r: r.blink() )        
 
-
-        # Suprised Sequence
-        # seq = self.roboeyes.sequences.add("surprise")
-        # seq.step( 0,    lambda r: r.open() )
-        # seq.step(200, lambda r: r.set_blink_speed(0.9))
-        # seq.step( 500,  lambda r: r.set_cyclops(True) )   # focus one eye
-        # seq.step( 800,  lambda r: r.vert_flicker(True, 3) )
-        # seq.step( 1500, lambda r: r.vert_flicker(False) )
-        # seq.step( 2000, lambda r: r.set_cyclops(False) )
-        # seq.step( 2100, lambda r: print(seq.name, "done!") )
 
 
 

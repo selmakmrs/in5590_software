@@ -34,7 +34,7 @@ if __name__ == "__main__":
         robot.start()
         
         print("\n✓ Robot is now running!")
-        print("  Commands: happy, sad, angry, surprise, fear, status, quit")
+        # print("  Commands: happy, sad, angry, surprise, fear, status, quit")
         print("  Press Ctrl+C to shutdown\n")
         
         # Keep main thread alive
