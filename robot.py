@@ -14,10 +14,10 @@ from led import LED
 
 EMOTIONS = {
     "happy" : 0.95,
-    "angry" : 0.6,
-    "sad"   : 0.5,
-    "suprise" : 0.6,
-    "fear" : 0.5
+    "angry" : 0.55,
+    "sad"   : 0.4,
+    "suprise" : 0.55,
+    "fear" : 0.4
 
 }
 
