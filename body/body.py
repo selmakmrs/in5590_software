@@ -492,7 +492,7 @@ class BODY:
         move = random.choice(self._sad_sequence)
         move()
         if random.random() < _do_movement_two_prob:
-            move = random.choice(self._happy_sequence)
+            move = random.choice(self._sad_sequence)
             move()
         else:
             time.sleep(4)
