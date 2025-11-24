@@ -1,0 +1,9 @@
+opencv-python
+numpy
+onnxruntime
+picamera2
+dynamixel-sdk
+rpi-lgpio
+luma-oled
+Pillow
+neopixel

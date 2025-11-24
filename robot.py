@@ -451,19 +451,7 @@ class Robot:
 
                 th_body.join()
                 th_led.join()
-                # led = threading.Thread(target=)
-                # self.led.run_emotion(current_emotion)
-                # match current_emotion:
-                #     case "happy":
-                #         self.body.happy()
-                #     case "sad":
-                #         self.body.sad()
-                #     case "angry":
-                #         self.body.angry()
-                #     case "suprise":
-                #         self.body.suprise()
-                #     case "fear":
-                #         self.body.fear()
+
 
                 time.sleep(1)
                 self.body.home_position()
