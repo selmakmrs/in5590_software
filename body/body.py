@@ -216,6 +216,9 @@ class BODY:
             self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_CW_ANGLE_LIMIT, 0)
             self.pkt.write2ByteTxRx(self.port, dxl_id, ADDR_CCW_ANGLE_LIMIT, 1023)
             self.current_mode = JOINT
+
+            time.sleep(0.05)
+
             # Update tracked position when entering joint mode
             self.tracked_positions[dxl_id] = self.get_position(dxl_id)
 
@@ -244,7 +247,7 @@ class BODY:
         
         # In joint mode, read actual position
         pos, comm, err = self.pkt.read2ByteTxRx(self.port, dxl_id, ADDR_PRESENT_POSITION)
-        if comm == COMM_SUCCESS:
+        if comm == COMM_SUCCESS and err == 0:
             self.tracked_positions[dxl_id] = pos
             return pos
         
